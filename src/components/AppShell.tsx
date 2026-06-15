@@ -52,7 +52,7 @@ export function AppShell({ children }: { children: ReactNode }) {
     queryClient.clear();
     await supabase.auth.signOut();
     toast.success("Signed out");
-    navigate({ to: "/auth", replace: true });
+    navigate({ to: "/login", replace: true });
   }
 
   return (

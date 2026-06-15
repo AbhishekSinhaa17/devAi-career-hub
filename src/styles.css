@@ -170,6 +170,16 @@
   * { border-color: var(--color-border); }
 
   ::selection { background: oklch(0.68 0.18 280 / 0.35); }
+
+  /* Fix browser autofill colors */
+  input:-webkit-autofill,
+  input:-webkit-autofill:hover, 
+  input:-webkit-autofill:focus, 
+  input:-webkit-autofill:active {
+    -webkit-box-shadow: 0 0 0 30px var(--color-background) inset !important;
+    -webkit-text-fill-color: var(--color-foreground) !important;
+    transition: background-color 5000s ease-in-out 0s;
+  }
 }
 
 @utility glass-card {
@@ -192,4 +202,17 @@
     linear-gradient(90deg, oklch(1 0 0 / 0.04) 1px, transparent 1px);
   background-size: 48px 48px;
   mask-image: radial-gradient(ellipse at center, black 30%, transparent 75%);
+}
+
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+
+.marquee {
+  animation: marquee var(--duration, 40s) linear infinite;
+}
+
+.marquee:hover {
+  animation-play-state: paused;
 }

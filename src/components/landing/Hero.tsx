@@ -34,7 +34,7 @@ export function Hero() {
 
         <Reveal delay={240}>
           <div className="mt-9 flex flex-col items-center justify-center gap-3 sm:flex-row">
-            <Link to="/auth">
+            <Link to="/signup">
               <Button
                 size="lg"
                 className="group h-12 gap-2 px-7 text-base shadow-xl shadow-primary/25"

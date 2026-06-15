@@ -40,12 +40,12 @@ export function Nav() {
         </nav>
         <div className="flex items-center gap-2">
           <ThemeToggle />
-          <Link to="/auth">
-            <Button variant="ghost" size="sm">
-              Sign in
+          <Link to="/login">
+            <Button variant="ghost" className="text-muted-foreground hover:text-foreground">
+              Sign In
             </Button>
           </Link>
-          <Link to="/auth">
+          <Link to="/signup">
             <Button size="sm" className="group gap-1.5 shadow-lg shadow-primary/20">
               Get started
               <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
