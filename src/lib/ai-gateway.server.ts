@@ -1,16 +1,13 @@
-// Server-only helper for calling Lovable AI Gateway.
+// Server-only helper for calling OpenAI.
 // Loaded only inside createServerFn handlers via dynamic import.
 
-const ENDPOINT = "https://ai.gateway.lovable.dev/v1/chat/completions";
-const DEFAULT_MODEL = "google/gemini-3-flash-preview";
+const ENDPOINT = "https://api.openai.com/v1/chat/completions";
+const DEFAULT_MODEL = "gpt-4o-mini";
 
 // Approximate USD cost per 1K tokens (input, output). Used for analytics estimates.
 const MODEL_PRICING: Record<string, { in: number; out: number }> = {
-  "google/gemini-3-flash-preview": { in: 0.000075, out: 0.0003 },
-  "google/gemini-2.5-flash": { in: 0.000075, out: 0.0003 },
-  "google/gemini-2.5-pro": { in: 0.00125, out: 0.005 },
-  "openai/gpt-5": { in: 0.00125, out: 0.01 },
-  "openai/gpt-5-mini": { in: 0.00025, out: 0.002 },
+  "gpt-4o": { in: 0.005, out: 0.015 },
+  "gpt-4o-mini": { in: 0.00015, out: 0.0006 },
 };
 
 export interface AiMessage {
@@ -57,8 +54,8 @@ async function rawCall(opts: {
   jsonSchema?: { name: string; schema: Record<string, unknown> };
   temperature?: number;
 }): Promise<{ text: string; usage: AiUsage }> {
-  const key = process.env.LOVABLE_API_KEY;
-  if (!key) throw new Error("Missing LOVABLE_API_KEY");
+  const key = process.env.OPENAI_API_KEY;
+  if (!key) throw new Error("Missing OPENAI_API_KEY");
   const model = opts.model ?? DEFAULT_MODEL;
 
   const body: Record<string, unknown> = { model, messages: opts.messages };
