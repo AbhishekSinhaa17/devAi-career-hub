@@ -1,12 +1,11 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import {
-  Sparkles,
   Loader2,
   ArrowRight,
   Github,
@@ -15,15 +14,14 @@ import {
   Eye,
   EyeOff,
   Code2,
-  Zap,
-  Shield,
-  Brain,
   GitBranch,
   FileText,
-  Cpu,
-  Lightbulb,
+  Brain,
   Rocket,
   TrendingUp,
+  Terminal,
+  Cpu,
+  Zap,
 } from "lucide-react";
 
 export const Route = createFileRoute("/login")({
@@ -31,16 +29,348 @@ export const Route = createFileRoute("/login")({
   component: LoginPage,
 });
 
+// ─── Particle Canvas ─────────────────────────────────────────────────────────
+interface Particle {
+  x: number;
+  y: number;
+  vx: number;
+  vy: number;
+  radius: number;
+  opacity: number;
+  color: string;
+  pulse: number;
+  pulseSpeed: number;
+}
+
+function ParticleCanvas() {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const particlesRef = useRef<Particle[]>([]);
+  const animFrameRef = useRef<number>(0);
+  const mouseRef = useRef({ x: -9999, y: -9999 });
+
+  const colors = ["#6366f1", "#8b5cf6", "#a78bfa", "#818cf8", "#c084fc", "#38bdf8"];
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    const resize = () => {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    };
+    resize();
+    window.addEventListener("resize", resize);
+
+    // Init particles
+    const count = Math.min(120, Math.floor((window.innerWidth * window.innerHeight) / 10000));
+    particlesRef.current = Array.from({ length: count }, () => ({
+      x: Math.random() * canvas.width,
+      y: Math.random() * canvas.height,
+      vx: (Math.random() - 0.5) * 0.4,
+      vy: (Math.random() - 0.5) * 0.4,
+      radius: Math.random() * 1.5 + 0.5,
+      opacity: Math.random() * 0.5 + 0.1,
+      color: colors[Math.floor(Math.random() * colors.length)],
+      pulse: Math.random() * Math.PI * 2,
+      pulseSpeed: Math.random() * 0.02 + 0.005,
+    }));
+
+    const onMouseMove = (e: MouseEvent) => {
+      mouseRef.current = { x: e.clientX, y: e.clientY };
+    };
+    window.addEventListener("mousemove", onMouseMove);
+
+    let lastTime = 0;
+    const draw = (time: number) => {
+      const delta = time - lastTime;
+      lastTime = time;
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      const particles = particlesRef.current;
+
+      // Update & draw particles
+      for (let i = 0; i < particles.length; i++) {
+        const p = particles[i];
+        p.pulse += p.pulseSpeed;
+        const pulsedOpacity = p.opacity * (0.7 + 0.3 * Math.sin(p.pulse));
+
+        // Mouse repulsion
+        const dx = p.x - mouseRef.current.x;
+        const dy = p.y - mouseRef.current.y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        if (dist < 120) {
+          const force = (120 - dist) / 120;
+          p.vx += (dx / dist) * force * 0.5;
+          p.vy += (dy / dist) * force * 0.5;
+        }
+
+        // Damping
+        p.vx *= 0.98;
+        p.vy *= 0.98;
+
+        p.x += p.vx;
+        p.y += p.vy;
+
+        // Wrap
+        if (p.x < 0) p.x = canvas.width;
+        if (p.x > canvas.width) p.x = 0;
+        if (p.y < 0) p.y = canvas.height;
+        if (p.y > canvas.height) p.y = 0;
+
+        // Draw particle
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+        ctx.fillStyle = p.color;
+        ctx.globalAlpha = pulsedOpacity;
+        ctx.fill();
+
+        // Draw connections
+        for (let j = i + 1; j < particles.length; j++) {
+          const q = particles[j];
+          const ex = p.x - q.x;
+          const ey = p.y - q.y;
+          const edist = Math.sqrt(ex * ex + ey * ey);
+          if (edist < 100) {
+            ctx.beginPath();
+            ctx.moveTo(p.x, p.y);
+            ctx.lineTo(q.x, q.y);
+            ctx.strokeStyle = p.color;
+            ctx.globalAlpha = (1 - edist / 100) * 0.15;
+            ctx.lineWidth = 0.5;
+            ctx.stroke();
+          }
+        }
+      }
+
+      ctx.globalAlpha = 1;
+      animFrameRef.current = requestAnimationFrame(draw);
+    };
+
+    animFrameRef.current = requestAnimationFrame(draw);
+
+    return () => {
+      cancelAnimationFrame(animFrameRef.current);
+      window.removeEventListener("resize", resize);
+      window.removeEventListener("mousemove", onMouseMove);
+    };
+  }, []);
+
+  return (
+    <canvas
+      ref={canvasRef}
+      className="absolute inset-0 w-full h-full pointer-events-none"
+      style={{ opacity: 0.6 }}
+    />
+  );
+}
+
+// ─── Typing animation hook ────────────────────────────────────────────────────
+function useTypewriter(texts: string[], speed = 80, pause = 2000) {
+  const [displayed, setDisplayed] = useState("");
+  const [textIndex, setTextIndex] = useState(0);
+  const [charIndex, setCharIndex] = useState(0);
+  const [deleting, setDeleting] = useState(false);
+
+  useEffect(() => {
+    const current = texts[textIndex];
+    let timeout: ReturnType<typeof setTimeout>;
+
+    if (!deleting && charIndex <= current.length) {
+      timeout = setTimeout(() => {
+        setDisplayed(current.slice(0, charIndex));
+        setCharIndex((c) => c + 1);
+      }, speed);
+    } else if (!deleting && charIndex > current.length) {
+      timeout = setTimeout(() => setDeleting(true), pause);
+    } else if (deleting && charIndex >= 0) {
+      timeout = setTimeout(() => {
+        setDisplayed(current.slice(0, charIndex));
+        setCharIndex((c) => c - 1);
+      }, speed / 2);
+    } else {
+      setDeleting(false);
+      setTextIndex((t) => (t + 1) % texts.length);
+    }
+
+    return () => clearTimeout(timeout);
+  }, [charIndex, deleting, textIndex, texts, speed, pause]);
+
+  return displayed;
+}
+
+// ─── Code Rain Lines (Matrix-style decorative) ───────────────────────────────
+const CODE_SNIPPETS = [
+  "git commit -m 'feat: AI-powered'",
+  "const resume = await ai.generate()",
+  "npm run analyze --github",
+  "interview.prepare({ ai: true })",
+  "portfolio.deploy({ stack: 'next' })",
+  "roadmap.generate({ goal: 'senior' })",
+];
+
+function FloatingCodeLine({
+  text,
+  delay,
+  top,
+  opacity,
+}: {
+  text: string;
+  delay: number;
+  top: string;
+  opacity: number;
+}) {
+  return (
+    <div
+      className="absolute left-0 whitespace-nowrap font-mono text-xs text-primary/40 select-none pointer-events-none"
+      style={{
+        top,
+        opacity,
+        animation: `login-codeFloat ${18 + delay}s linear ${delay}s infinite`,
+      }}
+    >
+      <span className="text-emerald-400/60">$ </span>
+      {text}
+    </div>
+  );
+}
+
+// ─── Feature Pill ─────────────────────────────────────────────────────────────
+const FEATURES = [
+  { icon: GitBranch, label: "GitHub Analysis", color: "#10b981", glow: "rgba(16,185,129,0.3)" },
+  { icon: FileText, label: "AI Resumes", color: "#6366f1", glow: "rgba(99,102,241,0.3)" },
+  { icon: Brain, label: "Mock Interviews", color: "#8b5cf6", glow: "rgba(139,92,246,0.3)" },
+  { icon: Code2, label: "Code Reviews", color: "#f59e0b", glow: "rgba(245,158,11,0.3)" },
+  { icon: TrendingUp, label: "Career Roadmap", color: "#ef4444", glow: "rgba(239,68,68,0.3)" },
+  { icon: Rocket, label: "Portfolio Builder", color: "#38bdf8", glow: "rgba(56,189,248,0.3)" },
+];
+
+function FeatureCard({ feature, index }: { feature: (typeof FEATURES)[0]; index: number }) {
+  const Icon = feature.icon;
+  const [hovered, setHovered] = useState(false);
+
+  return (
+    <div
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      className="relative rounded-2xl border border-white/[0.06] bg-white/[0.02] p-4 cursor-default overflow-hidden transition-all duration-500"
+      style={{
+        animationDelay: `${index * 80}ms`,
+        boxShadow: hovered ? `0 0 24px ${feature.glow}, inset 0 0 24px ${feature.glow}` : "none",
+        borderColor: hovered ? feature.color + "40" : undefined,
+        transform: hovered ? "translateY(-2px)" : "translateY(0)",
+      }}
+    >
+      {/* Background glow on hover */}
+      <div
+        className="absolute inset-0 transition-opacity duration-500 rounded-2xl"
+        style={{
+          background: `radial-gradient(circle at 50% 50%, ${feature.color}12 0%, transparent 70%)`,
+          opacity: hovered ? 1 : 0,
+        }}
+      />
+
+      {/* Scan line */}
+      <div
+        className="absolute inset-x-0 h-px transition-all duration-1000"
+        style={{
+          background: `linear-gradient(90deg, transparent, ${feature.color}80, transparent)`,
+          top: hovered ? "100%" : "0%",
+          opacity: hovered ? 0 : 1,
+        }}
+      />
+
+      <div className="relative z-10 flex items-center gap-3">
+        <div
+          className="rounded-xl p-2 transition-all duration-300"
+          style={{
+            backgroundColor: feature.color + "18",
+            boxShadow: hovered ? `0 0 12px ${feature.glow}` : "none",
+          }}
+        >
+          <Icon
+            className="h-4 w-4 transition-transform duration-300"
+            style={{
+              color: feature.color,
+              transform: hovered ? "scale(1.2) rotate(5deg)" : "scale(1)",
+            }}
+          />
+        </div>
+        <span
+          className="text-sm font-semibold transition-colors duration-300"
+          style={{ color: hovered ? feature.color : "#94a3b8" }}
+        >
+          {feature.label}
+        </span>
+      </div>
+    </div>
+  );
+}
+
+// ─── Stat Counter ─────────────────────────────────────────────────────────────
+function StatCounter({ value, label, delay }: { value: string; label: string; delay: number }) {
+  const [visible, setVisible] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const obs = new IntersectionObserver(
+      ([e]) => {
+        if (e.isIntersecting) setVisible(true);
+      },
+      { threshold: 0.5 },
+    );
+    if (ref.current) obs.observe(ref.current);
+    return () => obs.disconnect();
+  }, []);
+
+  return (
+    <div
+      ref={ref}
+      className="group text-center cursor-default"
+      style={{
+        opacity: visible ? 1 : 0,
+        transform: visible ? "translateY(0)" : "translateY(16px)",
+        transition: `all 0.6s cubic-bezier(0.34,1.56,0.64,1) ${delay}ms`,
+      }}
+    >
+      <div className="text-3xl font-black bg-gradient-to-br from-white to-primary/60 bg-clip-text text-transparent group-hover:from-primary group-hover:to-violet-400 transition-all duration-500">
+        {value}
+      </div>
+      <div className="text-[10px] uppercase tracking-[0.2em] text-slate-500 font-bold mt-1 group-hover:text-slate-400 transition-colors">
+        {label}
+      </div>
+    </div>
+  );
+}
+
+// ─── Main Page ────────────────────────────────────────────────────────────────
 function LoginPage() {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
-  const [focusedField, setFocusedField] = useState<string | null>(null);
-  const containerRef = useRef<HTMLDivElement>(null);
+  const [mounted, setMounted] = useState(false);
   const cardRef = useRef<HTMLDivElement>(null);
+  const rotateRef = useRef({ x: 0, y: 0 });
+
+  const typewriterText = useTypewriter(
+    [
+      "your GitHub profile.",
+      "ATS-friendly resumes.",
+      "interview skills.",
+      "your career roadmap.",
+      "stunning portfolios.",
+    ],
+    75,
+    2200,
+  );
+
+  useEffect(() => {
+    const t = setTimeout(() => setMounted(true), 100);
+    return () => clearTimeout(t);
+  }, []);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => {
@@ -48,40 +378,32 @@ function LoginPage() {
     });
   }, [navigate]);
 
-  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (!containerRef.current) return;
-    const rect = containerRef.current.getBoundingClientRect();
-    setMousePos({
-      x: e.clientX - rect.left,
-      y: e.clientY - rect.top,
-    });
-
+  // Smooth card tilt
+  const handleCardMouseMove = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
     if (!cardRef.current) return;
-    const cardRect = cardRef.current.getBoundingClientRect();
-    const cardCenterX = cardRect.width / 2;
-    const cardCenterY = cardRect.height / 2;
-    const rotateX = (e.clientY - cardRect.top - cardCenterY) / 40;
-    const rotateY = (e.clientX - cardRect.left - cardCenterX) / -40;
+    const rect = cardRef.current.getBoundingClientRect();
+    const cx = rect.left + rect.width / 2;
+    const cy = rect.top + rect.height / 2;
+    const dx = (e.clientX - cx) / (rect.width / 2);
+    const dy = (e.clientY - cy) / (rect.height / 2);
 
+    rotateRef.current = { x: -dy * 6, y: dx * 6 };
+    cardRef.current.style.transform = `perspective(1000px) rotateX(${-dy * 6}deg) rotateY(${dx * 6}deg) scale3d(1.01,1.01,1.01)`;
     cardRef.current.style.transition = "transform 0.1s ease-out";
-    cardRef.current.style.transform = `perspective(1200px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
-  };
+  }, []);
 
-  const handleMouseLeave = () => {
-    if (cardRef.current) {
-      cardRef.current.style.transition = "transform 0.5s ease-out";
-      cardRef.current.style.transform = "perspective(1200px) rotateX(0deg) rotateY(0deg) scale(1)";
-    }
-  };
+  const handleCardMouseLeave = useCallback(() => {
+    if (!cardRef.current) return;
+    cardRef.current.style.transform =
+      "perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1,1,1)";
+    cardRef.current.style.transition = "transform 0.6s cubic-bezier(0.34,1.56,0.64,1)";
+  }, []);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true);
     try {
-      const { error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
+      const { error } = await supabase.auth.signInWithPassword({ email, password });
       if (error) throw error;
       toast.success("Welcome back!");
       navigate({ to: "/dashboard" });
@@ -96,12 +418,10 @@ function LoginPage() {
     setLoading(true);
     const { data, error } = await supabase.auth.signInWithOAuth({
       provider: "google",
-      options: {
-        redirectTo: window.location.origin + "/dashboard",
-      },
+      options: { redirectTo: `${window.location.origin}/dashboard` },
     });
     if (error) {
-      toast.error(error.message ?? "Google sign-in failed");
+      toast.error(error.message);
       setLoading(false);
       return;
     }
@@ -116,12 +436,10 @@ function LoginPage() {
     setLoading(true);
     const { data, error } = await supabase.auth.signInWithOAuth({
       provider: "github",
-      options: {
-        redirectTo: window.location.origin + "/dashboard",
-      },
+      options: { redirectTo: `${window.location.origin}/dashboard` },
     });
     if (error) {
-      toast.error(error.message ?? "GitHub sign-in failed");
+      toast.error(error.message);
       setLoading(false);
       return;
     }
@@ -131,485 +449,419 @@ function LoginPage() {
     }
   }
 
-  const features = [
-    { icon: GitBranch, title: "GitHub Analysis", color: "#10b981" },
-    { icon: FileText, title: "AI Resumes", color: "#3b82f6" },
-    { icon: Brain, title: "Mock Interviews", color: "#8b5cf6" },
-    { icon: Code2, title: "Code Reviews", color: "#f59e0b" },
-    { icon: TrendingUp, title: "Career Paths", color: "#ef4444" },
-    { icon: Rocket, title: "Portfolio Builder", color: "#06b6d4" },
-  ];
-
   return (
-    <div
-      ref={containerRef}
-      onMouseMove={handleMouseMove}
-      onMouseLeave={handleMouseLeave}
-      className="relative min-h-screen flex items-center justify-center overflow-hidden bg-background"
-    >
-      {/* Enhanced animated background */}
-      <div className="pointer-events-none absolute inset-0 -z-10">
-        {/* Animated gradient mesh */}
-        <div className="absolute inset-0 bg-[linear-gradient(45deg,transparent_0%,rgba(99,102,241,0.1)_25%,transparent_50%,rgba(168,85,247,0.1)_75%,transparent_100%)] bg-[length:400%_400%] animate-gradient-shift" />
+    <div id="login-page" className="relative min-h-screen flex items-center justify-center overflow-hidden bg-[#030712]">
+      {/* ── Particle field ── */}
+      <ParticleCanvas />
 
-        {/* Floating orbs with different colors */}
-        <div className="absolute -top-40 -left-40 w-80 h-80 bg-gradient-to-br from-primary/30 via-purple-500/20 to-transparent rounded-full blur-3xl animate-blob" />
-        <div className="absolute -bottom-32 -right-40 w-96 h-96 bg-gradient-to-tl from-blue-500/20 via-cyan-500/10 to-transparent rounded-full blur-3xl animate-blob animation-delay-2000" />
-        <div className="absolute top-1/2 left-1/3 w-72 h-72 bg-gradient-to-br from-violet-500/20 to-transparent rounded-full blur-3xl animate-blob animation-delay-4000" />
+      {/* ── Deep background gradients ── */}
+      <div className="pointer-events-none absolute inset-0">
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[900px] h-[500px] bg-gradient-to-b from-violet-600/10 via-indigo-600/5 to-transparent rounded-full blur-3xl" />
+        <div className="absolute bottom-0 left-0 w-[600px] h-[400px] bg-gradient-to-tr from-cyan-600/8 to-transparent rounded-full blur-3xl" />
+        <div className="absolute bottom-0 right-0 w-[500px] h-[400px] bg-gradient-to-tl from-purple-600/8 to-transparent rounded-full blur-3xl" />
 
-        {/* Grid overlay */}
-        <svg className="absolute inset-0 w-full h-full opacity-[0.02] dark:opacity-[0.05]" preserveAspectRatio="none">
-          <defs>
-            <pattern id="grid" width="50" height="50" patternUnits="userSpaceOnUse">
-              <path d="M 50 0 L 0 0 0 50" fill="none" stroke="currentColor" strokeWidth="0.5" />
-            </pattern>
-          </defs>
-          <rect width="100%" height="100%" fill="url(#grid)" />
-        </svg>
-
-        {/* Spotlight that follows mouse */}
+        {/* Subtle grid */}
         <div
-          className="absolute rounded-full transition-all duration-200 ease-out pointer-events-none"
+          className="absolute inset-0 opacity-[0.035]"
           style={{
-            width: "300px",
-            height: "300px",
-            left: `${mousePos.x - 150}px`,
-            top: `${mousePos.y - 150}px`,
-            background:
-              "radial-gradient(circle, rgba(99, 102, 241, 0.2) 0%, rgba(168, 85, 247, 0.1) 30%, transparent 70%)",
-            filter: "blur(60px)",
-            zIndex: 1,
+            backgroundImage: `
+              linear-gradient(rgba(99,102,241,0.8) 1px, transparent 1px),
+              linear-gradient(90deg, rgba(99,102,241,0.8) 1px, transparent 1px)
+            `,
+            backgroundSize: "60px 60px",
           }}
         />
-      </div>
 
-      {/* Main layout */}
-      <div className="relative z-10 grid grid-cols-1 lg:grid-cols-2 gap-12 max-w-7xl px-4 py-8 items-center">
-        {/* Left side - Features showcase */}
-        <div className="hidden lg:flex flex-col justify-center space-y-8">
-          {/* Animated header */}
-          <div className="space-y-6">
-            <div className="inline-block">
-              <div className="relative inline-flex items-center gap-3 px-4 py-2 rounded-full border border-primary/30 bg-primary/5 backdrop-blur-sm hover:border-primary/60 hover:bg-primary/10 transition-all duration-500 group cursor-default">
-                <Sparkles className="h-4 w-4 text-primary animate-spin group-hover:animate-bounce" />
-                <span className="text-xs font-semibold text-primary uppercase tracking-widest">
-                  AI-Powered Developer Platform
-                </span>
-              </div>
-            </div>
-
-            <div>
-              <h2 className="text-5xl md:text-6xl font-black tracking-tight mb-4 group">
-                <span className="inline-block animate-slide-up text-foreground">Unlock your</span>
-                <br />
-                <span className="inline-block text-transparent bg-clip-text bg-gradient-to-r from-primary via-purple-500 to-pink-500 animate-gradient animate-slide-up animation-delay-100">
-                  full potential
-                </span>
-              </h2>
-              <p className="text-lg text-muted-foreground leading-relaxed max-w-md animate-fade-in animation-delay-200">
-                Get AI-powered insights into your code, build stunning resumes, and master your next
-                interview.
-              </p>
-            </div>
-          </div>
-
-          {/* Feature grid with hover effects */}
-          <div className="grid grid-cols-2 gap-3 mt-8">
-            {features.map((feature, index) => {
-              const Icon = feature.icon;
-              return (
-                <div
-                  key={feature.title}
-                  className="group relative rounded-2xl border border-border/40 bg-card/50 backdrop-blur-md p-4 hover:border-primary/30 hover:bg-card/80 transition-all duration-500 overflow-hidden cursor-default animate-slide-up"
-                  style={{ animationDelay: `${300 + index * 100}ms` }}
-                >
-                  {/* Feature glow */}
-                  <div
-                    className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
-                    style={{
-                      background: `radial-gradient(circle at center, ${feature.color}15 0%, transparent 70%)`,
-                    }}
-                  />
-
-                  <div className="relative z-10">
-                    <div
-                      className="inline-block p-2 rounded-lg mb-2 transition-all duration-300 group-hover:scale-110 group-hover:shadow-lg"
-                      style={{
-                        backgroundColor: `${feature.color}20`,
-                      }}
-                    >
-                      <Icon
-                        className="h-5 w-5 transition-transform duration-300 group-hover:rotate-12"
-                        style={{ color: feature.color }}
-                      />
-                    </div>
-                    <p className="text-sm font-semibold text-foreground group-hover:text-primary transition-colors">
-                      {feature.title}
-                    </p>
-                  </div>
-
-                  {/* Border gradient animation */}
-                  <div
-                    className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
-                    style={{
-                      background: `linear-gradient(135deg, ${feature.color}40 0%, transparent 100%)`,
-                      borderRadius: "1rem",
-                    }}
-                  />
-                </div>
-              );
-            })}
-          </div>
-
-          {/* Stats */}
-          <div className="grid grid-cols-3 gap-4 pt-4 border-t border-border/40">
-            {[
-              { label: "50K+", desc: "Repos Analyzed" },
-              { label: "12K+", desc: "Careers Transformed" },
-              { label: "4.9/5", desc: "Developer Rating" },
-            ].map((stat, i) => (
-              <div key={i} className="group cursor-default">
-                <div className="text-2xl font-black text-primary group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-primary group-hover:to-purple-500 transition-all duration-500">
-                  {stat.label}
-                </div>
-                <div className="text-xs text-muted-foreground group-hover:text-foreground transition-colors uppercase tracking-widest font-semibold mt-1">
-                  {stat.desc}
-                </div>
-              </div>
-            ))}
-          </div>
+        {/* Floating code lines */}
+        <div className="absolute inset-0 overflow-hidden">
+          {CODE_SNIPPETS.map((s, i) => (
+            <FloatingCodeLine
+              key={i}
+              text={s}
+              delay={i * 3}
+              top={`${10 + i * 14}%`}
+              opacity={0.25}
+            />
+          ))}
         </div>
 
-        {/* Right side - Auth card */}
-        <div className="w-full max-w-md mx-auto lg:mx-0">
-          {/* Mobile header */}
-          <div className="lg:hidden mb-8 space-y-4 text-center">
-            <div className="inline-block mx-auto">
-              <div className="relative inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-primary/30 bg-primary/5">
-                <Sparkles className="h-3 w-3 text-primary" />
-                <span className="text-xs font-semibold text-primary uppercase">DevAI</span>
-              </div>
-            </div>
-            <h1 className="text-3xl font-bold text-foreground">Welcome back</h1>
-            <p className="text-muted-foreground text-sm">Sign in to continue your journey</p>
-          </div>
+        {/* Radial vignette */}
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_0%,#030712_80%)]" />
+      </div>
 
-          {/* Card container */}
+      {/* ── Content ── */}
+      <div className="relative z-10 w-full max-w-7xl mx-auto px-4 py-12">
+        <div className="grid grid-cols-1 lg:grid-cols-[1fr_480px] gap-16 items-center">
+          {/* ── Left: Hero ── */}
           <div
-            ref={cardRef}
-            className="group relative rounded-3xl border border-border/40 bg-background/60 backdrop-blur-2xl p-8 shadow-2xl overflow-hidden"
+            className="hidden lg:flex flex-col gap-10"
             style={{
-              boxShadow: `0 25px 50px -12px rgba(99, 102, 241, 0.15)`,
+              opacity: mounted ? 1 : 0,
+              transform: mounted ? "translateX(0)" : "translateX(-32px)",
+              transition: "all 0.9s cubic-bezier(0.34,1.2,0.64,1)",
             }}
           >
-            {/* Card inner glow */}
-            <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-primary/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-
-            {/* Animated top border */}
-            <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary/50 to-transparent" />
-
-            {/* Content */}
-            <div className="relative z-10 space-y-6">
-              {/* OAuth buttons */}
-              <div className="space-y-3">
-                <Button
-                  onClick={handleGoogle}
-                  disabled={loading}
-                  variant="outline"
-                  className="h-12 w-full rounded-xl bg-foreground/5 border-border/50 hover:bg-foreground/10 hover:border-primary/40 text-foreground font-semibold transition-all duration-300 group/btn hover:shadow-lg hover:shadow-blue-500/20"
-                >
-                  <svg
-                    className="h-5 w-5 transition-transform group-hover/btn:rotate-12"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      fill="currentColor"
-                      d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
-                      opacity="0.8"
-                    />
-                    <path
-                      fill="currentColor"
-                      d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
-                      opacity="0.8"
-                    />
-                    <path
-                      fill="currentColor"
-                      d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
-                      opacity="0.8"
-                    />
-                    <path
-                      fill="currentColor"
-                      d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
-                      opacity="0.8"
-                    />
-                  </svg>
-                  <span className="ml-2">Google</span>
-                </Button>
-
-                <Button
-                  onClick={handleGithub}
-                  disabled={loading}
-                  variant="outline"
-                  className="h-12 w-full rounded-xl bg-foreground/5 border-border/50 hover:bg-foreground/10 hover:border-primary/40 text-foreground font-semibold transition-all duration-300 group/btn hover:shadow-lg hover:shadow-slate-500/20"
-                >
-                  <Github className="h-5 w-5 transition-transform group-hover/btn:rotate-12" />
-                  <span className="ml-2">GitHub</span>
-                </Button>
-              </div>
-
-              {/* Divider with animation */}
-              <div className="relative flex items-center gap-3 py-4">
-                <div className="flex-1 h-px bg-gradient-to-r from-transparent via-border to-transparent" />
-                <span className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
-                  Continue with email
+            {/* Badge */}
+            <div className="flex items-center gap-3">
+              <div className="relative flex items-center gap-2 px-4 py-2 rounded-full border border-indigo-500/30 bg-indigo-500/5 backdrop-blur-xl">
+                <span className="relative flex h-2 w-2">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75" />
+                  <span className="relative inline-flex h-2 w-2 rounded-full bg-indigo-500" />
                 </span>
-                <div className="flex-1 h-px bg-gradient-to-r from-transparent via-border to-transparent" />
+                <Terminal className="h-3.5 w-3.5 text-indigo-400" />
+                <span className="text-[11px] font-bold text-indigo-300 uppercase tracking-[0.2em]">
+                  AI Developer Platform
+                </span>
+              </div>
+            </div>
+
+            {/* Heading */}
+            <div className="space-y-3">
+              <h1 className="text-6xl xl:text-7xl font-black tracking-tight leading-[1.05]">
+                <span className="text-white">AI that</span>
+                <br />
+                <span className="text-white">understands</span>
+                <br />
+                <span
+                  className="bg-gradient-to-r from-indigo-400 via-violet-400 to-purple-400 bg-clip-text text-transparent"
+                  style={{
+                    backgroundSize: "200% 100%",
+                    animation: "login-gradientShift 4s ease infinite",
+                  }}
+                >
+                  developers.
+                </span>
+              </h1>
+
+              {/* Typewriter */}
+              <div className="flex items-center gap-3 mt-6">
+                <Cpu className="h-4 w-4 text-indigo-400 flex-shrink-0 animate-pulse" />
+                <p className="text-lg text-slate-400 font-mono">
+                  Analyze{" "}
+                  <span className="text-indigo-300 font-semibold">
+                    {typewriterText}
+                    <span className="inline-block w-0.5 h-5 bg-indigo-400 ml-0.5 align-middle animate-blink" />
+                  </span>
+                </p>
               </div>
 
-              {/* Form */}
-              <form onSubmit={handleSubmit} className="space-y-4">
-                {/* Email field */}
-                <div className="space-y-2.5 group/field">
-                  <Label className="text-xs font-semibold uppercase tracking-widest text-foreground/80 transition-colors group-focus-within/field:text-primary">
-                    Email Address
-                  </Label>
-                  <div className="relative">
-                    <Mail className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground/60 transition-all duration-300 group-focus-within/field:text-primary group-focus-within/field:scale-110" />
-                    <Input
-                      id="email"
-                      type="email"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      onFocus={() => setFocusedField("email")}
-                      onBlur={() => setFocusedField(null)}
-                      placeholder="your@email.com"
-                      required
-                      className="h-12 w-full rounded-xl bg-foreground/5 border-border/50 placeholder:text-muted-foreground/50 pl-12 text-foreground font-medium transition-all duration-300 focus:bg-foreground/10 focus:border-primary/60 focus:shadow-lg focus:shadow-primary/30 focus:outline-none hover:bg-foreground/10 hover:border-border/80"
-                    />
-                  </div>
-                </div>
-
-                {/* Password field */}
-                <div className="space-y-2.5 group/field">
-                  <div className="flex items-center justify-between">
-                    <Label className="text-xs font-semibold uppercase tracking-widest text-foreground/80 transition-colors group-focus-within/field:text-primary">
-                      Password
-                    </Label>
-                    <Link
-                      to="/"
-                      className="text-xs font-medium text-primary/80 hover:text-primary transition-all duration-300 hover:underline underline-offset-2"
-                    >
-                      Forgot password?
-                    </Link>
-                  </div>
-                  <div className="relative">
-                    <Lock className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground/60 transition-all duration-300 group-focus-within/field:text-primary group-focus-within/field:scale-110" />
-                    <Input
-                      id="password"
-                      type={showPassword ? "text" : "password"}
-                      minLength={6}
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      onFocus={() => setFocusedField("password")}
-                      onBlur={() => setFocusedField(null)}
-                      placeholder="••••••••"
-                      required
-                      className="h-12 w-full rounded-xl bg-foreground/5 border-border/50 placeholder:text-muted-foreground/50 pl-12 pr-12 text-foreground font-medium transition-all duration-300 focus:bg-foreground/10 focus:border-primary/60 focus:shadow-lg focus:shadow-primary/30 focus:outline-none hover:bg-foreground/10 hover:border-border/80"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground/60 hover:text-foreground transition-all duration-300 p-1 hover:scale-110"
-                    >
-                      {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
-                    </button>
-                  </div>
-                </div>
-
-                {/* Submit button */}
-                <Button
-                  type="submit"
-                  disabled={loading}
-                  className="h-12 w-full mt-6 rounded-xl font-bold text-lg relative overflow-hidden bg-gradient-to-r from-primary via-purple-500 to-pink-500 shadow-2xl shadow-primary/50 hover:shadow-primary/70 transition-all duration-300 active:scale-[0.98] group/submit"
-                >
-                  {/* Button shine */}
-                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent -translate-x-full group-hover/submit:translate-x-full transition-transform duration-500" />
-
-                  <span className="relative flex items-center justify-center gap-2">
-                    {loading ? (
-                      <>
-                        <Loader2 className="h-5 w-5 animate-spin" />
-                        <span>Signing in...</span>
-                      </>
-                    ) : (
-                      <>
-                        <span>Sign In</span>
-                        <ArrowRight className="h-5 w-5 transition-all duration-300 group-hover/submit:translate-x-1 group-hover/submit:scale-110" />
-                      </>
-                    )}
-                  </span>
-                </Button>
-              </form>
-
-              {/* Sign up link */}
-              <p className="text-center text-sm text-muted-foreground">
-                Don't have an account?{" "}
-                <Link
-                  to="/signup"
-                  className="font-bold text-primary hover:text-primary/80 transition-all duration-300 hover:underline underline-offset-2"
-                >
-                  Sign up
-                </Link>
+              <p className="text-slate-500 text-base leading-relaxed max-w-lg mt-4">
+                From GitHub insights to personalized career roadmaps — DevAI is your intelligent
+                co-pilot through every stage of your developer journey.
               </p>
+            </div>
+
+            {/* Feature grid */}
+            <div className="grid grid-cols-2 gap-3 max-w-lg">
+              {FEATURES.map((f, i) => (
+                <FeatureCard key={f.label} feature={f} index={i} />
+              ))}
+            </div>
+
+            {/* Stats */}
+            <div className="flex items-center gap-10 pt-6 border-t border-white/[0.05]">
+              <StatCounter value="50K+" label="Repos Analyzed" delay={0} />
+              <div className="w-px h-10 bg-white/[0.06]" />
+              <StatCounter value="12K+" label="Careers Boosted" delay={100} />
+              <div className="w-px h-10 bg-white/[0.06]" />
+              <StatCounter value="4.9★" label="Developer Rating" delay={200} />
             </div>
           </div>
 
-          {/* Trust badges */}
-          <div className="mt-8 grid grid-cols-3 gap-3">
-            {[
-              { icon: Shield, label: "Secure" },
-              { icon: Zap, label: "Fast" },
-              { icon: Brain, label: "Smart" },
-            ].map((badge, i) => {
-              const Icon = badge.icon;
-              return (
-                <div
-                  key={i}
-                  className="group flex flex-col items-center gap-2 rounded-xl border border-border/50 bg-foreground/5 hover:bg-foreground/10 hover:border-primary/40 p-3 transition-all duration-300 cursor-default"
-                >
-                  <Icon className="h-5 w-5 text-primary transition-transform group-hover:scale-125 group-hover:rotate-12" />
-                  <span className="text-xs font-semibold text-muted-foreground group-hover:text-foreground transition-colors">
-                    {badge.label}
-                  </span>
-                </div>
-              );
-            })}
-          </div>
+          {/* ── Right: Auth Card ── */}
+          <div
+            style={{
+              opacity: mounted ? 1 : 0,
+              transform: mounted ? "translateY(0)" : "translateY(40px)",
+              transition: "all 1s cubic-bezier(0.34,1.2,0.64,1) 150ms",
+            }}
+          >
+            {/* Mobile header */}
+            <div className="lg:hidden mb-8 text-center space-y-3">
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-indigo-500/30 bg-indigo-500/10">
+                <Zap className="h-3 w-3 text-indigo-400" />
+                <span className="text-xs font-bold text-indigo-300 uppercase tracking-widest">
+                  DevAI
+                </span>
+              </div>
+              <h2 className="text-3xl font-black text-white">Welcome back</h2>
+              <p className="text-slate-500 text-sm">Your AI-powered developer journey continues</p>
+            </div>
 
-          {/* Footer */}
-          <p className="mt-6 text-center text-xs text-muted-foreground/60">
-            By signing in, you agree to our{" "}
-            <Link
-              to="/"
-              className="text-muted-foreground hover:text-foreground underline-offset-2 hover:underline transition-colors"
+            {/* Card */}
+            <div
+              ref={cardRef}
+              onMouseMove={handleCardMouseMove}
+              onMouseLeave={handleCardMouseLeave}
+              className="relative rounded-3xl overflow-hidden cursor-default"
+              style={{
+                background:
+                  "linear-gradient(135deg, rgba(15,15,30,0.95) 0%, rgba(10,10,25,0.98) 100%)",
+                border: "1px solid rgba(99,102,241,0.2)",
+                boxShadow: `
+                  0 0 0 1px rgba(99,102,241,0.1),
+                  0 32px 64px -16px rgba(0,0,0,0.8),
+                  0 0 80px rgba(99,102,241,0.08),
+                  inset 0 1px 0 rgba(255,255,255,0.05)
+                `,
+              }}
             >
-              Terms
-            </Link>{" "}
-            and{" "}
-            <Link
-              to="/"
-              className="text-muted-foreground hover:text-foreground underline-offset-2 hover:underline transition-colors"
-            >
-              Privacy
-            </Link>
-          </p>
+              {/* Top glow bar */}
+              <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-indigo-500/60 to-transparent" />
+
+              {/* Corner accents */}
+              <div className="absolute top-0 left-0 w-16 h-16 border-t border-l border-indigo-500/30 rounded-tl-3xl" />
+              <div className="absolute top-0 right-0 w-16 h-16 border-t border-r border-violet-500/30 rounded-tr-3xl" />
+              <div className="absolute bottom-0 left-0 w-16 h-16 border-b border-l border-violet-500/20 rounded-bl-3xl" />
+              <div className="absolute bottom-0 right-0 w-16 h-16 border-b border-r border-indigo-500/20 rounded-br-3xl" />
+
+              {/* Inner glow */}
+              <div className="absolute inset-0 bg-gradient-to-br from-indigo-600/[0.04] via-transparent to-violet-600/[0.04] pointer-events-none" />
+
+              {/* Header */}
+              <div className="relative px-8 pt-8 pb-6 border-b border-white/[0.04]">
+                <div className="flex items-center justify-between mb-1">
+                  <div className="flex items-center gap-2.5">
+                    <div className="relative h-8 w-8 rounded-xl bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center shadow-lg shadow-indigo-500/30">
+                      <Zap className="h-4 w-4 text-white" />
+                      <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-white/20 to-transparent" />
+                    </div>
+                    <span className="text-lg font-black text-white tracking-tight">DevAI</span>
+                  </div>
+                  <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20">
+                    <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                    <span className="text-[10px] font-bold text-emerald-400 uppercase tracking-widest">
+                      Secure
+                    </span>
+                  </div>
+                </div>
+                <h2 className="text-2xl font-black text-white mt-4">Sign in</h2>
+                <p className="text-slate-500 text-sm mt-1">
+                  Continue building your developer career
+                </p>
+              </div>
+
+              {/* Body */}
+              <div className="relative px-8 py-6 space-y-5">
+                {/* OAuth */}
+                <div className="grid grid-cols-2 gap-3">
+                  <button
+                    onClick={handleGoogle}
+                    disabled={loading}
+                    className="group relative h-11 rounded-xl border border-white/[0.08] bg-white/[0.03] hover:bg-white/[0.07] hover:border-white/20 transition-all duration-300 flex items-center justify-center gap-2.5 font-semibold text-sm text-slate-300 hover:text-white overflow-hidden"
+                  >
+                    <div className="absolute inset-0 bg-gradient-to-r from-blue-600/0 via-blue-600/5 to-red-600/0 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                    <svg className="h-4 w-4 flex-shrink-0 relative z-10" viewBox="0 0 24 24">
+                      <path
+                        fill="#4285F4"
+                        d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+                      />
+                      <path
+                        fill="#34A853"
+                        d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+                      />
+                      <path
+                        fill="#FBBC05"
+                        d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
+                      />
+                      <path
+                        fill="#EA4335"
+                        d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
+                      />
+                    </svg>
+                    <span className="relative z-10">Google</span>
+                  </button>
+
+                  <button
+                    onClick={handleGithub}
+                    disabled={loading}
+                    className="group relative h-11 rounded-xl border border-white/[0.08] bg-white/[0.03] hover:bg-white/[0.07] hover:border-white/20 transition-all duration-300 flex items-center justify-center gap-2.5 font-semibold text-sm text-slate-300 hover:text-white overflow-hidden"
+                  >
+                    <div className="absolute inset-0 bg-gradient-to-r from-slate-600/0 via-slate-600/10 to-slate-600/0 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                    <Github className="h-4 w-4 flex-shrink-0 relative z-10" />
+                    <span className="relative z-10">GitHub</span>
+                  </button>
+                </div>
+
+                {/* Divider */}
+                <div className="flex items-center gap-3">
+                  <div className="flex-1 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+                  <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-600">
+                    or email
+                  </span>
+                  <div className="flex-1 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+                </div>
+
+                {/* Form */}
+                <form onSubmit={handleSubmit} className="space-y-4">
+                  {/* Email */}
+                  <div className="space-y-2 group/f">
+                    <Label className="text-[11px] font-bold uppercase tracking-[0.15em] text-slate-500 group-focus-within/f:text-indigo-400 transition-colors">
+                      Email
+                    </Label>
+                    <div className="relative">
+                      <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-600 group-focus-within/f:text-indigo-400 transition-colors pointer-events-none z-10" />
+                      <Input
+                        type="email"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        placeholder="you@company.com"
+                        required
+                        className="h-11 pl-10 rounded-xl bg-white/[0.03] border-white/[0.08] text-white placeholder:text-slate-700 focus:border-indigo-500/50 focus:bg-white/[0.05] focus:ring-0 focus:shadow-lg focus:shadow-indigo-500/10 transition-all duration-300 hover:border-white/15 hover:bg-white/[0.04]"
+                      />
+                      {/* Animated focus line */}
+                      <div className="absolute bottom-0 inset-x-0 h-px scale-x-0 group-focus-within/f:scale-x-100 transition-transform duration-300 rounded-full bg-gradient-to-r from-transparent via-indigo-500 to-transparent" />
+                    </div>
+                  </div>
+
+                  {/* Password */}
+                  <div className="space-y-2 group/f">
+                    <div className="flex items-center justify-between">
+                      <Label className="text-[11px] font-bold uppercase tracking-[0.15em] text-slate-500 group-focus-within/f:text-indigo-400 transition-colors">
+                        Password
+                      </Label>
+                      <Link
+                        to="/"
+                        className="text-[11px] font-semibold text-slate-600 hover:text-indigo-400 transition-colors"
+                      >
+                        Forgot?
+                      </Link>
+                    </div>
+                    <div className="relative">
+                      <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-600 group-focus-within/f:text-indigo-400 transition-colors pointer-events-none z-10" />
+                      <Input
+                        type={showPassword ? "text" : "password"}
+                        minLength={6}
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        placeholder="••••••••••"
+                        required
+                        className="h-11 pl-10 pr-11 rounded-xl bg-white/[0.03] border-white/[0.08] text-white placeholder:text-slate-700 focus:border-indigo-500/50 focus:bg-white/[0.05] focus:ring-0 focus:shadow-lg focus:shadow-indigo-500/10 transition-all duration-300 hover:border-white/15 hover:bg-white/[0.04]"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowPassword(!showPassword)}
+                        className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-600 hover:text-slate-300 transition-colors p-1"
+                      >
+                        {showPassword ? (
+                          <EyeOff className="h-4 w-4" />
+                        ) : (
+                          <Eye className="h-4 w-4" />
+                        )}
+                      </button>
+                      <div className="absolute bottom-0 inset-x-0 h-px scale-x-0 group-focus-within/f:scale-x-100 transition-transform duration-300 rounded-full bg-gradient-to-r from-transparent via-indigo-500 to-transparent" />
+                    </div>
+                  </div>
+
+                  {/* Submit */}
+                  <button
+                    type="submit"
+                    disabled={loading}
+                    className="group/btn relative w-full h-12 mt-2 rounded-xl font-bold text-sm text-white overflow-hidden disabled:opacity-60 disabled:cursor-not-allowed"
+                    style={{
+                      background: "linear-gradient(135deg, #4f46e5 0%, #7c3aed 50%, #9333ea 100%)",
+                      boxShadow:
+                        "0 0 32px rgba(99,102,241,0.4), inset 0 1px 0 rgba(255,255,255,0.15)",
+                    }}
+                  >
+                    {/* Shine sweep */}
+                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/15 to-transparent -translate-x-full group-hover/btn:translate-x-full transition-transform duration-700 ease-in-out" />
+                    {/* Top highlight */}
+                    <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/40 to-transparent" />
+
+                    <span className="relative flex items-center justify-center gap-2">
+                      {loading ? (
+                        <>
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                          Authenticating...
+                        </>
+                      ) : (
+                        <>
+                          Sign In
+                          <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover/btn:translate-x-1" />
+                        </>
+                      )}
+                    </span>
+                  </button>
+                </form>
+
+                {/* Sign up */}
+                <p className="text-center text-sm text-slate-600">
+                  New to DevAI?{" "}
+                  <Link
+                    to="/signup"
+                    className="font-bold text-indigo-400 hover:text-indigo-300 transition-colors"
+                  >
+                    Create account →
+                  </Link>
+                </p>
+              </div>
+
+              {/* Footer */}
+              <div className="px-8 pb-6 flex items-center justify-center gap-4">
+                {[
+                  { icon: "🔒", text: "256-bit SSL" },
+                  { icon: "🛡️", text: "SOC 2 Ready" },
+                  { icon: "⚡", text: "99.9% Uptime" },
+                ].map((b) => (
+                  <div key={b.text} className="flex items-center gap-1.5">
+                    <span className="text-xs">{b.icon}</span>
+                    <span className="text-[10px] font-semibold text-slate-700 uppercase tracking-wider">
+                      {b.text}
+                    </span>
+                  </div>
+                ))}
+              </div>
+
+              {/* Bottom glow */}
+              <div className="absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-violet-500/40 to-transparent" />
+            </div>
+
+            {/* Below card */}
+            <p className="mt-5 text-center text-xs text-slate-700">
+              By signing in, you agree to our{" "}
+              <Link
+                to="/"
+                className="text-slate-500 hover:text-slate-300 transition-colors underline underline-offset-2"
+              >
+                Terms
+              </Link>
+              {" & "}
+              <Link
+                to="/"
+                className="text-slate-500 hover:text-slate-300 transition-colors underline underline-offset-2"
+              >
+                Privacy Policy
+              </Link>
+            </p>
+          </div>
         </div>
       </div>
 
       <style>{`
-        @keyframes blob {
-          0%, 100% {
-            transform: translate(0, 0) scale(1);
-          }
-          25% {
-            transform: translate(20px, -50px) scale(1.1);
-          }
-          50% {
-            transform: translate(-20px, 20px) scale(0.9);
-          }
-          75% {
-            transform: translate(50px, 50px) scale(1.05);
-          }
+        @keyframes login-codeFloat {
+          0% { transform: translateX(-100%); opacity: 0; }
+          5% { opacity: 1; }
+          95% { opacity: 1; }
+          100% { transform: translateX(110vw); opacity: 0; }
         }
-
-        @keyframes gradient-shift {
-          0% {
-            background-position: 0% 50%;
-          }
-          50% {
-            background-position: 100% 50%;
-          }
-          100% {
-            background-position: 0% 50%;
-          }
+        @keyframes login-gradientShift {
+          0%, 100% { background-position: 0% 50%; }
+          50% { background-position: 100% 50%; }
         }
-
-        @keyframes slide-up {
-          from {
-            opacity: 0;
-            transform: translateY(30px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
+        @keyframes login-blink {
+          0%, 50% { opacity: 1; }
+          51%, 100% { opacity: 0; }
         }
-
-        @keyframes fade-in {
-          from {
-            opacity: 0;
-          }
-          to {
-            opacity: 1;
-          }
+        #login-page .animate-blink {
+          animation: login-blink 1s step-end infinite;
         }
-
-        @keyframes float {
-          0%, 100% {
-            transform: translateY(0px);
-          }
-          50% {
-            transform: translateY(-20px);
-          }
-        }
-
-        .animate-blob {
-          animation: blob 7s infinite;
-        }
-
-        .animation-delay-2000 {
-          animation-delay: 2s;
-        }
-
-        .animation-delay-4000 {
-          animation-delay: 4s;
-        }
-
-        .animate-gradient-shift {
-          animation: gradient-shift 8s ease infinite;
-        }
-
-        .animate-slide-up {
-          animation: slide-up 0.8s ease-out forwards;
-        }
-
-        .animation-delay-100 {
-          animation-delay: 100ms;
-        }
-
-        .animation-delay-200 {
-          animation-delay: 200ms;
-        }
-
-        .animation-delay-300 {
-          animation-delay: 300ms;
-        }
-
-        .animate-fade-in {
-          animation: fade-in 0.8s ease-out;
-        }
-
-        .animate-gradient {
-          background-size: 200% 200%;
-          animation: gradient-shift 3s ease infinite;
-        }
-
-        input:-webkit-autofill,
-        input:-webkit-autofill:hover,
-        input:-webkit-autofill:focus {
-          -webkit-box-shadow: inset 0 0 0 30px rgba(255, 255, 255, 0.05) !important;
-          -webkit-text-fill-color: white !important;
-          caret-color: white !important;
+        #login-page input:-webkit-autofill,
+        #login-page input:-webkit-autofill:hover,
+        #login-page input:-webkit-autofill:focus {
+          -webkit-box-shadow: inset 0 0 0 40px rgba(10,10,25,0.98) !important;
+          -webkit-text-fill-color: #e2e8f0 !important;
+          caret-color: #e2e8f0 !important;
         }
       `}</style>
     </div>

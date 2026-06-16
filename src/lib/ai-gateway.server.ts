@@ -1,11 +1,16 @@
-// Server-only helper for calling OpenAI.
+// Server-only helper for calling AI endpoints.
 // Loaded only inside createServerFn handlers via dynamic import.
 
-const ENDPOINT = "https://api.openai.com/v1/chat/completions";
-const DEFAULT_MODEL = "gpt-4o-mini";
+const GEMINI_ENDPOINT = "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions";
+const GROK_ENDPOINT = "https://api.x.ai/v1/chat/completions";
+
+const DEFAULT_GEMINI_MODEL = "gemini-2.5-flash";
+const DEFAULT_GROK_MODEL = "grok-2-latest";
 
 // Approximate USD cost per 1K tokens (input, output). Used for analytics estimates.
 const MODEL_PRICING: Record<string, { in: number; out: number }> = {
+  "gemini-2.5-flash": { in: 0.000075, out: 0.0003 },
+  "grok-2-latest": { in: 0.002, out: 0.010 },
   "gpt-4o": { in: 0.005, out: 0.015 },
   "gpt-4o-mini": { in: 0.00015, out: 0.0006 },
 };
@@ -48,16 +53,16 @@ async function logUsage(ctx: LogContext, usage: AiUsage, status: string) {
   }
 }
 
-async function rawCall(opts: {
-  messages: AiMessage[];
-  model?: string;
-  jsonSchema?: { name: string; schema: Record<string, unknown> };
-  temperature?: number;
-}): Promise<{ text: string; usage: AiUsage }> {
-  const key = process.env.OPENAI_API_KEY;
-  if (!key) throw new Error("Missing OPENAI_API_KEY");
-  const model = opts.model ?? DEFAULT_MODEL;
-
+async function executeProviderCall(
+  endpoint: string,
+  key: string,
+  model: string,
+  opts: {
+    messages: AiMessage[];
+    jsonSchema?: { name: string; schema: Record<string, unknown> };
+    temperature?: number;
+  }
+): Promise<{ text: string; usage: AiUsage }> {
   const body: Record<string, unknown> = { model, messages: opts.messages };
   if (opts.temperature !== undefined) body.temperature = opts.temperature;
   if (opts.jsonSchema) {
@@ -68,7 +73,7 @@ async function rawCall(opts: {
   }
 
   const start = Date.now();
-  const res = await fetch(ENDPOINT, {
+  const res = await fetch(endpoint, {
     method: "POST",
     headers: { "Content-Type": "application/json", Authorization: `Bearer ${key}` },
     body: JSON.stringify(body),
@@ -97,6 +102,42 @@ async function rawCall(opts: {
   };
 }
 
+async function rawCall(opts: {
+  messages: AiMessage[];
+  model?: string;
+  jsonSchema?: { name: string; schema: Record<string, unknown> };
+  temperature?: number;
+}): Promise<{ text: string; usage: AiUsage }> {
+  let lastError: unknown;
+
+  // Try Gemini first
+  const geminiKey = process.env.GEMINI_API_KEY;
+  if (geminiKey) {
+    try {
+      const model = (opts.model && opts.model.includes("gemini")) ? opts.model : DEFAULT_GEMINI_MODEL;
+      return await executeProviderCall(GEMINI_ENDPOINT, geminiKey, model, opts);
+    } catch (err) {
+      console.warn("Gemini call failed, falling back to Grok", err);
+      lastError = err;
+    }
+  }
+
+  // Fallback to Grok
+  const grokKey = process.env.XAI_API_KEY || process.env.GROK_API_KEY;
+  if (grokKey) {
+    try {
+      const model = DEFAULT_GROK_MODEL;
+      return await executeProviderCall(GROK_ENDPOINT, grokKey, model, opts);
+    } catch (err) {
+      console.warn("Grok call failed", err);
+      lastError = err;
+    }
+  }
+
+  if (lastError) throw lastError;
+  throw new Error("No AI providers configured (missing GEMINI_API_KEY or XAI_API_KEY/GROK_API_KEY)");
+}
+
 export async function callAi(opts: {
   messages: AiMessage[];
   model?: string;
@@ -112,7 +153,7 @@ export async function callAi(opts: {
     if (opts.log) {
       await logUsage(
         opts.log,
-        { model: opts.model ?? DEFAULT_MODEL, prompt_tokens: 0, completion_tokens: 0, total_tokens: 0, cost_usd: 0, duration_ms: 0 },
+        { model: opts.model ?? DEFAULT_GEMINI_MODEL, prompt_tokens: 0, completion_tokens: 0, total_tokens: 0, cost_usd: 0, duration_ms: 0 },
         "error",
       );
     }
@@ -140,7 +181,7 @@ export async function callAiJson<T>(opts: {
     if (opts.log) {
       await logUsage(
         opts.log,
-        { model: opts.model ?? DEFAULT_MODEL, prompt_tokens: 0, completion_tokens: 0, total_tokens: 0, cost_usd: 0, duration_ms: 0 },
+        { model: opts.model ?? DEFAULT_GEMINI_MODEL, prompt_tokens: 0, completion_tokens: 0, total_tokens: 0, cost_usd: 0, duration_ms: 0 },
         "error",
       );
     }
