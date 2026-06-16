@@ -7,6 +7,7 @@ import { toast } from "sonner";
 import {
   Loader2,
   ArrowRight,
+  ArrowLeft,
   Github,
   Mail,
   Lock,
@@ -102,7 +103,7 @@ function PasswordStrengthMeter({ password }: { password: string }) {
             key={i}
             className="h-1 flex-1 rounded-full transition-all duration-500"
             style={{
-              backgroundColor: i < score ? color : "rgba(255,255,255,0.08)",
+              backgroundColor: i < score ? color : "var(--color-border)",
               boxShadow: i < score ? `0 0 6px ${color}80` : "none",
             }}
           />
@@ -118,12 +119,12 @@ function PasswordStrengthMeter({ password }: { password: string }) {
         {checks.map((c) => (
           <div key={c.label} className="flex items-center gap-1.5">
             {c.pass ? (
-              <CheckCircle2 className="h-3 w-3 text-emerald-400 flex-shrink-0" />
+              <CheckCircle2 className="h-3 w-3 text-emerald-500 dark:text-emerald-400 flex-shrink-0" />
             ) : (
-              <XCircle className="h-3 w-3 text-slate-600 flex-shrink-0" />
+              <XCircle className="h-3 w-3 text-slate-400 dark:text-slate-600 flex-shrink-0" />
             )}
             <span
-              className={`text-[10px] font-medium transition-colors ${c.pass ? "text-slate-400" : "text-slate-600"}`}
+              className={`text-[10px] font-medium transition-colors ${c.pass ? "text-slate-700 dark:text-slate-400" : "text-slate-400 dark:text-slate-600"}`}
             >
               {c.label}
             </span>
@@ -147,13 +148,13 @@ const CODE_SNIPPETS = [
 function FloatingCodeLine({ text, delay, top }: { text: string; delay: number; top: string }) {
   return (
     <div
-      className="absolute left-0 whitespace-nowrap font-mono text-xs text-emerald-400/30 select-none pointer-events-none"
+      className="absolute left-0 whitespace-nowrap font-mono text-xs text-emerald-600/40 dark:text-emerald-400/30 select-none pointer-events-none"
       style={{
         top,
         animation: `signup-codeFloat ${20 + delay}s linear ${delay}s infinite`,
       }}
     >
-      <span className="text-teal-400/50">$ </span>
+      <span className="text-teal-500/60 dark:text-teal-400/50">$ </span>
       {text}
     </div>
   );
@@ -199,7 +200,7 @@ function FeatureCard({ feature, index }: { feature: (typeof FEATURES)[0]; index:
     <div
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
-      className="relative rounded-2xl border border-white/[0.08] bg-[#030712]/40 backdrop-blur-sm p-3.5 cursor-default overflow-hidden"
+      className="relative rounded-2xl border border-slate-200 dark:border-white/[0.08] bg-white dark:bg-[#030712]/40 backdrop-blur-sm p-3.5 cursor-default overflow-hidden shadow-sm dark:shadow-none"
       style={{
         transition: "all 0.4s cubic-bezier(0.34,1.2,0.64,1)",
         boxShadow: hovered ? `0 0 20px ${feature.glow}, inset 0 0 20px ${feature.glow}` : "none",
@@ -233,34 +234,14 @@ function FeatureCard({ feature, index }: { feature: (typeof FEATURES)[0]; index:
         </div>
         <div>
           <p
-            className="text-sm font-bold transition-colors duration-300"
-            style={{ color: hovered ? feature.color : "#e2e8f0" }}
+            className="text-sm font-bold transition-colors duration-300 text-slate-900 dark:text-[#e2e8f0]"
+            style={{ color: hovered ? feature.color : undefined }}
           >
             {feature.label}
           </p>
-          <p className="text-[11px] text-slate-400 mt-0.5">{feature.desc}</p>
+          <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">{feature.desc}</p>
         </div>
       </div>
-    </div>
-  );
-}
-
-// ─── Step Indicator ───────────────────────────────────────────────────────────
-function StepDots({ current, total }: { current: number; total: number }) {
-  return (
-    <div className="flex items-center gap-2">
-      {Array.from({ length: total }).map((_, i) => (
-        <div
-          key={i}
-          className="rounded-full transition-all duration-500"
-          style={{
-            width: i === current ? "20px" : "6px",
-            height: "6px",
-            backgroundColor: i <= current ? "#10b981" : "rgba(255,255,255,0.1)",
-            boxShadow: i === current ? "0 0 8px #10b98180" : "none",
-          }}
-        />
-      ))}
     </div>
   );
 }
@@ -287,8 +268,6 @@ function SignupPage() {
     75,
     2200,
   );
-
-  const currentStep = name ? (email ? (password ? 2 : 1) : 1) : 0;
 
   useEffect(() => {
     const t = setTimeout(() => setMounted(true), 100);
@@ -359,7 +338,20 @@ function SignupPage() {
   }
 
   return (
-    <div id="signup-page" className="flex min-h-screen bg-[#030712]">
+    <div id="signup-page" className="flex min-h-screen bg-white dark:bg-[#030712] text-slate-900 dark:text-foreground transition-colors duration-500">
+      {/* Back to Home Button */}
+      <Link
+        to="/"
+        className="absolute top-6 left-6 md:top-8 md:left-8 z-50 flex items-center gap-2 text-slate-500 dark:text-slate-400 hover:text-emerald-600 dark:hover:text-white transition-colors group"
+      >
+        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-slate-50 dark:bg-white/[0.03] border border-slate-200 dark:border-white/[0.05] group-hover:bg-slate-100 dark:group-hover:bg-white/[0.08] transition-colors shadow-sm dark:shadow-none">
+          <ArrowLeft className="h-4 w-4" />
+        </div>
+        <span className="text-sm font-semibold opacity-0 group-hover:opacity-100 -translate-x-2 group-hover:translate-x-0 transition-all duration-300 hidden md:block">
+          Back to Home
+        </span>
+      </Link>
+
       {/* ── Left side: Auth Form ── */}
       <div className="w-full lg:w-[45%] flex flex-col justify-center px-8 sm:px-16 lg:px-24 py-12 relative z-10">
         <div
@@ -375,24 +367,24 @@ function SignupPage() {
               <Zap className="h-5 w-5 text-white" />
               <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-white/20 to-transparent" />
             </div>
-            <span className="text-xl font-black text-white tracking-tight">DevAI</span>
+            <span className="text-xl font-black text-slate-900 dark:text-white tracking-tight">DevAI</span>
           </div>
 
           <div className="mb-8">
-            <h2 className="text-3xl font-black text-white">Create an account</h2>
-            <p className="text-slate-400 text-sm mt-2">
+            <h2 className="text-3xl font-black text-slate-900 dark:text-white">Create an account</h2>
+            <p className="text-slate-500 dark:text-slate-400 text-sm mt-2">
               Start building your developer career for free.
             </p>
           </div>
 
           {success ? (
             <div className="text-center space-y-4 py-8">
-              <div className="w-16 h-16 mx-auto rounded-full bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center">
-                <Mail className="h-8 w-8 text-emerald-400" />
+              <div className="w-16 h-16 mx-auto rounded-full bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20 flex items-center justify-center">
+                <Mail className="h-8 w-8 text-emerald-600 dark:text-emerald-400" />
               </div>
-              <h3 className="text-xl font-bold text-white">Check your email</h3>
-              <p className="text-slate-400 text-sm max-w-[300px] mx-auto">
-                We've sent a magic link to <span className="text-white font-semibold">{email}</span>.
+              <h3 className="text-xl font-bold text-slate-900 dark:text-white">Check your email</h3>
+              <p className="text-slate-500 dark:text-slate-400 text-sm max-w-[300px] mx-auto">
+                We've sent a magic link to <span className="text-slate-900 dark:text-white font-semibold">{email}</span>.
                 Click it to activate your account.
               </p>
             </div>
@@ -403,9 +395,9 @@ function SignupPage() {
                 <button
                   onClick={handleGoogle}
                   disabled={loading}
-                  className="group relative h-11 rounded-xl border border-white/[0.08] bg-white/[0.02] hover:bg-white/[0.06] hover:border-white/20 transition-all duration-300 flex items-center justify-center gap-2.5 font-semibold text-sm text-slate-300 hover:text-white overflow-hidden"
+                  className="group relative h-11 rounded-xl border border-slate-200 dark:border-white/[0.08] bg-slate-50 dark:bg-white/[0.02] hover:bg-white dark:hover:bg-white/[0.06] hover:border-slate-300 dark:hover:border-white/20 transition-all duration-300 flex items-center justify-center gap-2.5 font-semibold text-sm text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white overflow-hidden shadow-sm dark:shadow-none"
                 >
-                  <svg className="h-4 w-4 flex-shrink-0" viewBox="0 0 24 24">
+                  <svg className="h-4 w-4 flex-shrink-0 relative z-10" viewBox="0 0 24 24">
                     <path
                       fill="#4285F4"
                       d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
@@ -423,80 +415,80 @@ function SignupPage() {
                       d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
                     />
                   </svg>
-                  <span>Google</span>
+                  <span className="relative z-10">Google</span>
                 </button>
 
                 <button
                   onClick={handleGithub}
                   disabled={loading}
-                  className="group relative h-11 rounded-xl border border-white/[0.08] bg-white/[0.02] hover:bg-white/[0.06] hover:border-white/20 transition-all duration-300 flex items-center justify-center gap-2.5 font-semibold text-sm text-slate-300 hover:text-white overflow-hidden"
+                  className="group relative h-11 rounded-xl border border-slate-200 dark:border-white/[0.08] bg-slate-50 dark:bg-white/[0.02] hover:bg-white dark:hover:bg-white/[0.06] hover:border-slate-300 dark:hover:border-white/20 transition-all duration-300 flex items-center justify-center gap-2.5 font-semibold text-sm text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white overflow-hidden shadow-sm dark:shadow-none"
                 >
-                  <Github className="h-4 w-4 flex-shrink-0" />
-                  <span>GitHub</span>
+                  <Github className="h-4 w-4 flex-shrink-0 relative z-10 text-slate-900 dark:text-white" />
+                  <span className="relative z-10">GitHub</span>
                 </button>
               </div>
 
               <div className="flex items-center gap-3 mb-6">
-                <div className="flex-1 h-px bg-white/[0.06]" />
-                <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-500">
+                <div className="flex-1 h-px bg-slate-200 dark:bg-white/[0.06]" />
+                <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-500 dark:text-slate-500">
                   or continue with email
                 </span>
-                <div className="flex-1 h-px bg-white/[0.06]" />
+                <div className="flex-1 h-px bg-slate-200 dark:bg-white/[0.06]" />
               </div>
 
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div className="space-y-1.5 group/f">
-                  <Label className="text-[11px] font-bold uppercase tracking-[0.1em] text-slate-400 group-focus-within/f:text-emerald-400 transition-colors">
+                  <Label className="text-[11px] font-bold uppercase tracking-[0.1em] text-slate-500 dark:text-slate-400 group-focus-within/f:text-emerald-600 dark:group-focus-within/f:text-emerald-400 transition-colors">
                     Full Name
                   </Label>
                   <div className="relative">
-                    <User className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-600 group-focus-within/f:text-emerald-400 transition-colors pointer-events-none" />
+                    <User className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 dark:text-slate-600 group-focus-within/f:text-emerald-600 dark:group-focus-within/f:text-emerald-400 transition-colors pointer-events-none" />
                     <Input
                       type="text"
                       value={name}
                       onChange={(e) => setName(e.target.value)}
                       placeholder="Jane Doe"
                       required
-                      className="h-11 pl-10 rounded-xl bg-white/[0.02] border-white/[0.08] text-white placeholder:text-slate-600 focus:border-emerald-500/50 focus:bg-white/[0.04] focus:ring-0 focus:shadow-lg focus:shadow-emerald-500/10 transition-all duration-300 hover:border-white/15"
+                      className="h-11 pl-10 rounded-xl bg-slate-50 dark:bg-white/[0.02] border-slate-200 dark:border-white/[0.08] text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-600 focus:border-emerald-500/50 focus:bg-white dark:focus:bg-white/[0.04] focus:ring-0 focus:shadow-lg focus:shadow-emerald-500/10 transition-all duration-300 hover:border-slate-300 dark:hover:border-white/15"
                     />
                   </div>
                 </div>
 
                 <div className="space-y-1.5 group/f">
-                  <Label className="text-[11px] font-bold uppercase tracking-[0.1em] text-slate-400 group-focus-within/f:text-emerald-400 transition-colors">
+                  <Label className="text-[11px] font-bold uppercase tracking-[0.1em] text-slate-500 dark:text-slate-400 group-focus-within/f:text-emerald-600 dark:group-focus-within/f:text-emerald-400 transition-colors">
                     Email
                   </Label>
                   <div className="relative">
-                    <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-600 group-focus-within/f:text-emerald-400 transition-colors pointer-events-none" />
+                    <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 dark:text-slate-600 group-focus-within/f:text-emerald-600 dark:group-focus-within/f:text-emerald-400 transition-colors pointer-events-none" />
                     <Input
                       type="email"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       placeholder="you@example.com"
                       required
-                      className="h-11 pl-10 rounded-xl bg-white/[0.02] border-white/[0.08] text-white placeholder:text-slate-600 focus:border-emerald-500/50 focus:bg-white/[0.04] focus:ring-0 focus:shadow-lg focus:shadow-emerald-500/10 transition-all duration-300 hover:border-white/15"
+                      className="h-11 pl-10 rounded-xl bg-slate-50 dark:bg-white/[0.02] border-slate-200 dark:border-white/[0.08] text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-600 focus:border-emerald-500/50 focus:bg-white dark:focus:bg-white/[0.04] focus:ring-0 focus:shadow-lg focus:shadow-emerald-500/10 transition-all duration-300 hover:border-slate-300 dark:hover:border-white/15"
                     />
                   </div>
                 </div>
 
                 <div className="space-y-1.5 group/f">
-                  <Label className="text-[11px] font-bold uppercase tracking-[0.1em] text-slate-400 group-focus-within/f:text-emerald-400 transition-colors">
+                  <Label className="text-[11px] font-bold uppercase tracking-[0.1em] text-slate-500 dark:text-slate-400 group-focus-within/f:text-emerald-600 dark:group-focus-within/f:text-emerald-400 transition-colors">
                     Password
                   </Label>
                   <div className="relative">
-                    <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-600 group-focus-within/f:text-emerald-400 transition-colors pointer-events-none" />
+                    <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 dark:text-slate-600 group-focus-within/f:text-emerald-600 dark:group-focus-within/f:text-emerald-400 transition-colors pointer-events-none" />
                     <Input
                       type={showPassword ? "text" : "password"}
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       placeholder="••••••••"
                       required
-                      className="h-11 pl-10 pr-10 rounded-xl bg-white/[0.02] border-white/[0.08] text-white placeholder:text-slate-600 focus:border-emerald-500/50 focus:bg-white/[0.04] focus:ring-0 focus:shadow-lg focus:shadow-emerald-500/10 transition-all duration-300 hover:border-white/15"
+                      className="h-11 pl-10 pr-10 rounded-xl bg-slate-50 dark:bg-white/[0.02] border-slate-200 dark:border-white/[0.08] text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-600 focus:border-emerald-500/50 focus:bg-white dark:focus:bg-white/[0.04] focus:ring-0 focus:shadow-lg focus:shadow-emerald-500/10 transition-all duration-300 hover:border-slate-300 dark:hover:border-white/15"
                     />
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300 transition-colors p-1"
+                      className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300 transition-colors p-1"
                     >
                       {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                     </button>
@@ -508,10 +500,10 @@ function SignupPage() {
                   <button
                     type="submit"
                     disabled={loading || password.length < 6}
-                    className="group/btn relative w-full h-12 rounded-xl font-bold text-sm text-white overflow-hidden disabled:opacity-60 disabled:cursor-not-allowed"
+                    className="group/btn relative w-full h-12 rounded-xl font-bold text-sm text-white overflow-hidden disabled:opacity-60 disabled:cursor-not-allowed shadow-md"
                     style={{
                       background: "linear-gradient(135deg, #059669 0%, #0d9488 100%)",
-                      boxShadow: "0 0 24px rgba(16,185,129,0.3), inset 0 1px 0 rgba(255,255,255,0.2)",
+                      boxShadow: "0 0 24px rgba(16,185,129,0.2), inset 0 1px 0 rgba(255,255,255,0.2)",
                     }}
                   >
                     <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/15 to-transparent -translate-x-full group-hover/btn:translate-x-full transition-transform duration-700 ease-in-out" />
@@ -533,7 +525,7 @@ function SignupPage() {
 
           <p className="mt-8 text-center text-sm text-slate-500">
             Already have an account?{" "}
-            <Link to="/login" className="font-bold text-emerald-400 hover:text-emerald-300 transition-colors">
+            <Link to="/login" className="font-bold text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 transition-colors">
               Sign in →
             </Link>
           </p>
@@ -541,14 +533,14 @@ function SignupPage() {
       </div>
 
       {/* ── Right side: Promotional Content ── */}
-      <div className="hidden lg:flex w-[55%] relative flex-col justify-center px-16 xl:px-24 border-l border-white/[0.05] overflow-hidden bg-[#03080c]">
+      <div className="hidden lg:flex w-[55%] relative flex-col justify-center px-16 xl:px-24 border-l border-slate-200 dark:border-white/[0.05] overflow-hidden bg-slate-50 dark:bg-[#03080c] transition-colors duration-500">
         {/* Abstract animated backgrounds */}
-        <div className="absolute top-[-20%] right-[-10%] w-[800px] h-[800px] bg-emerald-500/10 blur-[120px] rounded-full pointer-events-none mix-blend-screen" />
-        <div className="absolute bottom-[-10%] left-[-10%] w-[600px] h-[600px] bg-teal-500/10 blur-[100px] rounded-full pointer-events-none mix-blend-screen" />
+        <div className="absolute top-[-20%] right-[-10%] w-[800px] h-[800px] bg-emerald-500/10 dark:bg-emerald-500/10 blur-[120px] rounded-full pointer-events-none mix-blend-multiply dark:mix-blend-screen" />
+        <div className="absolute bottom-[-10%] left-[-10%] w-[600px] h-[600px] bg-teal-500/10 dark:bg-teal-500/10 blur-[100px] rounded-full pointer-events-none mix-blend-multiply dark:mix-blend-screen" />
         
         {/* Subtle grid */}
         <div
-          className="absolute inset-0 opacity-[0.03]"
+          className="absolute inset-0 opacity-[0.05] dark:opacity-[0.03]"
           style={{
             backgroundImage: `linear-gradient(rgba(16,185,129,0.8) 1px, transparent 1px), linear-gradient(90deg, rgba(16,185,129,0.8) 1px, transparent 1px)`,
             backgroundSize: "64px 64px",
@@ -571,20 +563,20 @@ function SignupPage() {
           }}
         >
           {/* Badge */}
-          <div className="inline-flex items-center gap-2.5 px-4 py-2 rounded-full border border-emerald-500/30 bg-emerald-500/10 backdrop-blur-xl mb-6">
-            <Sparkles className="h-3.5 w-3.5 text-emerald-400" />
-            <span className="text-[11px] font-bold text-emerald-300 uppercase tracking-[0.2em]">
+          <div className="inline-flex items-center gap-2.5 px-4 py-2 rounded-full border border-emerald-200 dark:border-emerald-500/30 bg-emerald-50 dark:bg-emerald-500/10 backdrop-blur-xl mb-6">
+            <Sparkles className="h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400" />
+            <span className="text-[11px] font-bold text-emerald-700 dark:text-emerald-300 uppercase tracking-[0.2em]">
               Join 12,000+ Developers
             </span>
           </div>
 
           <h1 className="text-5xl xl:text-6xl font-black tracking-tight leading-[1.05] mb-4">
-            <span className="text-white">Build</span>
+            <span className="text-slate-900 dark:text-white">Build</span>
             <br />
-            <span className="text-white">the career</span>
+            <span className="text-slate-900 dark:text-white">the career</span>
             <br />
             <span
-              className="bg-gradient-to-r from-emerald-400 via-teal-400 to-cyan-400 bg-clip-text text-transparent"
+              className="bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500 dark:from-emerald-400 dark:via-teal-400 dark:to-cyan-400 bg-clip-text text-transparent"
               style={{
                 backgroundSize: "200% 100%",
                 animation: "signup-gradientShift 4s ease infinite",
@@ -596,12 +588,12 @@ function SignupPage() {
 
           {/* Typewriter */}
           <div className="flex items-center gap-3 mb-10">
-            <Terminal className="h-5 w-5 text-emerald-400 flex-shrink-0 animate-pulse" />
-            <p className="text-xl text-slate-300 font-mono">
+            <Terminal className="h-5 w-5 text-emerald-500 dark:text-emerald-400 flex-shrink-0 animate-pulse" />
+            <p className="text-xl text-slate-600 dark:text-slate-300 font-mono">
               Land{" "}
-              <span className="text-emerald-300 font-semibold">
+              <span className="text-emerald-600 dark:text-emerald-300 font-semibold">
                 {typewriterText}
-                <span className="inline-block w-0.5 h-5 bg-emerald-400 ml-0.5 align-middle animate-blink" />
+                <span className="inline-block w-0.5 h-5 bg-emerald-500 dark:bg-emerald-400 ml-0.5 align-middle animate-blink" />
               </span>
             </p>
           </div>
@@ -614,7 +606,7 @@ function SignupPage() {
           </div>
 
           {/* Trust indicators */}
-          <div className="flex items-center gap-6 pt-6 border-t border-white/[0.08]">
+          <div className="flex items-center gap-6 pt-6 border-t border-slate-200 dark:border-white/[0.08]">
             {[
               { icon: "🔒", text: "256-bit SSL" },
               { icon: "✨", text: "Free Forever" },
@@ -622,7 +614,7 @@ function SignupPage() {
             ].map((b) => (
               <div key={b.text} className="flex items-center gap-2">
                 <span className="text-sm">{b.icon}</span>
-                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
                   {b.text}
                 </span>
               </div>
@@ -652,9 +644,9 @@ function SignupPage() {
         #signup-page input:-webkit-autofill,
         #signup-page input:-webkit-autofill:hover,
         #signup-page input:-webkit-autofill:focus {
-          -webkit-box-shadow: inset 0 0 0 40px rgba(25,25,35,0) !important;
-          -webkit-text-fill-color: #e2e8f0 !important;
-          caret-color: #e2e8f0 !important;
+          -webkit-box-shadow: inset 0 0 0 40px var(--color-background) !important;
+          -webkit-text-fill-color: var(--color-foreground) !important;
+          caret-color: var(--color-foreground) !important;
           transition: background-color 5000s ease-in-out 0s;
         }
       `}</style>
