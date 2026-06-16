@@ -30,7 +30,7 @@ export function FAQ() {
   ];
 
   return (
-    <section id="faq" className="relative py-28">
+    <section id="faq" className="relative py-16">
       <div className="mx-auto grid max-w-6xl gap-12 px-6 lg:grid-cols-[0.8fr_1.2fr] lg:gap-16">
         {/* sticky heading / sidebar */}
         <div className="lg:sticky lg:top-28 lg:self-start">

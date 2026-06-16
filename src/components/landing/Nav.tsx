@@ -3,8 +3,9 @@ import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { useEffect, useState } from "react";
 import { Sparkles, ArrowRight } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 
-export function Nav() {
+export function Nav({ session }: { session?: any }) {
   const [scrolled, setScrolled] = useState(false);
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 12);
@@ -40,17 +41,37 @@ export function Nav() {
         </nav>
         <div className="flex items-center gap-2">
           <ThemeToggle />
-          <Link to="/login">
-            <Button variant="ghost" className="text-muted-foreground hover:text-foreground">
-              Sign In
-            </Button>
-          </Link>
-          <Link to="/signup">
-            <Button size="sm" className="group gap-1.5 shadow-lg shadow-primary/20">
-              Get started
-              <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
-            </Button>
-          </Link>
+          {session ? (
+            <>
+              <Button
+                variant="ghost"
+                className="text-muted-foreground hover:text-foreground"
+                onClick={() => supabase.auth.signOut()}
+              >
+                Sign Out
+              </Button>
+              <Link to="/dashboard">
+                <Button size="sm" className="group gap-1.5 shadow-lg shadow-primary/20">
+                  Go to Dashboard
+                  <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
+                </Button>
+              </Link>
+            </>
+          ) : (
+            <>
+              <Link to="/login">
+                <Button variant="ghost" className="text-muted-foreground hover:text-foreground">
+                  Sign In
+                </Button>
+              </Link>
+              <Link to="/signup">
+                <Button size="sm" className="group gap-1.5 shadow-lg shadow-primary/20">
+                  Get started
+                  <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
+                </Button>
+              </Link>
+            </>
+          )}
         </div>
       </div>
     </header>

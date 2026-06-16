@@ -3,10 +3,10 @@ import { Button } from "@/components/ui/button";
 import { Reveal } from "./shared";
 import { Check, Zap, Shield, ArrowRight, Github, TrendingUp } from "lucide-react";
 
-export function Hero() {
+export function Hero({ session }: { session?: any }) {
   return (
     <section className="relative">
-      <div className="relative mx-auto max-w-5xl px-6 pt-6 pb-28 text-center md:pt-8">
+      <div className="relative mx-auto max-w-5xl px-6 pt-6 pb-16 text-center md:pt-8">
         <Reveal>
           <div className="mx-auto inline-flex items-center gap-2 rounded-full border border-border bg-card/60 px-4 py-1.5 text-xs text-muted-foreground shadow-sm backdrop-blur">
             <span className="relative flex h-2 w-2">
@@ -34,15 +34,27 @@ export function Hero() {
 
         <Reveal delay={240}>
           <div className="mt-9 flex flex-col items-center justify-center gap-3 sm:flex-row">
-            <Link to="/signup">
-              <Button
-                size="lg"
-                className="group h-12 gap-2 px-7 text-base shadow-xl shadow-primary/25"
-              >
-                Get started free
-                <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
-              </Button>
-            </Link>
+            {session ? (
+              <Link to="/dashboard">
+                <Button
+                  size="lg"
+                  className="group h-12 gap-2 px-7 text-base shadow-xl shadow-primary/25"
+                >
+                  Go to Dashboard
+                  <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+                </Button>
+              </Link>
+            ) : (
+              <Link to="/signup">
+                <Button
+                  size="lg"
+                  className="group h-12 gap-2 px-7 text-base shadow-xl shadow-primary/25"
+                >
+                  Get started free
+                  <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+                </Button>
+              </Link>
+            )}
             <a href="#features">
               <Button size="lg" variant="outline" className="h-12 px-7 text-base backdrop-blur">
                 Explore features

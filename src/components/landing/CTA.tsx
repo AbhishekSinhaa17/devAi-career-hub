@@ -6,7 +6,7 @@ import { ArrowRight, Check, Sparkles } from "lucide-react";
 export function CTA() {
   return (
     <>
-      <section className="px-6 py-24">
+      <section className="px-6 py-12">
         <Reveal>
           <div className="cta-glow relative mx-auto max-w-5xl rounded-[2rem] p-px">
             <div className="relative overflow-hidden rounded-[calc(2rem-1px)] border border-primary/20 bg-gradient-to-br from-primary/15 via-card/70 to-chart-2/10 px-8 py-20 text-center backdrop-blur-xl">

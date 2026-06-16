@@ -28,7 +28,7 @@ const stats = [
 
 export function Stats() {
   return (
-    <section className="relative py-24 overflow-hidden">
+    <section className="relative py-12 overflow-hidden">
       {/* Ambient Background */}
       <div className="absolute inset-0 -z-10">
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-3xl h-[400px] rounded-full bg-primary/10 blur-[120px]" />

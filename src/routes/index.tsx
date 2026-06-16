@@ -1,4 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
 import { Aurora, StyleInjector } from "@/components/landing/shared";
 import { Nav } from "@/components/landing/Nav";
 import { Hero } from "@/components/landing/Hero";
@@ -25,11 +27,25 @@ export const Route = createFileRoute("/")({
 });
 
 function Landing() {
+  const [session, setSession] = useState<any>(null);
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+    });
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session);
+    });
+    return () => subscription.unsubscribe();
+  }, []);
+
   return (
     <div className="min-h-screen bg-background text-foreground antialiased">
       <Aurora />
-      <Nav />
-      <Hero />
+      <Nav session={session} />
+      <Hero session={session} />
       <Marquee />
       <Features />
       <Stats />

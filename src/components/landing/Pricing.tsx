@@ -44,7 +44,7 @@ export function Pricing() {
   ];
 
   return (
-    <section id="pricing" className="relative py-32 overflow-hidden">
+    <section id="pricing" className="relative py-16 overflow-hidden">
       {/* Background decoration */}
       <div className="pointer-events-none absolute inset-0 -z-10">
         <div className="absolute left-1/2 top-0 h-[600px] w-[900px] -translate-x-1/2 rounded-full bg-primary/5 blur-[120px]" />
