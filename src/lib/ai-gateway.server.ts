@@ -2,15 +2,15 @@
 // Loaded only inside createServerFn handlers via dynamic import.
 
 const GEMINI_ENDPOINT = "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions";
-const GROK_ENDPOINT = "https://api.x.ai/v1/chat/completions";
+const GROQ_ENDPOINT = "https://api.groq.com/openai/v1/chat/completions";
 
 const DEFAULT_GEMINI_MODEL = "gemini-2.5-flash";
-const DEFAULT_GROK_MODEL = "grok-2-latest";
+const DEFAULT_GROQ_MODEL = "llama-3.3-70b-versatile";
 
 // Approximate USD cost per 1K tokens (input, output). Used for analytics estimates.
 const MODEL_PRICING: Record<string, { in: number; out: number }> = {
   "gemini-2.5-flash": { in: 0.000075, out: 0.0003 },
-  "grok-2-latest": { in: 0.002, out: 0.010 },
+  "llama-3.3-70b-versatile": { in: 0.00059, out: 0.00079 },
   "gpt-4o": { in: 0.005, out: 0.015 },
   "gpt-4o-mini": { in: 0.00015, out: 0.0006 },
 };
@@ -66,10 +66,23 @@ async function executeProviderCall(
   const body: Record<string, unknown> = { model, messages: opts.messages };
   if (opts.temperature !== undefined) body.temperature = opts.temperature;
   if (opts.jsonSchema) {
-    body.response_format = {
-      type: "json_schema",
-      json_schema: { name: opts.jsonSchema.name, schema: opts.jsonSchema.schema, strict: true },
-    };
+    if (endpoint.includes("groq")) {
+      body.response_format = { type: "json_object" };
+      // Ensure Groq knows the schema by appending it to the first message if needed,
+      // or we just trust the system prompt already has enough context.
+      // Appending to the last message safely:
+      if (Array.isArray(body.messages) && body.messages.length > 0) {
+        body.messages[body.messages.length - 1] = {
+          ...body.messages[body.messages.length - 1],
+          content: body.messages[body.messages.length - 1].content + `\n\nOutput strictly valid JSON matching this schema: ${JSON.stringify(opts.jsonSchema.schema)}`
+        };
+      }
+    } else {
+      body.response_format = {
+        type: "json_schema",
+        json_schema: { name: opts.jsonSchema.name, schema: opts.jsonSchema.schema, strict: true },
+      };
+    }
   }
 
   const start = Date.now();
@@ -117,25 +130,25 @@ async function rawCall(opts: {
       const model = (opts.model && opts.model.includes("gemini")) ? opts.model : DEFAULT_GEMINI_MODEL;
       return await executeProviderCall(GEMINI_ENDPOINT, geminiKey, model, opts);
     } catch (err) {
-      console.warn("Gemini call failed, falling back to Grok", err);
+      console.warn("Gemini call failed, falling back to Groq", err);
       lastError = err;
     }
   }
 
-  // Fallback to Grok
-  const grokKey = process.env.XAI_API_KEY || process.env.GROK_API_KEY;
-  if (grokKey) {
+  // Fallback to Groq
+  const groqKey = process.env.GROQ_API_KEY;
+  if (groqKey) {
     try {
-      const model = DEFAULT_GROK_MODEL;
-      return await executeProviderCall(GROK_ENDPOINT, grokKey, model, opts);
+      const model = DEFAULT_GROQ_MODEL;
+      return await executeProviderCall(GROQ_ENDPOINT, groqKey, model, opts);
     } catch (err) {
-      console.warn("Grok call failed", err);
+      console.warn("Groq call failed", err);
       lastError = err;
     }
   }
 
   if (lastError) throw lastError;
-  throw new Error("No AI providers configured (missing GEMINI_API_KEY or XAI_API_KEY/GROK_API_KEY)");
+  throw new Error("No AI providers configured (missing GEMINI_API_KEY or GROQ_API_KEY)");
 }
 
 export async function callAi(opts: {

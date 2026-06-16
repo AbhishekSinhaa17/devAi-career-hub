@@ -1,5 +1,4 @@
 import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
-import { Button } from "@/components/ui/button";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { getDashboard } from "@/lib/ai.functions";
@@ -8,33 +7,461 @@ import {
   FileText,
   Code2,
   MessageSquare,
-  Map as MapIcon,
   TrendingUp,
   TrendingDown,
   Minus,
   ArrowRight,
   Activity,
-  Award,
   Briefcase,
   Star,
   FileBadge,
   Zap,
   Medal,
   Trophy,
+  Sparkles,
+  GitBranch,
+  Brain,
+  Rocket,
+  BarChart3,
+  ChevronRight,
+  Cpu,
 } from "lucide-react";
-import { PolarAngleAxis, PolarGrid, Radar, RadarChart, ResponsiveContainer, Tooltip } from "recharts";
+import {
+  PolarAngleAxis,
+  PolarGrid,
+  Radar,
+  RadarChart,
+  ResponsiveContainer,
+  Tooltip,
+} from "recharts";
+import { useState, useEffect, useRef } from "react";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
   head: () => ({ meta: [{ title: "Dashboard — DevAI" }] }),
   component: Dashboard,
 });
 
+// ─── Animated counter ─────────────────────────────────────────────────────────
+function useCountUp(target: number, duration = 1200) {
+  const [count, setCount] = useState(0);
+  useEffect(() => {
+    if (target === 0) return;
+    let start = 0;
+    const step = target / (duration / 16);
+    const timer = setInterval(() => {
+      start += step;
+      if (start >= target) {
+        setCount(target);
+        clearInterval(timer);
+      } else {
+        setCount(Math.floor(start));
+      }
+    }, 16);
+    return () => clearInterval(timer);
+  }, [target, duration]);
+  return count;
+}
+
+// ─── Glowing orb background ───────────────────────────────────────────────────
+function BackgroundOrbs() {
+  return (
+    <div className="pointer-events-none fixed inset-0 -z-10 overflow-hidden">
+      <div className="absolute -top-60 -left-60 w-[500px] h-[500px] rounded-full bg-indigo-600/10 dark:bg-indigo-600/8 blur-3xl animate-pulse" />
+      <div
+        className="absolute top-1/3 -right-40 w-[400px] h-[400px] rounded-full bg-violet-600/10 dark:bg-violet-600/6 blur-3xl"
+        style={{ animation: "pulse 4s ease-in-out 1s infinite" }}
+      />
+      <div
+        className="absolute -bottom-40 left-1/3 w-[350px] h-[350px] rounded-full bg-purple-600/10 dark:bg-purple-600/6 blur-3xl"
+        style={{ animation: "pulse 5s ease-in-out 2s infinite" }}
+      />
+      {/* Subtle grid */}
+      <div
+        className="absolute inset-0 opacity-[0.05] dark:opacity-[0.025]"
+        style={{
+          backgroundImage: `linear-gradient(rgba(99,102,241,0.8) 1px, transparent 1px), linear-gradient(90deg, rgba(99,102,241,0.8) 1px, transparent 1px)`,
+          backgroundSize: "60px 60px",
+        }}
+      />
+    </div>
+  );
+}
+
+// ─── Dev Score Ring ───────────────────────────────────────────────────────────
+function DevScoreRing({ score, trend }: { score: number; trend: number }) {
+  const animScore = useCountUp(score);
+  const radius = 52;
+  const circumference = 2 * Math.PI * radius;
+  const offset = circumference - (animScore / 100) * circumference;
+
+  const color =
+    score >= 75 ? "#10b981" : score >= 50 ? "#6366f1" : score >= 25 ? "#f59e0b" : "#ef4444";
+
+  return (
+    <div className="flex items-center gap-8">
+      {/* Ring */}
+      <div className="relative flex items-center justify-center">
+        <svg width="140" height="140" className="-rotate-90">
+          {/* Track */}
+          <circle
+            cx="70"
+            cy="70"
+            r={radius}
+            fill="none"
+            className="stroke-slate-200 dark:stroke-white/5"
+            strokeWidth="10"
+          />
+          {/* Progress */}
+          <circle
+            cx="70"
+            cy="70"
+            r={radius}
+            fill="none"
+            stroke={color}
+            strokeWidth="10"
+            strokeLinecap="round"
+            strokeDasharray={circumference}
+            strokeDashoffset={offset}
+            style={{
+              transition: "stroke-dashoffset 1.2s cubic-bezier(0.34,1.2,0.64,1)",
+              filter: `drop-shadow(0 0 8px ${color}80)`,
+            }}
+          />
+        </svg>
+        <div className="absolute flex flex-col items-center">
+          <span className="text-4xl font-black" style={{ color }}>
+            {animScore}
+          </span>
+          <span className="text-[10px] text-slate-500 uppercase tracking-widest font-bold">
+            Score
+          </span>
+        </div>
+      </div>
+
+      {/* Meta */}
+      <div className="space-y-3">
+        <div>
+          <p className="text-xs text-slate-500 uppercase tracking-widest font-bold mb-1">
+            Career Health
+          </p>
+          <h2 className="text-2xl font-black text-slate-900 dark:text-white">Developer Score</h2>
+          <p className="text-slate-600 dark:text-slate-500 text-sm mt-1">Your comprehensive career readiness rating</p>
+        </div>
+        <div className="flex items-center gap-2">
+          <div
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold"
+            style={{
+              backgroundColor:
+                trend > 0
+                  ? "rgba(16,185,129,0.1)"
+                  : trend < 0
+                    ? "rgba(239,68,68,0.1)"
+                    : "rgba(100,116,139,0.1)", // Light mode friendly neutral
+              color: trend > 0 ? "#10b981" : trend < 0 ? "#ef4444" : "#64748b",
+              border: `1px solid ${trend > 0 ? "rgba(16,185,129,0.2)" : trend < 0 ? "rgba(239,68,68,0.2)" : "rgba(100,116,139,0.2)"}`,
+            }}
+          >
+            {trend > 0 ? (
+              <TrendingUp className="h-3.5 w-3.5" />
+            ) : trend < 0 ? (
+              <TrendingDown className="h-3.5 w-3.5" />
+            ) : (
+              <Minus className="h-3.5 w-3.5" />
+            )}
+            {Math.abs(trend)} pts this week
+          </div>
+        </div>
+        <Link to="/developer-score">
+          <button
+            className="group flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold text-white transition-all duration-300 relative overflow-hidden"
+            style={{
+              background: "linear-gradient(135deg, #4f46e5, #7c3aed)",
+              boxShadow: "0 0 20px rgba(99,102,241,0.3)",
+            }}
+          >
+            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-500" />
+            <span className="relative">View Full Report</span>
+            <ArrowRight className="h-4 w-4 relative transition-transform group-hover:translate-x-0.5" />
+          </button>
+        </Link>
+      </div>
+    </div>
+  );
+}
+
+// ─── Metric Bar Card ──────────────────────────────────────────────────────────
+function MetricCard({
+  label,
+  value,
+  loading,
+  icon: Icon,
+  color = "#6366f1",
+}: {
+  label: string;
+  value: number;
+  loading: boolean;
+  icon: React.ElementType;
+  color?: string;
+}) {
+  const animated = useCountUp(value);
+
+  return (
+    <div
+      className="relative rounded-2xl border border-slate-200 dark:border-white/[0.06] bg-white dark:bg-white/[0.02] p-5 overflow-hidden group hover:border-slate-300 dark:hover:border-white/[0.12] transition-all duration-500 shadow-sm dark:shadow-none"
+    >
+      <div
+        className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+        style={{
+          background: `radial-gradient(circle at 50% 0%, ${color}10 0%, transparent 60%)`,
+        }}
+      />
+      <div
+        className="absolute inset-x-0 top-0 h-px opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+        style={{ background: `linear-gradient(90deg, transparent, ${color}60, transparent)` }}
+      />
+
+      <div className="relative z-10">
+        <div className="flex items-center justify-between mb-4">
+          <div
+            className="h-9 w-9 rounded-xl flex items-center justify-center"
+            style={{ backgroundColor: `${color}18` }}
+          >
+            <Icon className="h-4.5 w-4.5" style={{ color }} />
+          </div>
+          <span className="text-[10px] font-bold uppercase tracking-widest text-slate-500 dark:text-slate-600">
+            {label}
+          </span>
+        </div>
+
+        <div className="flex items-baseline gap-1 mb-3">
+          <span className="text-4xl font-black text-slate-900 dark:text-white">{loading ? "—" : animated}</span>
+          <span className="text-slate-500 dark:text-slate-600 text-sm font-semibold">/100</span>
+        </div>
+
+        {/* Progress track */}
+        <div className="h-1.5 rounded-full bg-slate-100 dark:bg-white/[0.06] overflow-hidden">
+          <div
+            className="h-full rounded-full transition-all duration-1000 ease-out"
+            style={{
+              width: `${animated}%`,
+              background: `linear-gradient(90deg, ${color}80, ${color})`,
+              boxShadow: `0 0 8px ${color}60`,
+            }}
+          />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─── Radar chart custom tooltip ───────────────────────────────────────────────
+function CustomTooltip({ active, payload }: any) {
+  if (!active || !payload?.length) return null;
+  return (
+    <div className="rounded-xl border border-slate-200 dark:border-white/[0.08] bg-white/95 dark:bg-[#0f0f1e]/95 backdrop-blur-xl px-3 py-2 text-sm shadow-xl dark:shadow-2xl">
+      <p className="font-bold text-slate-900 dark:text-white">{payload[0]?.payload?.name}</p>
+      <p className="text-indigo-600 dark:text-indigo-400 font-semibold">{payload[0]?.value} / 100</p>
+    </div>
+  );
+}
+
+// ─── Glass Panel ──────────────────────────────────────────────────────────────
+function GlassPanel({
+  children,
+  className = "",
+  glow,
+}: {
+  children: React.ReactNode;
+  className?: string;
+  glow?: string;
+}) {
+  return (
+    <div
+      className={`relative rounded-2xl border border-slate-200 dark:border-white/[0.06] bg-white dark:bg-white/[0.02] overflow-hidden shadow-sm dark:shadow-none ${className}`}
+      style={{
+        boxShadow: glow ? `0 0 40px ${glow}` : undefined,
+      }}
+    >
+      {children}
+    </div>
+  );
+}
+
+// ─── Section header ───────────────────────────────────────────────────────────
+function SectionHeader({
+  icon: Icon,
+  label,
+  accent = "#6366f1",
+}: {
+  icon: React.ElementType;
+  label: string;
+  accent?: string;
+}) {
+  return (
+    <div className="flex items-center gap-2 mb-5">
+      <div
+        className="h-6 w-6 rounded-lg flex items-center justify-center"
+        style={{ backgroundColor: `${accent}20` }}
+      >
+        <Icon className="h-3.5 w-3.5" style={{ color: accent }} />
+      </div>
+      <span className="text-[11px] font-bold uppercase tracking-[0.18em] text-slate-500">
+        {label}
+      </span>
+    </div>
+  );
+}
+
+// ─── Action Card ──────────────────────────────────────────────────────────────
+const ACTION_COLORS: Record<string, { color: string; glow: string }> = {
+  "/mock-interview": { color: "#8b5cf6", glow: "rgba(139,92,246,0.2)" },
+  "/github-resume": { color: "#10b981", glow: "rgba(16,185,129,0.2)" },
+  "/developer-score": { color: "#6366f1", glow: "rgba(99,102,241,0.2)" },
+  "/github": { color: "#f59e0b", glow: "rgba(245,158,11,0.2)" },
+  "/resume": { color: "#3b82f6", glow: "rgba(59,130,246,0.2)" },
+  "/interview": { color: "#ec4899", glow: "rgba(236,72,153,0.2)" },
+};
+
+function ActionCard({
+  to,
+  icon: Icon,
+  title,
+  desc,
+}: {
+  to: string;
+  icon: React.ElementType;
+  title: string;
+  desc: string;
+}) {
+  const router = useRouter();
+  const { color, glow } = ACTION_COLORS[to] ?? {
+    color: "#6366f1",
+    glow: "rgba(99,102,241,0.2)",
+  };
+  const [hovered, setHovered] = useState(false);
+
+  return (
+    <Link
+      to={to}
+      onClick={() => router.invalidate()}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+    >
+      <div
+        className="relative rounded-2xl border border-slate-200 dark:border-white/[0.06] bg-white dark:bg-white/[0.02] p-5 overflow-hidden cursor-pointer h-full shadow-sm dark:shadow-none"
+        style={{
+          transition: "all 0.4s cubic-bezier(0.34,1.2,0.64,1)",
+          borderColor: hovered ? `${color}30` : undefined,
+          transform: hovered ? "translateY(-3px)" : "none",
+          boxShadow: hovered
+            ? `0 16px 40px ${glow}`
+            : undefined,
+        }}
+      >
+        {/* Hover glow */}
+        <div
+          className="absolute inset-0 transition-opacity duration-500"
+          style={{
+            background: `radial-gradient(circle at 30% 30%, ${color}10 0%, transparent 60%)`,
+            opacity: hovered ? 1 : 0,
+          }}
+        />
+        <div
+          className="absolute inset-x-0 top-0 h-px transition-opacity duration-500"
+          style={{
+            background: `linear-gradient(90deg, transparent, ${color}50, transparent)`,
+            opacity: hovered ? 1 : 0,
+          }}
+        />
+
+        <div className="relative z-10">
+          <div
+            className="h-10 w-10 rounded-xl flex items-center justify-center mb-4 transition-all duration-300"
+            style={{
+              backgroundColor: `${color}18`,
+              boxShadow: hovered ? `0 0 16px ${color}40` : "none",
+            }}
+          >
+            <Icon
+              className="h-5 w-5 transition-transform duration-300"
+              style={{
+                color,
+                transform: hovered ? "scale(1.15) rotate(5deg)" : "scale(1)",
+              }}
+            />
+          </div>
+
+          <div className="flex items-start justify-between gap-2">
+            <div>
+              <h3 className="font-bold text-slate-900 dark:text-white text-sm">{title}</h3>
+              <p className="mt-1 text-xs text-slate-500 dark:text-slate-600 leading-relaxed">{desc}</p>
+            </div>
+            <ChevronRight
+              className="h-4 w-4 flex-shrink-0 mt-0.5 transition-all duration-300"
+              style={{
+                color: hovered ? color : "#64748b",
+                transform: hovered ? "translateX(2px)" : "none",
+              }}
+            />
+          </div>
+        </div>
+      </div>
+    </Link>
+  );
+}
+
+// ─── Row components ───────────────────────────────────────────────────────────
+function DataRow({ label, value }: { label: string; value: string | number }) {
+  return (
+    <div className="flex items-center justify-between py-2.5 border-b border-slate-100 dark:border-white/[0.04] last:border-0">
+      <dt className="text-xs text-slate-500 dark:text-slate-600 font-semibold uppercase tracking-wider">{label}</dt>
+      <dd className="text-sm font-bold text-slate-700 dark:text-slate-300">{value}</dd>
+    </div>
+  );
+}
+
+function InsightRow({
+  icon: Icon,
+  label,
+  value,
+  color = "#6366f1",
+}: {
+  icon: React.ElementType;
+  label: string;
+  value: string;
+  color?: string;
+}) {
+  return (
+    <div className="flex items-center gap-3 py-2">
+      <div
+        className="h-8 w-8 rounded-xl flex items-center justify-center flex-shrink-0"
+        style={{ backgroundColor: `${color}18` }}
+      >
+        <Icon className="h-3.5 w-3.5" style={{ color }} />
+      </div>
+      <div className="min-w-0">
+        <div className="text-[10px] uppercase tracking-widest text-slate-500 dark:text-slate-600 font-bold">
+          {label}
+        </div>
+        <div className="text-sm font-semibold text-slate-800 dark:text-slate-300 truncate mt-0.5">{value}</div>
+      </div>
+    </div>
+  );
+}
+
+// ─── Main Dashboard ───────────────────────────────────────────────────────────
 function Dashboard() {
   const fetcher = useServerFn(getDashboard);
   const { data, isLoading } = useQuery({
     queryKey: ["dashboard"],
     queryFn: () => fetcher(),
   });
+
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => {
+    const t = setTimeout(() => setMounted(true), 80);
+    return () => clearTimeout(t);
+  }, []);
 
   const scores = [
     { name: "Profile", value: data?.profileCompletion ?? 0 },
@@ -44,240 +471,397 @@ function Dashboard() {
     { name: "Interview", value: data?.interviewReady ?? 0 },
   ];
 
+  const firstName = data?.profile?.name?.split(" ")[0] ?? null;
+
   return (
-    <div className="space-y-8">
-      <div>
-        <h1 className="text-3xl font-semibold tracking-tight">
-          Welcome back{data?.profile?.name ? `, ${data.profile.name.split(" ")[0]}` : ""}
-        </h1>
-        <p className="mt-1 text-muted-foreground">Here&apos;s how your developer career is shaping up.</p>
-      </div>
+    <div
+      className="space-y-8 min-h-screen text-slate-900 dark:text-foreground"
+      style={{
+        opacity: mounted ? 1 : 0,
+        transform: mounted ? "none" : "translateY(12px)",
+        transition: "all 0.6s cubic-bezier(0.34,1.2,0.64,1)",
+      }}
+    >
+      <BackgroundOrbs />
 
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <div className="glass-card rounded-xl p-6 md:col-span-2 lg:col-span-4 flex flex-col md:flex-row items-center justify-between gap-6 border-primary/20 bg-gradient-to-br from-background to-primary/5">
-          <div>
-            <h2 className="text-xl font-semibold flex items-center gap-2"><Activity className="h-5 w-5 text-primary" /> Developer Health Score</h2>
-            <p className="text-muted-foreground mt-1 text-sm">Your comprehensive career readiness rating across all metrics.</p>
-          </div>
-          <div className="flex items-center gap-8">
-            <div className="text-center">
-              <div className="text-sm text-muted-foreground mb-1">Current Score</div>
-              <div className="text-5xl font-bold tracking-tighter gradient-text">{data?.devScore ?? 0}</div>
+      {/* ── Header ── */}
+      <div className="flex items-start justify-between">
+        <div>
+          <div className="flex items-center gap-2 mb-2">
+            <div className="flex items-center gap-2 px-3 py-1 rounded-full border border-indigo-500/20 bg-indigo-500/5">
+              <span className="h-1.5 w-1.5 rounded-full bg-indigo-500 dark:bg-indigo-400 animate-pulse" />
+              <span className="text-[11px] font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-widest">
+                Live Dashboard
+              </span>
             </div>
-            <div className="text-center">
-              <div className="text-sm text-muted-foreground mb-1">Trend</div>
-              <div className={`flex items-center justify-center gap-1 font-medium ${(data?.devScoreTrend ?? 0) > 0 ? "text-green-500" : (data?.devScoreTrend ?? 0) < 0 ? "text-red-500" : "text-muted-foreground"}`}>
-                {(data?.devScoreTrend ?? 0) > 0 ? <TrendingUp className="h-4 w-4" /> : (data?.devScoreTrend ?? 0) < 0 ? <TrendingDown className="h-4 w-4" /> : <Minus className="h-4 w-4" />}
-                {Math.abs(data?.devScoreTrend ?? 0)} pts
-              </div>
-            </div>
-            <Link to="/developer-score">
-              <Button variant="default" className="gap-2 rounded-full">View Details <ArrowRight className="h-4 w-4" /></Button>
-            </Link>
           </div>
+          <h1 className="text-3xl font-black text-slate-900 dark:text-white tracking-tight">
+            {firstName ? (
+              <>
+                Welcome back,{" "}
+                <span className="bg-gradient-to-r from-indigo-500 to-violet-500 dark:from-indigo-400 dark:to-violet-400 bg-clip-text text-transparent">
+                  {firstName}
+                </span>{" "}
+                👋
+              </>
+            ) : (
+              "Your Dashboard"
+            )}
+          </h1>
+          <p className="mt-1 text-slate-600 dark:text-slate-500 text-sm">
+            Here's how your developer career is shaping up today.
+          </p>
         </div>
 
-        <ScoreCard label="Profile completion" value={data?.profileCompletion ?? 0} loading={isLoading} hint="Fill out your profile" />
-        
-        {/* Mock Interview Gamification */}
-        <div className="glass-card rounded-xl p-5 border-l-4 border-l-primary flex flex-col justify-between">
-          <div>
-            <div className="flex items-center gap-2 text-xs uppercase tracking-wider text-muted-foreground mb-4">
-              <Trophy className="h-4 w-4 text-primary" /> Mock Interview Stats
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <div className="text-[10px] text-muted-foreground uppercase tracking-widest font-semibold">Best Score</div>
-                <div className="text-2xl font-bold flex items-center gap-1">
-                  {data?.profile?.best_interview_score ?? 0} <Star className="h-3.5 w-3.5 text-amber-500 fill-amber-500" />
-                </div>
-              </div>
-              <div>
-                <div className="text-[10px] text-muted-foreground uppercase tracking-widest font-semibold">Streak</div>
-                <div className="text-2xl font-bold flex items-center gap-1">
-                  {data?.profile?.interview_streak ?? 0} <Zap className="h-3.5 w-3.5 text-orange-500 fill-orange-500" />
-                </div>
-              </div>
-            </div>
-            <div className="mt-4 pt-4 border-t border-border/50">
-              <div className="text-[10px] text-muted-foreground uppercase tracking-widest font-semibold mb-1.5">Latest Badges</div>
-              <div className="flex flex-wrap gap-1">
-                {(data?.profile?.badges || []).length > 0 ? (
-                   (data?.profile?.badges || []).slice(-2).map((b: string) => (
-                    <span key={b} className="px-1.5 py-0.5 rounded bg-primary/10 text-primary text-[10px] font-bold tracking-tight uppercase flex items-center gap-1">
-                      <Medal className="h-3 w-3" /> {b}
+        {/* AI pulse badge */}
+        <div className="hidden md:flex items-center gap-2 px-4 py-2 rounded-2xl border border-slate-200 dark:border-white/[0.06] bg-white dark:bg-white/[0.02] shadow-sm dark:shadow-none">
+          <Cpu className="h-4 w-4 text-violet-500 dark:text-violet-400 animate-pulse" />
+          <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">AI powered</span>
+        </div>
+      </div>
+
+      {/* ── Hero: Dev Score ── */}
+      <GlassPanel className="p-8" glow="rgba(99,102,241,0.06)">
+        {/* Top accent */}
+        <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-indigo-500/40 to-transparent" />
+
+        <div className="flex flex-col md:flex-row items-center justify-between gap-8">
+          <DevScoreRing score={data?.devScore ?? 0} trend={data?.devScoreTrend ?? 0} />
+
+          {/* Metric pills */}
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 flex-1 max-w-xl">
+            {scores.map((s, i) => {
+              const colors = ["#6366f1", "#10b981", "#f59e0b", "#38bdf8", "#8b5cf6"];
+              const icons = [Activity, GitBranch, FileText, Rocket, Brain];
+              const Icon = icons[i];
+              return (
+                <div
+                  key={s.name}
+                  className="rounded-xl border border-slate-200 dark:border-white/[0.05] bg-slate-50 dark:bg-white/[0.02] px-4 py-3 group hover:border-slate-300 dark:hover:border-white/[0.1] transition-all duration-300"
+                >
+                  <div className="flex items-center gap-2 mb-2">
+                    <Icon className="h-3.5 w-3.5" style={{ color: colors[i] }} />
+                    <span className="text-[10px] font-bold uppercase tracking-widest text-slate-500 dark:text-slate-600">
+                      {s.name}
                     </span>
-                   ))
-                ) : (
-                  <span className="text-xs text-muted-foreground">Take a mock interview to earn badges.</span>
-                )}
-              </div>
-            </div>
+                  </div>
+                  <div className="flex items-baseline gap-1 mb-2">
+                    <span className="text-2xl font-black" style={{ color: colors[i] }}>
+                      {s.value}
+                    </span>
+                    <span className="text-slate-500 dark:text-slate-700 text-xs">/100</span>
+                  </div>
+                  <div className="h-1 rounded-full bg-slate-200 dark:bg-white/[0.05] overflow-hidden">
+                    <div
+                      className="h-full rounded-full transition-all duration-1000"
+                      style={{
+                        width: `${s.value}%`,
+                        background: colors[i],
+                        boxShadow: `0 0 6px ${colors[i]}80`,
+                      }}
+                    />
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </div>
-        
-        {/* GitHub Resume Widget */}
-        <div className="glass-card rounded-xl p-5 border-l-4 border-l-primary flex flex-col justify-between">
-          <div>
-            <div className="flex items-center gap-2 text-xs uppercase tracking-wider text-muted-foreground mb-2">
-              <FileBadge className="h-4 w-4" /> GitHub Resume
-            </div>
-            {data?.githubResume ? (
-              <div className="space-y-1">
-                <div className="font-semibold text-lg">{data.githubResume.developer_type}</div>
-                <div className="text-sm text-muted-foreground flex gap-1 flex-wrap">
-                  {data.githubResume.badges?.slice(0,2).map((b: string) => (
-                    <span key={b} className="px-1.5 py-0.5 rounded-sm bg-primary/10 text-primary text-[10px] font-bold tracking-tight uppercase">{b}</span>
-                  ))}
-                </div>
-                <div className="text-xs text-muted-foreground mt-2">
-                  Generated {new Date(data.githubResume.created_at).toLocaleDateString()}
-                </div>
-              </div>
-            ) : (
-              <div className="text-sm text-muted-foreground">
-                No resume generated yet. Run the AI generator to extract your GitHub experience.
-              </div>
-            )}
-          </div>
-          <Link to="/github-resume" className="text-xs font-medium text-primary hover:underline mt-4 flex items-center gap-1">
-            {data?.githubResume ? "View & Export" : "Generate Now"} <ArrowRight className="h-3 w-3" />
-          </Link>
-        </div>
+      </GlassPanel>
 
-        {/* Latest Mock Interview Widget */}
-        <div className="glass-card rounded-xl p-5 border-l-4 border-l-primary flex flex-col justify-between">
-          <div>
-            <div className="flex items-center gap-2 text-xs uppercase tracking-wider text-muted-foreground mb-2">
-              <MessageSquare className="h-4 w-4" /> Latest Mock Interview
+      {/* ── Stats Row ── */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        {/* Profile Completion */}
+        <MetricCard
+          label="Profile"
+          value={data?.profileCompletion ?? 0}
+          loading={isLoading}
+          icon={Activity}
+          color="#6366f1"
+        />
+
+        {/* Mock Interview Gamification */}
+        <GlassPanel className="p-5">
+          <SectionHeader icon={Trophy} label="Interview Stats" accent="#f59e0b" />
+          <div className="grid grid-cols-2 gap-4 mb-4">
+            <div>
+              <div className="text-[10px] text-slate-500 dark:text-slate-600 uppercase tracking-widest font-bold mb-1">
+                Best Score
+              </div>
+              <div className="text-3xl font-black text-slate-900 dark:text-white flex items-end gap-1">
+                {data?.profile?.best_interview_score ?? 0}
+                <Star className="h-4 w-4 text-amber-500 dark:text-amber-400 fill-amber-500 dark:fill-amber-400 mb-1" />
+              </div>
             </div>
-            {data?.mockInterview ? (
-              <div className="space-y-1">
-                <div className="font-semibold text-lg">{data.mockInterview.job_role}</div>
-                <div className="text-3xl font-bold tracking-tighter gradient-text mt-1">{data.mockInterview.overall_score}/100</div>
-                <div className="text-xs text-muted-foreground mt-2">
-                  Taken {new Date(data.mockInterview.created_at).toLocaleDateString()}
-                </div>
+            <div>
+              <div className="text-[10px] text-slate-500 dark:text-slate-600 uppercase tracking-widest font-bold mb-1">
+                Streak
               </div>
-            ) : (
-              <div className="text-sm text-muted-foreground">
-                No mock interviews taken yet. Test your skills in a real-world scenario.
+              <div className="text-3xl font-black text-slate-900 dark:text-white flex items-end gap-1">
+                {data?.profile?.interview_streak ?? 0}
+                <Zap className="h-4 w-4 text-orange-500 dark:text-orange-400 fill-orange-500 dark:fill-orange-400 mb-1" />
               </div>
-            )}
+            </div>
           </div>
-          <Link to="/mock-interview" className="text-xs font-medium text-primary hover:underline mt-4 flex items-center gap-1">
-            {data?.mockInterview ? "Take Another" : "Start Simulator"} <ArrowRight className="h-3 w-3" />
+          <div className="border-t border-slate-100 dark:border-white/[0.04] pt-3">
+            <div className="text-[10px] text-slate-500 dark:text-slate-600 uppercase tracking-widest font-bold mb-2">
+              Badges
+            </div>
+            <div className="flex flex-wrap gap-1.5">
+              {(data?.profile?.badges || []).length > 0 ? (
+                (data?.profile?.badges || []).slice(-3).map((b: string) => (
+                  <span
+                    key={b}
+                    className="flex items-center gap-1 px-2 py-1 rounded-lg text-[10px] font-bold uppercase tracking-tight"
+                    style={{
+                      backgroundColor: "rgba(245,158,11,0.1)",
+                      color: "#f59e0b",
+                      border: "1px solid rgba(245,158,11,0.2)",
+                    }}
+                  >
+                    <Medal className="h-3 w-3" />
+                    {b}
+                  </span>
+                ))
+              ) : (
+                <span className="text-xs text-slate-500 dark:text-slate-700">Take a mock interview to earn badges</span>
+              )}
+            </div>
+          </div>
+        </GlassPanel>
+
+        {/* GitHub Resume */}
+        <GlassPanel className="p-5">
+          <SectionHeader icon={FileBadge} label="GitHub Resume" accent="#10b981" />
+          {data?.githubResume ? (
+            <div className="space-y-2">
+              <div className="text-lg font-black text-slate-900 dark:text-white leading-tight">
+                {data.githubResume.developer_type}
+              </div>
+              <div className="flex flex-wrap gap-1.5">
+                {data.githubResume.badges?.slice(0, 3).map((b: string) => (
+                  <span
+                    key={b}
+                    className="px-2 py-0.5 rounded-lg text-[10px] font-bold uppercase"
+                    style={{
+                      backgroundColor: "rgba(16,185,129,0.1)",
+                      color: "#10b981",
+                      border: "1px solid rgba(16,185,129,0.2)",
+                    }}
+                  >
+                    {b}
+                  </span>
+                ))}
+              </div>
+              <p className="text-[11px] text-slate-500 dark:text-slate-600 mt-2">
+                Generated {new Date(data.githubResume.created_at).toLocaleDateString()}
+              </p>
+            </div>
+          ) : (
+            <p className="text-sm text-slate-500 dark:text-slate-600 leading-relaxed">
+              No resume yet. Run the AI generator to extract your GitHub experience.
+            </p>
+          )}
+          <Link
+            to="/github-resume"
+            className="flex items-center gap-1.5 mt-4 text-xs font-bold transition-colors"
+            style={{ color: "#10b981" }}
+          >
+            {data?.githubResume ? "View & Export" : "Generate Now"}
+            <ArrowRight className="h-3.5 w-3.5" />
           </Link>
-        </div>
+        </GlassPanel>
+
+        {/* Latest Mock Interview */}
+        <GlassPanel className="p-5">
+          <SectionHeader icon={MessageSquare} label="Latest Interview" accent="#8b5cf6" />
+          {data?.mockInterview ? (
+            <div className="space-y-2">
+              <div className="text-base font-bold text-slate-900 dark:text-white">{data.mockInterview.job_role}</div>
+              <div className="text-4xl font-black" style={{ color: "#8b5cf6" }}>
+                {data.mockInterview.overall_score}
+                <span className="text-slate-400 dark:text-slate-600 text-lg font-bold">/100</span>
+              </div>
+              <div className="h-1.5 rounded-full bg-slate-200 dark:bg-white/[0.05] overflow-hidden">
+                <div
+                  className="h-full rounded-full"
+                  style={{
+                    width: `${data.mockInterview.overall_score}%`,
+                    background: "#8b5cf6",
+                    boxShadow: "0 0 8px rgba(139,92,246,0.6)",
+                  }}
+                />
+              </div>
+              <p className="text-[11px] text-slate-500 dark:text-slate-600">
+                {new Date(data.mockInterview.created_at).toLocaleDateString()}
+              </p>
+            </div>
+          ) : (
+            <p className="text-sm text-slate-500 dark:text-slate-600 leading-relaxed">
+              No interviews yet. Test your skills with a real-world scenario.
+            </p>
+          )}
+          <Link
+            to="/mock-interview"
+            className="flex items-center gap-1.5 mt-4 text-xs font-bold transition-colors"
+            style={{ color: "#8b5cf6" }}
+          >
+            {data?.mockInterview ? "Take Another" : "Start Simulator"}
+            <ArrowRight className="h-3.5 w-3.5" />
+          </Link>
+        </GlassPanel>
       </div>
 
+      {/* ── Radar + Insights ── */}
       <div className="grid gap-4 lg:grid-cols-3">
-        <div className="glass-card rounded-xl p-6 lg:col-span-2">
-          <div className="flex items-center justify-between">
-            <h2 className="font-semibold">Career radar</h2>
-            <TrendingUp className="h-4 w-4 text-primary" />
-          </div>
-          <div className="mt-4 h-72">
+        {/* Radar */}
+        <GlassPanel className="p-6 lg:col-span-2">
+          <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-indigo-500/30 to-transparent" />
+          <SectionHeader icon={BarChart3} label="Career Radar" accent="#6366f1" />
+
+          <div className="h-72">
             <ResponsiveContainer width="100%" height="100%">
-              <RadarChart data={scores} outerRadius="80%">
-                <PolarGrid stroke="var(--color-border)" />
-                <PolarAngleAxis dataKey="name" tick={{ fill: "var(--color-muted-foreground)", fontSize: 12 }} />
-                <Radar dataKey="value" stroke="var(--color-primary)" fill="var(--color-primary)" fillOpacity={0.25} />
-                <Tooltip contentStyle={{ background: "var(--color-popover)", border: "1px solid var(--color-border)", borderRadius: 8 }} />
+              <RadarChart data={scores} outerRadius="75%">
+                <PolarGrid className="stroke-slate-200 dark:stroke-white/5" gridType="polygon" />
+                <PolarAngleAxis
+                  dataKey="name"
+                  tick={{
+                    fill: "#64748b",
+                    fontSize: 12,
+                    fontWeight: 700,
+                  }}
+                />
+                <Radar
+                  dataKey="value"
+                  stroke="#6366f1"
+                  fill="#6366f1"
+                  fillOpacity={0.15}
+                  strokeWidth={2}
+                  dot={{ fill: "#6366f1", r: 4, strokeWidth: 0 }}
+                />
+                <Tooltip content={<CustomTooltip />} />
               </RadarChart>
             </ResponsiveContainer>
           </div>
-        </div>
-        <div className="glass-card rounded-xl p-6">
-          <h2 className="font-semibold">Activity & Insights</h2>
-          <dl className="mt-4 space-y-3 text-sm">
-            <Row label="Code reviews" value={data?.codeReviewCount ?? 0} />
-            <Row label="Interview sessions" value={data?.interviewCount ?? 0} />
-            <Row label="GitHub user" value={data?.githubUsername ?? data?.profile?.github_username ?? "—"} />
-            <Row label="Experience" value={data?.profile?.experience_level ?? "—"} />
+        </GlassPanel>
+
+        {/* Activity + Insights */}
+        <GlassPanel className="p-6">
+          <SectionHeader icon={Activity} label="Activity" accent="#38bdf8" />
+
+          <dl className="space-y-0 mb-6">
+            <DataRow label="Code reviews" value={data?.codeReviewCount ?? 0} />
+            <DataRow label="Interview sessions" value={data?.interviewCount ?? 0} />
+            <DataRow
+              label="GitHub"
+              value={data?.githubUsername ?? data?.profile?.github_username ?? "—"}
+            />
+            <DataRow label="Experience" value={data?.profile?.experience_level ?? "—"} />
           </dl>
 
-          <div className="mt-6 border-t border-border pt-4 space-y-3">
-            <h3 className="text-xs uppercase tracking-wider text-muted-foreground font-semibold">AI Insights</h3>
+          <div className="border-t border-slate-100 dark:border-white/[0.04] pt-5">
+            <div className="flex items-center gap-2 mb-3">
+              <Sparkles className="h-3.5 w-3.5 text-violet-500 dark:text-violet-400" />
+              <span className="text-[11px] font-bold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-600">
+                AI Insights
+              </span>
+            </div>
+
             {data?.githubResume ? (
-              <>
-                <InsightRow icon={Star} label="Top Skill" value={data.githubResume.resume_data?.skills?.[0] || "N/A"} />
-                <InsightRow icon={Briefcase} label="Impressive Project" value={data.githubResume.resume_data?.projects?.[0]?.name || "N/A"} />
-                <InsightRow icon={Activity} label="Recommended Next" value={data.githubResume.insights?.missingSkills?.[0] || "N/A"} />
-              </>
+              <div className="space-y-1 divide-y divide-slate-100 dark:divide-white/[0.04]">
+                <InsightRow
+                  icon={Star}
+                  label="Top Skill"
+                  value={data.githubResume.resume_data?.skills?.[0] ?? "N/A"}
+                  color="#f59e0b"
+                />
+                <InsightRow
+                  icon={Briefcase}
+                  label="Best Project"
+                  value={data.githubResume.resume_data?.projects?.[0]?.name ?? "N/A"}
+                  color="#10b981"
+                />
+                <InsightRow
+                  icon={TrendingUp}
+                  label="Learn Next"
+                  value={data.githubResume.insights?.missingSkills?.[0] ?? "N/A"}
+                  color="#6366f1"
+                />
+              </div>
             ) : (
-              <div className="text-xs text-muted-foreground">Generate a GitHub Resume to see deep insights.</div>
+              <div className="rounded-xl border border-slate-200 dark:border-white/[0.05] bg-slate-50 dark:bg-white/[0.02] p-3 text-center">
+                <p className="text-xs text-slate-500 dark:text-slate-600">
+                  Generate a GitHub Resume to unlock deep AI insights
+                </p>
+                <Link
+                  to="/github-resume"
+                  className="text-xs font-bold text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 transition-colors mt-1 inline-block"
+                >
+                  Get started →
+                </Link>
+              </div>
             )}
           </div>
-        </div>
+        </GlassPanel>
       </div>
 
+      {/* ── Quick Actions ── */}
       <div>
-        <h2 className="mb-4 text-lg font-semibold">Quick actions</h2>
+        <div className="flex items-center gap-3 mb-5">
+          <h2 className="text-lg font-black text-slate-900 dark:text-white">Quick Actions</h2>
+          <div className="flex-1 h-px bg-gradient-to-r from-slate-200 dark:from-white/[0.06] to-transparent" />
+          <span className="text-xs text-slate-500 dark:text-slate-600 font-semibold uppercase tracking-widest">
+            6 tools
+          </span>
+        </div>
+
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          <ActionCard to="/mock-interview" icon={MessageSquare} title="Mock Interview" desc="Full interview simulator with AI." />
-          <ActionCard to="/github-resume" icon={FileBadge} title="GitHub Resume" desc="AI-generate a resume from your repos." />
-          <ActionCard to="/developer-score" icon={Activity} title="Developer Score" desc="View your full career readiness analytics." />
-          <ActionCard to="/github" icon={Github} title="Analyze GitHub" desc="Get a full AI breakdown of your public work." />
-          <ActionCard to="/resume" icon={FileText} title="Build a resume" desc="ATS-friendly resumes with live scoring." />
-          <ActionCard to="/interview" icon={MessageSquare} title="Interview Hub" desc="Practice quick tailored questions." />
+          <ActionCard
+            to="/mock-interview"
+            icon={MessageSquare}
+            title="Mock Interview"
+            desc="Full AI interview simulator with scoring."
+          />
+          <ActionCard
+            to="/github-resume"
+            icon={FileBadge}
+            title="GitHub Resume"
+            desc="AI-generate a resume from your repos."
+          />
+          <ActionCard
+            to="/developer-score"
+            icon={Activity}
+            title="Developer Score"
+            desc="View your full career readiness analytics."
+          />
+          <ActionCard
+            to="/github"
+            icon={Github}
+            title="Analyze GitHub"
+            desc="Full AI breakdown of your public work."
+          />
+          <ActionCard
+            to="/resume"
+            icon={FileText}
+            title="Build Resume"
+            desc="ATS-friendly resumes with live scoring."
+          />
+          <ActionCard
+            to="/interview"
+            icon={MessageSquare}
+            title="Interview Hub"
+            desc="Practice quick tailored questions."
+          />
         </div>
       </div>
+
+      <style>{`
+        @keyframes pulse {
+          0%, 100% { opacity: 0.6; transform: scale(1); }
+          50% { opacity: 1; transform: scale(1.05); }
+        }
+      `}</style>
     </div>
   );
 }
 
-function ScoreCard({ label, value, loading, hint }: { label: string; value: number; loading: boolean; hint: string }) {
-  return (
-    <div className="glass-card rounded-xl p-5">
-      <div className="text-xs uppercase tracking-wider text-muted-foreground">{label}</div>
-      <div className="mt-2 flex items-baseline gap-1">
-        <span className="text-3xl font-semibold tracking-tight">{loading ? "…" : value}</span>
-        <span className="text-sm text-muted-foreground">/ 100</span>
-      </div>
-      <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-secondary">
-        <div className="h-full rounded-full bg-gradient-to-r from-primary to-chart-2 transition-all" style={{ width: `${value}%` }} />
-      </div>
-      {value === 0 && <p className="mt-2 text-xs text-muted-foreground">{hint}</p>}
-    </div>
-  );
-}
-
-function Row({ label, value }: { label: string; value: string | number }) {
-  return (
-    <div className="flex items-center justify-between border-b border-border/60 pb-2 last:border-0">
-      <dt className="text-muted-foreground">{label}</dt>
-      <dd className="font-medium">{value}</dd>
-    </div>
-  );
-}
-
-function InsightRow({ icon: Icon, label, value }: { icon: any; label: string; value: string }) {
-  return (
-    <div className="flex items-center gap-3">
-      <div className="grid h-7 w-7 place-items-center rounded bg-primary/10 text-primary">
-        <Icon className="h-3.5 w-3.5" />
-      </div>
-      <div>
-        <div className="text-[10px] uppercase tracking-wider text-muted-foreground">{label}</div>
-        <div className="text-sm font-medium leading-none mt-0.5">{value}</div>
-      </div>
-    </div>
-  );
-}
-
-function ActionCard({ to, icon: Icon, title, desc }: { to: string; icon: typeof Github; title: string; desc: string }) {
-  const router = useRouter();
-  return (
-    <Link to={to} className="glass-card group flex flex-col rounded-xl p-5 transition hover:border-primary/40" onClick={() => router.invalidate()}>
-      <div className="grid h-9 w-9 place-items-center rounded-lg bg-primary/10 text-primary">
-        <Icon className="h-4.5 w-4.5" />
-      </div>
-      <div className="mt-3 flex items-center justify-between">
-        <h3 className="font-medium">{title}</h3>
-        <ArrowRight className="h-4 w-4 text-muted-foreground transition group-hover:translate-x-0.5 group-hover:text-foreground" />
-      </div>
-      <p className="mt-1 text-sm text-muted-foreground">{desc}</p>
-    </Link>
-  );
-}
+export default Dashboard;
