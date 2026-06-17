@@ -306,3 +306,71 @@ ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS badges TEXT[] NOT NULL DEFA
 ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS interview_streak INT NOT NULL DEFAULT 0;
 ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS best_interview_score INT NOT NULL DEFAULT 0;
 ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS total_interviews INT NOT NULL DEFAULT 0;
+-- Copilot Conversations
+CREATE TABLE public.copilot_conversations (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  title TEXT NOT NULL DEFAULT 'Career Discussion',
+  context_snapshot JSONB NOT NULL DEFAULT '{}',
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.copilot_conversations TO authenticated;
+GRANT ALL ON public.copilot_conversations TO service_role;
+ALTER TABLE public.copilot_conversations ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Users manage own conversations" ON public.copilot_conversations
+  FOR ALL TO authenticated USING (auth.uid() = user_id) WITH CHECK (auth.uid() = user_id);
+
+-- Copilot Messages
+CREATE TABLE public.copilot_messages (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  conversation_id UUID NOT NULL REFERENCES public.copilot_conversations(id) ON DELETE CASCADE,
+  user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  role TEXT NOT NULL CHECK (role IN ('user', 'assistant')),
+  content TEXT NOT NULL,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+GRANT SELECT, INSERT ON public.copilot_messages TO authenticated;
+GRANT ALL ON public.copilot_messages TO service_role;
+ALTER TABLE public.copilot_messages ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Users manage own messages" ON public.copilot_messages
+  FOR ALL TO authenticated USING (auth.uid() = user_id) WITH CHECK (auth.uid() = user_id);
+CREATE INDEX copilot_messages_conversation_idx ON public.copilot_messages (conversation_id, created_at ASC);
+
+-- Portfolio Deployments
+CREATE TABLE public.portfolio_deployments (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  portfolio_id UUID REFERENCES public.github_resumes(id) ON DELETE CASCADE,
+  provider TEXT NOT NULL DEFAULT 'Vercel',
+  status TEXT NOT NULL DEFAULT 'pending',
+  deployment_url TEXT,
+  error_message TEXT,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+GRANT SELECT, INSERT, UPDATE ON public.portfolio_deployments TO authenticated;
+GRANT ALL ON public.portfolio_deployments TO service_role;
+ALTER TABLE public.portfolio_deployments ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Users manage own deployments" ON public.portfolio_deployments
+  FOR ALL TO authenticated USING (auth.uid() = user_id) WITH CHECK (auth.uid() = user_id);
+
+-- Developer Health Scores
+CREATE TABLE public.developer_health_scores (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  github_score INT NOT NULL DEFAULT 0,
+  resume_score INT NOT NULL DEFAULT 0,
+  interview_score INT NOT NULL DEFAULT 0,
+  job_match_score INT NOT NULL DEFAULT 0,
+  portfolio_score INT NOT NULL DEFAULT 0,
+  overall_score INT NOT NULL DEFAULT 0,
+  strengths TEXT[] NOT NULL DEFAULT '{}',
+  weaknesses TEXT[] NOT NULL DEFAULT '{}',
+  recommendations TEXT[] NOT NULL DEFAULT '{}',
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+GRANT SELECT, INSERT ON public.developer_health_scores TO authenticated;
+GRANT ALL ON public.developer_health_scores TO service_role;
+ALTER TABLE public.developer_health_scores ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Users manage own health scores" ON public.developer_health_scores
+  FOR ALL TO authenticated USING (auth.uid() = user_id) WITH CHECK (auth.uid() = user_id);
+CREATE INDEX health_scores_user_idx ON public.developer_health_scores (user_id, created_at DESC);

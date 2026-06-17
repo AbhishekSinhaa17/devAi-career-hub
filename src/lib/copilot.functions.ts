@@ -3,48 +3,48 @@ import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { callAi } from "./ai-gateway.server";
 
+// Plain async helper — NOT a server function, just a regular function
+async function fetchContextSnapshotFromDb(userId: string, supabase: any) {
+  const [ghRes, resumeRes, jobMatchRes, scoresRes, mockIntRes, portfolioRes] = await Promise.all([
+    supabase.from("github_resumes").select("developer_type, insights, resume_data").eq("user_id", userId).order("created_at", { ascending: false }).limit(1).maybeSingle(),
+    supabase.from("resumes").select("title, score, ai_suggestions").eq("user_id", userId).order("updated_at", { ascending: false }).limit(1).maybeSingle(),
+    supabase.from("job_matches").select("job_role, ats_score, analysis").eq("user_id", userId).order("created_at", { ascending: false }).limit(1).maybeSingle(),
+    supabase.from("developer_scores").select("overall_score").eq("user_id", userId).order("created_at", { ascending: false }).limit(1).maybeSingle(),
+    supabase.from("mock_interviews").select("job_role, overall_score, feedback").eq("user_id", userId).order("created_at", { ascending: false }).limit(1).maybeSingle(),
+    supabase.from("portfolio_deployments").select("provider, status, deployment_url").eq("user_id", userId).order("created_at", { ascending: false }).limit(1).maybeSingle(),
+  ]);
+
+  return {
+    github_inferred_profile: ghRes.data || null,
+    latest_resume: resumeRes.data || null,
+    latest_job_match: jobMatchRes.data || null,
+    developer_health_score: scoresRes.data?.overall_score || null,
+    latest_mock_interview: mockIntRes.data || null,
+    portfolio_deployment: portfolioRes.data || null,
+  };
+}
+
+// The server function now calls the helper with context
 export const getContextSnapshot = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
-    const userId = context.userId;
-    const db = context.supabase;
-
-    // Fetch the most recent data from all relevant tables
-    const [ghRes, resumeRes, jobMatchRes, scoresRes, mockIntRes, portfolioRes] = await Promise.all([
-      db.from("github_resumes").select("developer_type, insights, resume_data").eq("user_id", userId).order("created_at", { ascending: false }).limit(1).maybeSingle(),
-      db.from("resumes").select("title, score, ai_suggestions").eq("user_id", userId).order("updated_at", { ascending: false }).limit(1).maybeSingle(),
-      db.from("job_matches").select("job_role, ats_score, analysis").eq("user_id", userId).order("created_at", { ascending: false }).limit(1).maybeSingle(),
-      db.from("developer_scores").select("overall_score").eq("user_id", userId).order("created_at", { ascending: false }).limit(1).maybeSingle(),
-      db.from("mock_interviews").select("job_role, overall_score, feedback").eq("user_id", userId).order("created_at", { ascending: false }).limit(1).maybeSingle(),
-      db.from("portfolio_deployments").select("provider, status, deployment_url").eq("user_id", userId).order("created_at", { ascending: false }).limit(1).maybeSingle(),
-    ]);
-
-    return {
-      github_inferred_profile: ghRes.data || null,
-      latest_resume: resumeRes.data || null,
-      latest_job_match: jobMatchRes.data || null,
-      developer_health_score: scoresRes.data?.overall_score || null,
-      latest_mock_interview: mockIntRes.data || null,
-      portfolio_deployment: portfolioRes.data || null,
-    };
+    return fetchContextSnapshotFromDb(context.userId, context.supabase);
   });
 
 export const startCopilotConversation = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .validator((d: unknown) => z.object({ title: z.string().optional() }).parse(d))
   .handler(async ({ data, context }) => {
-    // 1. Get Snapshot
-    const snapshot = await getContextSnapshot();
+    // Call the plain helper, NOT the server function
+    const snapshot = await fetchContextSnapshotFromDb(context.userId, context.supabase);
 
-    // 2. Create Conversation
     const { data: convData, error } = await context.supabase
       .from("copilot_conversations")
       .insert({
         user_id: context.userId,
         title: data.title || "Career Discussion",
         context_snapshot: snapshot as any,
-      }).select()
-      .single();
+      }).select().single();
 
     if (error) throw new Error("Failed to start conversation");
     return convData;
