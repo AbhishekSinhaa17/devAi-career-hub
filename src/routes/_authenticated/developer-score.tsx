@@ -1157,7 +1157,7 @@ function DeveloperScore() {
                         fillOpacity={1}
                         fill="url(#scoreGrad)"
                         dot={{ fill: "#6366f1", strokeWidth: 0, r: 4 }}
-                        activeDot={{ fill: "#818cf8", r: 6, boxShadow: "0 0 12px #6366f1" }}
+                        activeDot={{ fill: "#818cf8", r: 6 }}
                       />
                     </AreaChart>
                   </ResponsiveContainer>

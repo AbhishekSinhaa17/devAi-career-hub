@@ -1013,7 +1013,7 @@ Role: ${data.jobRole}
 Level: ${data.experienceLevel}
 Type: ${data.interviewType}
 Candidate GitHub Summary: ${ghRes.data?.summary || "N/A"}
-Candidate Resume Skills: ${JSON.stringify(resumeRes.data?.content?.skills || [])}
+Candidate Resume Skills: ${JSON.stringify((resumeRes.data?.content as any)?.skills || [])}
 `;
 
     const ai = await callAiJson<{ questions: { question: string; expected_answer: string; type: string }[] }>({

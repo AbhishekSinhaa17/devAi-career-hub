@@ -9,7 +9,7 @@ import {
   setUserAdmin,
   isAdmin as isAdminFn,
 } from "@/lib/admin.functions";
-import { Users, Github, FileText, Code2, MessageSquare, Map as MapIcon, ShieldAlert, Activity } from "lucide-react";
+import { Users, Github, FileText, Code2, MessageSquare, Map as MapIcon, ShieldAlert, Activity, BarChart3 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 
@@ -92,12 +92,20 @@ function AdminPage() {
             Monitor platform usage, users, and AI activity.
           </p>
         </div>
-        <a
-          href="/admin/usage"
-          className="inline-flex items-center gap-2 rounded-md border border-border bg-card px-3 py-1.5 text-xs hover:bg-accent"
-        >
-          <Activity className="h-3.5 w-3.5" /> API usage analytics
-        </a>
+        <div className="flex gap-2">
+          <a
+            href="/admin/analytics"
+            className="inline-flex items-center gap-2 rounded-md border border-border bg-indigo-600 px-3 py-1.5 text-xs text-white hover:bg-indigo-700 transition-colors"
+          >
+            <BarChart3 className="h-3.5 w-3.5" /> Platform analytics
+          </a>
+          <a
+            href="/admin/usage"
+            className="inline-flex items-center gap-2 rounded-md border border-border bg-card px-3 py-1.5 text-xs hover:bg-accent"
+          >
+            <Activity className="h-3.5 w-3.5" /> API usage
+          </a>
+        </div>
       </div>
 
       <div className="grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-6">

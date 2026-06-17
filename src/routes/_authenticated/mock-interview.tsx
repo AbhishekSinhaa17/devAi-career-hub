@@ -338,8 +338,8 @@ function MockInterviewPage() {
     onMutate: () => setStatus("generating"),
     onSuccess: (data) => {
       setInterviewId(data.id);
-      setQuestions(data.questions);
-      setAnswers(new Array(data.questions.length).fill(""));
+      setQuestions(data.questions as any[]);
+      setAnswers(new Array((data.questions as any[]).length).fill(""));
       setCurrentQ(0);
       setStatus("interview");
       if (timerOpt > 0) setTimeRemaining(timerOpt);
@@ -873,15 +873,14 @@ function MockInterviewPage() {
                         ? "#f59e0b"
                         : "#ef4444";
                 return (
-                  <Panel
-                    key={i}
-                    accent={scoreColor}
-                    className="overflow-hidden"
-                    style={{ animation: `fadeSlideIn 0.4s ease-out ${i * 60}ms both` }}
-                  >
-                    {/* Q header */}
-                    <div className="flex items-start justify-between gap-4 px-6 py-5 border-b border-border/40">
-                      <div className="flex items-start gap-3 flex-1 min-w-0">
+                  <div key={i} style={{ animation: `fadeSlideIn 0.4s ease-out ${i * 60}ms both` }}>
+                    <Panel
+                      accent={scoreColor}
+                      className="overflow-hidden"
+                    >
+                      {/* Q header */}
+                      <div className="flex items-start justify-between gap-4 px-6 py-5 border-b border-border/40">
+                        <div className="flex items-start gap-3 flex-1 min-w-0">
                         <div
                           className="h-7 w-7 rounded-xl grid place-items-center font-black text-xs text-white flex-shrink-0 mt-0.5"
                           style={{
@@ -941,6 +940,7 @@ function MockInterviewPage() {
                       </div>
                     </div>
                   </Panel>
+                </div>
                 );
               })}
             </div>

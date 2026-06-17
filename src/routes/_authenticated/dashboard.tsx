@@ -640,7 +640,7 @@ function Dashboard() {
                 {data.githubResume.developer_type}
               </div>
               <div className="flex flex-wrap gap-1.5">
-                {data.githubResume.badges?.slice(0, 3).map((b: string) => (
+                {((data.githubResume.badges as string[]) || []).slice(0, 3).map((b: string) => (
                   <span
                     key={b}
                     className="px-2 py-0.5 rounded-lg text-[10px] font-bold uppercase"
@@ -668,7 +668,7 @@ function Dashboard() {
             className="flex items-center gap-1.5 mt-4 text-xs font-bold transition-colors"
             style={{ color: "#10b981" }}
           >
-            {data?.githubResume ? "View & Export" : "Generate Now"}
+            {((data?.githubResume as any)?.insights || []).length > 0 ? "Insights available" : "No insights yet"}
             <ArrowRight className="h-3.5 w-3.5" />
           </Link>
         </GlassPanel>
@@ -689,7 +689,6 @@ function Dashboard() {
                   style={{
                     width: `${data.mockInterview.overall_score}%`,
                     background: "#8b5cf6",
-                    boxShadow: "0 0 8px rgba(139,92,246,0.6)",
                   }}
                 />
               </div>
@@ -773,19 +772,19 @@ function Dashboard() {
                 <InsightRow
                   icon={Star}
                   label="Top Skill"
-                  value={data.githubResume.resume_data?.skills?.[0] ?? "N/A"}
+                  value={(data.githubResume.resume_data as any)?.skills?.[0] ?? "N/A"}
                   color="#f59e0b"
                 />
                 <InsightRow
                   icon={Briefcase}
                   label="Best Project"
-                  value={data.githubResume.resume_data?.projects?.[0]?.name ?? "N/A"}
+                  value={((data.githubResume.resume_data as any)?.projects || []).length > 0 ? `${((data.githubResume.resume_data as any)?.projects || []).length} projects highlighted` : "N/A"}
                   color="#10b981"
                 />
                 <InsightRow
                   icon={TrendingUp}
                   label="Learn Next"
-                  value={data.githubResume.insights?.missingSkills?.[0] ?? "N/A"}
+                  value={(data.githubResume as any)?.insights?.missingSkills?.[0] ?? "N/A"}
                   color="#6366f1"
                 />
               </div>
