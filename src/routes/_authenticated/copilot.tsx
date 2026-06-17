@@ -23,7 +23,9 @@ import {
   Clock,
   ChevronRight,
   Zap,
+  Menu,
 } from "lucide-react";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 
@@ -349,7 +351,7 @@ function CopilotPage() {
   const hasMessages = displayMsgs.length > 0;
 
   return (
-    <div className="flex h-[calc(100vh-64px)] overflow-hidden bg-slate-50 dark:bg-transparent">
+    <div className="flex h-[calc(100dvh-130px)] md:h-[calc(100dvh-64px)] overflow-hidden bg-slate-50 dark:bg-transparent">
       {/* ── Sidebar ── */}
       <aside className="hidden md:flex w-72 flex-col border-r border-slate-200 dark:border-white/8 bg-white dark:bg-white/[0.02] flex-shrink-0">
         {/* Sidebar header */}
@@ -430,7 +432,57 @@ function CopilotPage() {
       </aside>
 
       {/* ── Main chat ── */}
-      <main className="flex-1 flex flex-col min-w-0 relative">
+      <main className="flex-1 flex flex-col min-w-0 relative h-full">
+        {/* Mobile Header Toggle */}
+        <div className="md:hidden flex items-center justify-between p-3 border-b border-slate-200 dark:border-white/8 bg-white/80 dark:bg-black/50 backdrop-blur-md z-10 shrink-0">
+          <div className="flex items-center gap-2">
+            <div className="h-6 w-6 rounded-md bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center">
+              <Bot className="h-3 w-3 text-white" />
+            </div>
+            <span className="text-sm font-bold text-slate-800 dark:text-slate-100">AI Copilot</span>
+          </div>
+          <Sheet>
+            <SheetTrigger asChild>
+              <button className="h-8 w-8 rounded-lg flex items-center justify-center border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-white/5">
+                <Menu className="h-4 w-4 text-slate-600 dark:text-slate-400" />
+              </button>
+            </SheetTrigger>
+            <SheetContent side="left" className="w-[300px] p-0 border-r border-white/10">
+              <div className="flex flex-col h-full bg-white dark:bg-zinc-950">
+                <div className="p-4 border-b border-slate-200 dark:border-white/8">
+                  <button
+                    onClick={() => {
+                      setActiveConvId(null);
+                      setOptimisticMsgs([]);
+                    }}
+                    className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-bold bg-indigo-600 hover:bg-indigo-700 text-white"
+                  >
+                    <Plus className="h-4 w-4" />
+                    New Conversation
+                  </button>
+                </div>
+                <div className="flex-1 overflow-y-auto p-3 space-y-1">
+                  {!history?.length ? (
+                    <p className="text-xs text-center mt-10 text-slate-400">No conversations yet.</p>
+                  ) : (
+                    history.map((conv) => (
+                      <ConvItem
+                        key={conv.id}
+                        conv={conv}
+                        isActive={activeConvId === conv.id}
+                        onClick={() => {
+                          setActiveConvId(conv.id);
+                          setOptimisticMsgs([]);
+                        }}
+                      />
+                    ))
+                  )}
+                </div>
+              </div>
+            </SheetContent>
+          </Sheet>
+        </div>
+
         {/* Ambient backgrounds (dark only) */}
         <div className="fixed inset-0 pointer-events-none -z-10 hidden dark:block">
           <div className="absolute top-0 left-1/3 w-[500px] h-[500px] rounded-full bg-indigo-600/5 blur-[120px]" />
@@ -481,7 +533,7 @@ function CopilotPage() {
         ) : (
           /* ── Messages ── */
           <div ref={scrollRef} className="flex-1 overflow-y-auto">
-            <div className="max-w-3xl mx-auto px-4 md:px-6 py-8 space-y-6 pb-36">
+            <div className="max-w-3xl mx-auto px-4 md:px-6 py-8 space-y-6 pb-32">
               {displayMsgs.map((msg, i) => (
                 <MessageBubble key={msg.id || i} msg={msg} index={i} />
               ))}
@@ -502,9 +554,8 @@ function CopilotPage() {
         )}
 
         {/* ── Input bar ── */}
-        <div className="absolute bottom-0 left-0 right-0 pointer-events-none">
-          <div className="pointer-events-auto bg-gradient-to-t from-slate-50 dark:from-[#080810] via-slate-50/95 dark:via-[#080810]/95 to-transparent pt-8 pb-5 px-4">
-            <div className="max-w-3xl mx-auto">
+        <div className="absolute bottom-0 left-0 right-0 z-20 shrink-0 bg-white/80 dark:bg-[#080810]/80 backdrop-blur-md border-t border-slate-200 dark:border-white/10 p-3">
+          <div className="max-w-3xl mx-auto">
               <div
                 className="relative flex items-end gap-3 p-2 rounded-2xl border shadow-lg transition-all duration-200
                 bg-white dark:bg-white/[0.04]
@@ -545,11 +596,10 @@ function CopilotPage() {
                 </button>
               </div>
 
-              <p className="text-center text-[11px] text-slate-400 dark:text-slate-600 mt-3">
+              <p className="hidden md:block text-center text-[11px] text-slate-400 dark:text-slate-600 mt-2">
                 Copilot uses your personal DevAI context. AI responses may not always be accurate.
               </p>
             </div>
-          </div>
         </div>
       </main>
     </div>

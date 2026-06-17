@@ -16,24 +16,32 @@ import {
 import {
   Loader2,
   Sparkles,
-  Clock,
-  CheckCircle2,
-  AlertCircle,
-  PlayCircle,
-  Mic,
-  Star,
-  Target,
-  ChevronRight,
-  ChevronLeft,
-  Trophy,
   Brain,
-  MessageSquare,
+  CheckCircle2,
+  ChevronRight,
+  PlayCircle,
+  Clock,
+  CheckCircle,
+  RotateCcw,
+  AlertTriangle,
+  ArrowRight,
+  Mic,
+  ChevronLeft,
   Zap,
+  Target,
+  Flame,
+  Lightbulb,
+  Trophy,
+  Star,
+  Volume2,
+  VolumeX,
+  Square,
+  Camera,
+  VideoOff,
   BarChart3,
   RefreshCw,
   Shield,
   TrendingUp,
-  ArrowRight,
   Volume2,
   Square,
   VolumeX,
@@ -237,6 +245,64 @@ function ScoreMetric({
             boxShadow: `0 0 6px ${color}50`,
           }}
         />
+      </div>
+    </div>
+  );
+}
+
+// ─── Camera Preview ────────────────────────────────────────────────────────────
+function CameraPreview() {
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const [hasCamera, setHasCamera] = useState(false);
+  const [error, setError] = useState(false);
+
+  useEffect(() => {
+    let stream: MediaStream | null = null;
+    async function setupCamera() {
+      try {
+        stream = await navigator.mediaDevices.getUserMedia({ video: true });
+        if (videoRef.current) {
+          videoRef.current.srcObject = stream;
+          setHasCamera(true);
+        }
+      } catch (err) {
+        console.warn("Camera access denied or unavailable", err);
+        setError(true);
+      }
+    }
+    setupCamera();
+    return () => {
+      if (stream) {
+        stream.getTracks().forEach((track) => track.stop());
+      }
+    };
+  }, []);
+
+  return (
+    <div className="relative w-full aspect-video bg-zinc-900 rounded-2xl overflow-hidden shadow-xl border border-white/10 group">
+      {hasCamera ? (
+        <video
+          ref={videoRef}
+          autoPlay
+          playsInline
+          muted
+          className="w-full h-full object-cover scale-x-[-1]"
+        />
+      ) : (
+        <div className="absolute inset-0 flex flex-col items-center justify-center text-zinc-500">
+          {error ? <VideoOff className="h-10 w-10 mb-2 opacity-50" /> : <Camera className="h-10 w-10 mb-2 opacity-50" />}
+          <span className="text-xs font-bold uppercase tracking-widest">
+            {error ? "Camera Unavailable" : "Starting Camera..."}
+          </span>
+        </div>
+      )}
+      
+      {/* Recording overlay indicator */}
+      <div className="absolute top-4 right-4 h-3 w-3 rounded-full bg-red-500 animate-pulse shadow-[0_0_10px_rgba(239,68,68,0.8)]" />
+      <div className="absolute bottom-4 left-4 right-4 flex justify-between items-end">
+        <div className="px-3 py-1.5 rounded-lg bg-black/50 backdrop-blur-md border border-white/10 text-[10px] font-bold text-white uppercase tracking-widest">
+          Candidate Cam
+        </div>
       </div>
     </div>
   );
@@ -666,11 +732,41 @@ function MockInterviewPage() {
       {/* ──────────────────────── INTERVIEW ──────────────────────── */}
       {status === "interview" && questions.length > 0 && (
         <div
-          className="max-w-4xl mx-auto space-y-5"
+          className="flex flex-col lg:flex-row gap-6 max-w-6xl mx-auto"
           style={{ animation: "fadeSlideIn 0.4s ease-out both" }}
         >
-          {/* Top bar */}
-          <Panel className="px-5 py-4">
+          {/* Camera Column (Top on mobile, left on desktop) */}
+          <div className="w-full lg:w-[400px] xl:w-[480px] shrink-0 space-y-4">
+            <CameraPreview />
+            
+            <Panel className="p-5">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="h-8 w-8 rounded-xl bg-primary/10 border border-primary/20 grid place-items-center">
+                  <Brain className="h-4 w-4 text-primary" />
+                </div>
+                <h3 className="font-bold text-sm text-foreground">Interview Tips</h3>
+              </div>
+              <ul className="space-y-2.5 text-xs text-muted-foreground font-medium">
+                <li className="flex items-start gap-2">
+                  <CheckCircle2 className="h-3.5 w-3.5 text-emerald-500 shrink-0 mt-0.5" />
+                  Look directly at the camera to maintain eye contact.
+                </li>
+                <li className="flex items-start gap-2">
+                  <CheckCircle2 className="h-3.5 w-3.5 text-emerald-500 shrink-0 mt-0.5" />
+                  Use the STAR method (Situation, Task, Action, Result) for behavioral questions.
+                </li>
+                <li className="flex items-start gap-2">
+                  <CheckCircle2 className="h-3.5 w-3.5 text-emerald-500 shrink-0 mt-0.5" />
+                  Speak clearly and take a brief pause before answering.
+                </li>
+              </ul>
+            </Panel>
+          </div>
+
+          {/* Q&A Column (Bottom on mobile, right on desktop) */}
+          <div className="flex-1 space-y-5 min-w-0">
+            {/* Top bar */}
+            <Panel className="px-5 py-4">
             <div className="flex flex-wrap items-center justify-between gap-4">
               <div className="flex items-center gap-4">
                 <ProgressDots total={questions.length} current={currentQ} answers={answers} />
@@ -849,6 +945,7 @@ function MockInterviewPage() {
             </button>
           </div>
         </div>
+      </div>
       )}
 
       {/* ──────────────────────── EVALUATING ──────────────────────── */}

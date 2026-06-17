@@ -630,10 +630,10 @@ export function AppShell({ children }: { children: ReactNode }) {
   // Mobile bottom bar items (first 5 most important)
   const mobileBottomItems: NavItem[] = [
     { to: "/dashboard", icon: LayoutDashboard, label: "Dashboard" },
+    { to: "/github", icon: Briefcase, label: "Tools" },
     { to: "/copilot", icon: Bot, label: "Copilot" },
-    { to: "/github", icon: Github, label: "GitHub" },
-    { to: "/developer-score", icon: Activity, label: "Score" },
-    { to: "/job-match", icon: Briefcase, label: "Jobs" },
+    { to: "/developer-score", icon: Activity, label: "Analytics" },
+    { to: "/profile", icon: User, label: "Profile" },
   ];
 
   return (
@@ -791,7 +791,7 @@ export function AppShell({ children }: { children: ReactNode }) {
             <Link
               key={item.to}
               to={item.to}
-              className="relative flex flex-col items-center gap-1 px-3 py-1.5 rounded-xl transition-all duration-200"
+              className="relative flex flex-col items-center justify-center min-h-[48px] min-w-[48px] gap-1 px-1 py-1.5 rounded-xl transition-all duration-200"
               style={{
                 animation: `mobile-slide-up 0.4s ${i * 50}ms ease both`,
                 background: active ? "rgba(99,102,241,0.1)" : "transparent",

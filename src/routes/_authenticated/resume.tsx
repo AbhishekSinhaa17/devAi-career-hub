@@ -435,6 +435,7 @@ function Page() {
   const [currentId, setCurrentId] = useState<string | undefined>();
   const [skillInput, setSkillInput] = useState("");
   const [mounted, setMounted] = useState(false);
+  const [mobileTab, setMobileTab] = useState<"editor" | "preview">("editor");
   const queryClient = useQueryClient();
 
   useEffect(() => {
@@ -736,10 +737,34 @@ function Page() {
         </Panel>
       )}
 
+      {/* ── Mobile Tabs Toggle ── */}
+      <div className="flex lg:hidden bg-muted/50 p-1 rounded-xl mb-6">
+        <button
+          onClick={() => setMobileTab("editor")}
+          className={`flex-1 py-2 text-sm font-bold rounded-lg transition-colors ${
+            mobileTab === "editor"
+              ? "bg-background text-foreground shadow-sm"
+              : "text-muted-foreground hover:text-foreground hover:bg-background/50"
+          }`}
+        >
+          Editor
+        </button>
+        <button
+          onClick={() => setMobileTab("preview")}
+          className={`flex-1 py-2 text-sm font-bold rounded-lg transition-colors ${
+            mobileTab === "preview"
+              ? "bg-background text-foreground shadow-sm"
+              : "text-muted-foreground hover:text-foreground hover:bg-background/50"
+          }`}
+        >
+          Preview
+        </button>
+      </div>
+
       {/* ── Main grid ── */}
       <div className="grid gap-6 lg:grid-cols-2">
         {/* Editor */}
-        <div className="space-y-3 print:hidden">
+        <div className={`space-y-3 print:hidden ${mobileTab === "preview" ? "hidden lg:block" : "block"}`}>
           {/* Basics */}
           <EditorSection title="Personal Info" icon={User} accent="#6366f1">
             <div className="grid gap-3 sm:grid-cols-2">
@@ -950,7 +975,7 @@ function Page() {
         </div>
 
         {/* Preview */}
-        <div className="lg:sticky lg:top-6 lg:h-fit space-y-4">
+        <div className={`lg:sticky lg:top-6 lg:h-fit space-y-4 ${mobileTab === "editor" ? "hidden lg:block" : "block"}`}>
           <ResumePreview r={r} />
 
           {/* Quick tips */}
