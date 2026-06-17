@@ -1,4 +1,5 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
+import { RouteErrorBoundary } from "@/components/ErrorBoundary";
 import { useMutation } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useMemo, useState } from "react";
@@ -32,6 +33,7 @@ import {
 
 export const Route = createFileRoute("/_authenticated/github-resume")({
   head: () => ({ meta: [{ title: "GitHub Resume Generator — DevAI" }] }),
+  errorComponent: RouteErrorBoundary,
   component: GithubResumePage,
 });
 

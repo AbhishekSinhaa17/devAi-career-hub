@@ -14,6 +14,7 @@ CREATE TABLE public.ai_usage_events (
 CREATE INDEX ai_usage_events_created_at_idx ON public.ai_usage_events (created_at DESC);
 CREATE INDEX ai_usage_events_user_id_idx ON public.ai_usage_events (user_id);
 CREATE INDEX ai_usage_events_endpoint_idx ON public.ai_usage_events (endpoint);
+CREATE INDEX ai_usage_events_status_idx ON public.ai_usage_events (status);
 GRANT SELECT ON public.ai_usage_events TO authenticated;
 GRANT ALL ON public.ai_usage_events TO service_role;
 ALTER TABLE public.ai_usage_events ENABLE ROW LEVEL SECURITY;

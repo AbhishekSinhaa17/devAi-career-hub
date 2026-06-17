@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { RouteErrorBoundary } from "@/components/ErrorBoundary";
 import { useMutation } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useState, useEffect, useRef } from "react";
@@ -30,6 +31,7 @@ import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/roadmap")({
   head: () => ({ meta: [{ title: "Career Roadmap — DevAI" }] }),
+  errorComponent: RouteErrorBoundary,
   component: Page,
 });
 

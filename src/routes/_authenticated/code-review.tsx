@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { RouteErrorBoundary } from "@/components/ErrorBoundary";
 import { useMutation } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useState, useEffect, useRef } from "react";
@@ -30,9 +31,11 @@ import {
   Code2,
 } from "lucide-react";
 import { toast } from "sonner";
+import { PageLoadingState, PageEmptyState } from "@/components/LoadingStates";
 
 export const Route = createFileRoute("/_authenticated/code-review")({
   head: () => ({ meta: [{ title: "AI Code Reviewer — DevAI" }] }),
+  errorComponent: RouteErrorBoundary,
   component: Page,
 });
 
@@ -421,59 +424,15 @@ function CodeEditor({
   );
 }
 
-// ─── Loading shimmer ──────────────────────────────────────────────────────────
-function ReviewSkeleton() {
-  return (
-    <div className="space-y-4">
-      <Panel className="p-6">
-        <div className="h-5 w-24 rounded-lg bg-muted/40 mb-4 animate-pulse" />
-        <div className="space-y-2">
-          {[1, 0.8, 0.6].map((op, i) => (
-            <div
-              key={i}
-              className="h-3 rounded-lg bg-muted/40 animate-pulse"
-              style={{ opacity: op, width: `${70 + i * 10}%` }}
-            />
-          ))}
-        </div>
-      </Panel>
-      <div className="grid gap-4 md:grid-cols-2">
-        {[1, 2, 3, 4].map((i) => (
-          <div
-            key={i}
-            className="rounded-2xl border border-border/40 bg-muted/10 p-5 h-32 animate-pulse"
-          />
-        ))}
-      </div>
-    </div>
-  );
-}
 
 // ─── Empty state ──────────────────────────────────────────────────────────────
 function EmptyState() {
   return (
-    <div className="flex flex-col items-center justify-center py-20 text-center">
-      <div
-        className="relative h-20 w-20 rounded-3xl grid place-items-center mb-5"
-        style={{
-          background: "linear-gradient(135deg,rgba(99,102,241,0.12),rgba(139,92,246,0.08))",
-          border: "1px solid rgba(99,102,241,0.2)",
-          boxShadow: "0 0 40px rgba(99,102,241,0.08)",
-        }}
-      >
-        <Code2 className="h-9 w-9 text-primary/60" />
-        <div
-          className="absolute inset-0 rounded-3xl animate-pulse"
-          style={{
-            background: "radial-gradient(circle,rgba(99,102,241,0.08) 0%,transparent 70%)",
-          }}
-        />
-      </div>
-      <h3 className="text-xl font-black text-foreground mb-2">Paste your code to get started</h3>
-      <p className="text-sm text-muted-foreground max-w-sm leading-relaxed">
-        DevAI checks for bugs, security vulnerabilities, performance issues, and best practice
-        violations — instantly.
-      </p>
+    <PageEmptyState
+      title="Paste your code to get started"
+      subtitle="DevAI checks for bugs, security vulnerabilities, performance issues, and best practice violations — instantly."
+      icon={Code2}
+    >
       <div className="mt-6 flex flex-wrap gap-2 justify-center">
         {["Bugs", "Security", "Performance", "Clean Code", "Best Practices"].map((f) => (
           <span
@@ -484,7 +443,7 @@ function EmptyState() {
           </span>
         ))}
       </div>
-    </div>
+    </PageEmptyState>
   );
 }
 
@@ -597,6 +556,8 @@ function Page() {
           <CodeEditor value={code} onChange={setCode} language={language} />
         </div>
 
+
+
         {/* Footer */}
         <div className="flex items-center justify-between px-5 pb-5">
           <p className="text-[11px] text-muted-foreground">
@@ -631,7 +592,12 @@ function Page() {
       </Panel>
 
       {/* ── States ── */}
-      {mutation.isPending && <ReviewSkeleton />}
+      {mutation.isPending && (
+        <PageLoadingState
+          title="Analyzing code…"
+          subtitle="Checking for bugs, vulnerabilities, and best practices."
+        />
+      )}
 
       {!fb && !mutation.isPending && <EmptyState />}
 

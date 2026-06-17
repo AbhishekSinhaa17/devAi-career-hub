@@ -1,4 +1,5 @@
 import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
+import { RouteErrorBoundary } from "@/components/ErrorBoundary";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { getDashboard } from "@/lib/ai.functions";
@@ -38,6 +39,7 @@ import { useState, useEffect, useRef } from "react";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
   head: () => ({ meta: [{ title: "Dashboard — DevAI" }] }),
+  errorComponent: RouteErrorBoundary,
   component: Dashboard,
 });
 

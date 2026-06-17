@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { RouteErrorBoundary } from "@/components/ErrorBoundary";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useState, useRef, useEffect } from "react";
@@ -27,6 +28,7 @@ import pdfjsWorker from "pdfjs-dist/build/pdf.worker.mjs?url";
 
 export const Route = createFileRoute("/_authenticated/job-match")({
   head: () => ({ meta: [{ title: "Job Match Analyzer — DevAI" }] }),
+  errorComponent: RouteErrorBoundary,
   component: Page,
 });
 

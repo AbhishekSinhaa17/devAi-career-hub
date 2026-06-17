@@ -1,9 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { RouteErrorBoundary } from "@/components/ErrorBoundary";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useState, useEffect } from "react";
 import { getDeveloperScoresHistory, generateDeveloperScore } from "@/lib/ai.functions";
 import { CircularProgress } from "@/components/ui/circular-progress";
+import { PageLoadingState, PageEmptyState } from "@/components/LoadingStates";
 import {
   Activity,
   RefreshCw,
@@ -40,6 +42,7 @@ import { format } from "date-fns";
 
 export const Route = createFileRoute("/_authenticated/developer-score")({
   head: () => ({ meta: [{ title: "Developer Health Score — DevAI" }] }),
+  errorComponent: RouteErrorBoundary,
   component: DeveloperScore,
 });
 
@@ -373,77 +376,6 @@ function ListItem({
   );
 }
 
-// ─── Loading / empty states ────────────────────────────────────────────────────
-
-function LoadingState() {
-  return (
-    <div className="flex h-96 flex-col items-center justify-center gap-5 text-center">
-      <div className="relative">
-        <div
-          className="h-16 w-16 rounded-full"
-          style={{
-            border: "2px solid rgba(99,102,241,0.15)",
-            borderTop: "2px solid #6366f1",
-            animation: "spin-slow 1s linear infinite",
-          }}
-        />
-        <div
-          className="absolute inset-2 rounded-full"
-          style={{
-            border: "2px solid rgba(99,102,241,0.08)",
-            borderBottom: "2px solid #8b5cf6",
-            animation: "spin-slow 1.5s linear infinite reverse",
-          }}
-        />
-        <Activity className="absolute inset-0 m-auto h-5 w-5 text-indigo-400" />
-      </div>
-      <div>
-        <p className="text-base font-black t-heading">Analyzing your profile…</p>
-        <p className="text-xs t-sub mt-1 max-w-xs leading-relaxed">
-          Crunching GitHub, Resume, Interviews & Job Matches
-        </p>
-      </div>
-    </div>
-  );
-}
-
-function EmptyState({ onGenerate }: { onGenerate: () => void }) {
-  return (
-    <div className="flex h-96 flex-col items-center justify-center gap-6 text-center">
-      <div
-        className="relative h-20 w-20 rounded-2xl flex items-center justify-center"
-        style={{
-          background: "rgba(99,102,241,0.08)",
-          border: "1px solid rgba(99,102,241,0.2)",
-        }}
-      >
-        <div
-          className="absolute inset-0 rounded-2xl"
-          style={{
-            border: "1px solid rgba(99,102,241,0.3)",
-            animation: "pulse-ring 2s ease-out infinite",
-          }}
-        />
-        <Activity className="h-8 w-8 text-indigo-400" />
-      </div>
-      <div>
-        <h2 className="text-xl font-black t-heading">No score yet</h2>
-        <p className="text-sm t-sub mt-1 max-w-sm leading-relaxed">
-          Generate your first Developer Health Score to unlock career insights.
-        </p>
-      </div>
-      <button
-        onClick={onGenerate}
-        className="btn-primary-glow flex items-center gap-2 h-11 px-6 rounded-xl font-black text-sm text-white"
-        style={{ background: "linear-gradient(135deg,#4f46e5,#7c3aed)" }}
-      >
-        <Zap className="h-4 w-4" />
-        Generate Score
-      </button>
-    </div>
-  );
-}
-
 // ─── Main component ────────────────────────────────────────────────────────────
 
 function DeveloperScore() {
@@ -571,11 +503,26 @@ function DeveloperScore() {
         </header>
 
         {/* ── States ── */}
-        {isLoading && <LoadingState />}
-        {!isLoading && !hasScore && !isGenerating && (
-          <EmptyState onGenerate={() => mutation.mutate()} />
+        {isLoading && (
+          <PageLoadingState
+            title="Analyzing your profile…"
+            subtitle="Crunching GitHub, Resume, Interviews & Job Matches"
+          />
         )}
-        {!isLoading && !hasScore && isGenerating && <LoadingState />}
+        {!isLoading && !hasScore && !isGenerating && (
+          <PageEmptyState
+            title="No score yet"
+            subtitle="Generate your first Developer Health Score to unlock career insights."
+            onAction={() => mutation.mutate()}
+            actionLabel="Generate Score"
+          />
+        )}
+        {!isLoading && !hasScore && isGenerating && (
+          <PageLoadingState
+            title="Analyzing your profile…"
+            subtitle="Crunching GitHub, Resume, Interviews & Job Matches"
+          />
+        )}
 
         {/* ── Main content ── */}
         {hasScore && (

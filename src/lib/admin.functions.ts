@@ -126,7 +126,7 @@ export const listAdminAiRequests = createServerFn({ method: "GET" })
 
 export const setUserAdmin = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: { userId: string; makeAdmin: boolean }) => d)
+  .validator((d: { userId: string; makeAdmin: boolean }) => d)
   .handler(async ({ data, context }) => {
     await assertAdmin(context);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
@@ -148,7 +148,7 @@ export const setUserAdmin = createServerFn({ method: "POST" })
 
 export const getApiUsageAnalytics = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: unknown) => {
+  .validator((d: unknown) => {
     const obj = (d ?? {}) as { days?: number; startDate?: string; endDate?: string };
     const days = Math.min(Math.max(Number(obj.days ?? 30), 1), 365);
     const startDate = obj.startDate && /^\d{4}-\d{2}-\d{2}$/.test(obj.startDate) ? obj.startDate : undefined;

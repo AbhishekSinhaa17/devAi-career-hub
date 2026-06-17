@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { RouteErrorBoundary } from "@/components/ErrorBoundary";
 import { useMutation } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useState, useEffect, useRef } from "react";
@@ -38,9 +39,11 @@ import {
   AlertCircle,
 } from "lucide-react";
 import { toast } from "sonner";
+import { PageLoadingState, PageEmptyState } from "@/components/LoadingStates";
 
 export const Route = createFileRoute("/_authenticated/interview")({
   head: () => ({ meta: [{ title: "Interview Hub — DevAI" }] }),
+  errorComponent: RouteErrorBoundary,
   component: Page,
 });
 
@@ -311,23 +314,11 @@ function QuestionSkeleton({ count }: { count: number }) {
 
 function EmptyState() {
   return (
-    <div className="flex flex-col items-center justify-center py-20 text-center">
-      <div
-        className="h-18 w-18 rounded-2xl flex items-center justify-center mb-5 animate-pulse"
-        style={{
-          background: "rgba(99,102,241,0.08)",
-          border: "1px solid rgba(99,102,241,0.18)",
-          width: 72,
-          height: 72,
-        }}
-      >
-        <MessageSquare className="h-8 w-8 text-primary/50" />
-      </div>
-      <h3 className="text-lg font-black text-foreground mb-2">Configure your interview prep</h3>
-      <p className="text-sm text-muted-foreground max-w-sm leading-relaxed mb-5">
-        Select your role, category, and difficulty to generate targeted questions with model
-        answers.
-      </p>
+    <PageEmptyState
+      title="Configure your interview prep"
+      subtitle="Select your role, category, and difficulty to generate targeted questions with model answers."
+      icon={MessageSquare}
+    >
       <div className="flex flex-wrap gap-2 justify-center">
         {["AI Questions", "Model Answers", "Expert Tips", "Copy-Friendly"].map((f) => (
           <span
@@ -338,7 +329,7 @@ function EmptyState() {
           </span>
         ))}
       </div>
-    </div>
+    </PageEmptyState>
   );
 }
 
@@ -516,9 +507,16 @@ function Page() {
 
         {/* ── Loading ── */}
         {mutation.isPending && <QuestionSkeleton count={count} />}
-
         {/* ── Empty ── */}
         {!data && !mutation.isPending && <EmptyState />}
+
+        {/* ── Loading ── */}
+        {mutation.isPending && (
+          <PageLoadingState
+            title="Generating Questions..."
+            subtitle="Creating targeted interview questions based on your selections."
+          />
+        )}
 
         {/* ── Results ── */}
         {data && !mutation.isPending && (

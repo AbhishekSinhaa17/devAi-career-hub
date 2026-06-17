@@ -1,4 +1,5 @@
 import process from "node:process";
+import { ensureEnvValid } from "./env-validation.server";
 
 // Server-only config. The .server.ts suffix prevents Vite from bundling
 // this file into the client — values here never reach the browser.
@@ -17,6 +18,9 @@ import process from "node:process";
 //     VITE_ prefix. Never put secrets here — they ship to the browser.
 
 export function getServerConfig() {
+  // Validate all required env vars on first access
+  ensureEnvValid();
+
   return {
     nodeEnv: process.env.NODE_ENV,
     // Add server-only values here, e.g.:

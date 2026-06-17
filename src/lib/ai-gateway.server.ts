@@ -1,6 +1,9 @@
 // Server-only helper for calling AI endpoints.
 // Loaded only inside createServerFn handlers via dynamic import.
 
+import { getRequiredEnv } from "./env-validation.server";
+import { checkRateLimit, logRateLimitRejection } from "./rate-limiter.server";
+
 const GEMINI_ENDPOINT = "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions";
 const GROQ_ENDPOINT = "https://api.groq.com/openai/v1/chat/completions";
 
@@ -151,6 +154,21 @@ async function rawCall(opts: {
   throw new Error("No AI providers configured (missing GEMINI_API_KEY or GROQ_API_KEY)");
 }
 
+/**
+ * Enforce rate limits before making an AI call.
+ * Throws a user-friendly error if the limit is exceeded.
+ */
+async function enforceRateLimit(log?: LogContext): Promise<void> {
+  if (!log) return; // No context = internal call, skip rate limiting
+
+  const result = await checkRateLimit(log.userId);
+  if (!result.allowed) {
+    // Log the rejection for monitoring
+    await logRateLimitRejection(log.userId, log.endpoint, result.reason ?? "Rate limited");
+    throw new Error(result.reason ?? "Rate limit exceeded. Please try again later.");
+  }
+}
+
 export async function callAi(opts: {
   messages: AiMessage[];
   model?: string;
@@ -158,6 +176,9 @@ export async function callAi(opts: {
   temperature?: number;
   log?: LogContext;
 }): Promise<string> {
+  // Enforce rate limits before calling the AI provider
+  await enforceRateLimit(opts.log);
+
   try {
     const { text, usage } = await rawCall(opts);
     if (opts.log) await logUsage(opts.log, usage, "success");
@@ -180,6 +201,9 @@ export async function callAiJson<T>(opts: {
   schema: { name: string; schema: Record<string, unknown> };
   log?: LogContext;
 }): Promise<T> {
+  // Enforce rate limits before calling the AI provider
+  await enforceRateLimit(opts.log);
+
   try {
     const { text, usage } = await rawCall({ ...opts, jsonSchema: opts.schema });
     if (opts.log) await logUsage(opts.log, usage, "success");

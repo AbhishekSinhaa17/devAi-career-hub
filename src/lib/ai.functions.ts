@@ -1,44 +1,21 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { fetchGitHubUser, fetchGitHubRepos } from "./github-client.server";
 
 // ---------- GitHub Analyzer ----------
 
-interface GithubRepo {
-  name: string;
-  description: string | null;
-  language: string | null;
-  stargazers_count: number;
-  forks_count: number;
-  fork: boolean;
-  updated_at: string;
-}
-
 export const analyzeGithub = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: unknown) => z.object({ username: z.string().trim().min(1).max(40) }).parse(d))
+  .validator((d: unknown) => z.object({ username: z.string().trim().min(1).max(40) }).parse(d))
   .handler(async ({ data, context }) => {
     const { callAiJson } = await import("./ai-gateway.server");
     const username = data.username;
 
-    const userRes = await fetch(`https://api.github.com/users/${username}`, {
-      headers: { "User-Agent": "DevAI" },
-    });
-    if (!userRes.ok) throw new Error("GitHub user not found");
-    const user = (await userRes.json()) as {
-      public_repos: number;
-      followers: number;
-      following: number;
-      avatar_url: string;
-      bio: string | null;
-      name: string | null;
-    };
-
-    const reposRes = await fetch(
-      `https://api.github.com/users/${username}/repos?per_page=100&sort=updated`,
-      { headers: { "User-Agent": "DevAI" } },
+    const user = await fetchGitHubUser(username);
+    const repos = (await fetchGitHubRepos(username, { perPage: 100, sort: "updated" })).filter(
+      (r) => !r.fork,
     );
-    const repos = ((await reposRes.json()) as GithubRepo[]).filter((r) => !r.fork);
 
     const totalStars = repos.reduce((s, r) => s + r.stargazers_count, 0);
     const totalForks = repos.reduce((s, r) => s + r.forks_count, 0);
@@ -123,7 +100,7 @@ export const analyzeGithub = createServerFn({ method: "POST" })
 
 export const scoreResume = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: unknown) =>
+  .validator((d: unknown) =>
     z
       .object({
         resume: z.object({
@@ -182,7 +159,7 @@ export const scoreResume = createServerFn({ method: "POST" })
 
 export const reviewCode = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: unknown) =>
+  .validator((d: unknown) =>
     z
       .object({
         code: z.string().min(1).max(20000),
@@ -244,7 +221,7 @@ export const reviewCode = createServerFn({ method: "POST" })
 
 export const generateInterview = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: unknown) =>
+  .validator((d: unknown) =>
     z
       .object({
         role: z.string().min(1),
@@ -309,7 +286,7 @@ export const generateInterview = createServerFn({ method: "POST" })
 
 export const generateRoadmap = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: unknown) =>
+  .validator((d: unknown) =>
     z.object({ path: z.string().min(1), level: z.string().default("beginner") }).parse(d),
   )
   .handler(async ({ data, context }) => {
@@ -458,7 +435,7 @@ export const getDashboard = createServerFn({ method: "GET" })
 
 export const updateProfile = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: unknown) =>
+  .validator((d: unknown) =>
     z
       .object({
         name: z.string().max(80).optional(),
@@ -479,7 +456,7 @@ export const updateProfile = createServerFn({ method: "POST" })
 
 export const analyzeJobMatch = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: unknown) =>
+  .validator((d: unknown) =>
     z
       .object({
         resumeText: z.string().min(10),
@@ -868,12 +845,9 @@ export const generateGithubResume = createServerFn({ method: "POST" })
     const { callAiJson } = await import("./ai-gateway.server");
     const username = data.username;
 
-    const reposRes = await fetch(
-      `https://api.github.com/users/${username}/repos?per_page=30&sort=pushed`,
-      { headers: { "User-Agent": "DevAI" } }
+    const repos = (await fetchGitHubRepos(username, { perPage: 30, sort: "pushed" })).filter(
+      (r) => !r.fork,
     );
-    if (!reposRes.ok) throw new Error("GitHub user not found or rate limited");
-    const repos = ((await reposRes.json()) as any[]).filter((r) => !r.fork);
 
     // Deep analysis parameters (simulate deep scraping by sending top repo descriptions and topics)
     const topReposDeep = repos

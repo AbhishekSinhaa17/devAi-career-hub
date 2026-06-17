@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { RouteErrorBoundary } from "@/components/ErrorBoundary";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useState, useEffect, useRef } from "react";
@@ -48,6 +49,7 @@ import {
 
 export const Route = createFileRoute("/_authenticated/resume")({
   head: () => ({ meta: [{ title: "Resume Builder — DevAI" }] }),
+  errorComponent: RouteErrorBoundary,
   component: Page,
 });
 

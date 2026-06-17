@@ -1,10 +1,12 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { RouteErrorBoundary } from "@/components/ErrorBoundary";
 import { useMutation } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useState, useEffect } from "react";
 import { analyzeGithub, generateDeveloperScore } from "@/lib/ai.functions";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
+import { PageLoadingState, PageEmptyState } from "@/components/LoadingStates";
 import {
   Github,
   Loader2,
@@ -28,6 +30,7 @@ import { Bar, BarChart, ResponsiveContainer, Tooltip, XAxis, YAxis, Cell } from 
 
 export const Route = createFileRoute("/_authenticated/github")({
   head: () => ({ meta: [{ title: "GitHub Analyzer — DevAI" }] }),
+  errorComponent: RouteErrorBoundary,
   component: Page,
 });
 
@@ -287,53 +290,6 @@ const LANG_COLORS = [
 ];
 
 // ─── Empty / loading state ────────────────────────────────────────────────────
-function EmptyState({ isPending }: { isPending: boolean }) {
-  const examples = ["torvalds", "gaearon", "sindresorhus", "tj"];
-  return (
-    <div className="flex flex-col items-center justify-center py-24 text-center">
-      <div
-        className="relative h-24 w-24 rounded-3xl flex items-center justify-center mb-6"
-        style={{
-          background: "linear-gradient(135deg, rgba(99,102,241,0.15), rgba(139,92,246,0.1))",
-          border: "1px solid rgba(99,102,241,0.2)",
-          boxShadow: "0 0 40px rgba(99,102,241,0.1)",
-        }}
-      >
-        <Github className="h-12 w-12 text-primary/60" />
-        <div
-          className="absolute inset-0 rounded-3xl animate-pulse opacity-50"
-          style={{
-            background: "radial-gradient(circle, rgba(99,102,241,0.1) 0%, transparent 70%)",
-          }}
-        />
-      </div>
-      <h3 className="text-xl font-black text-foreground mb-2">
-        {isPending ? "Analyzing profile…" : "Enter a GitHub username"}
-      </h3>
-      <p className="text-muted-foreground text-sm max-w-sm leading-relaxed">
-        {isPending
-          ? "We're fetching repositories, computing stats, and generating AI insights."
-          : "DevAI will fetch the profile, analyze repositories, and write an honest AI review."}
-      </p>
-      {!isPending && (
-        <div className="mt-6 flex flex-wrap gap-2 justify-center">
-          <span className="text-xs text-muted-foreground font-semibold uppercase tracking-widest mr-1">
-            Try:
-          </span>
-          {examples.map((ex) => (
-            <span
-              key={ex}
-              className="px-3 py-1 rounded-full text-xs font-bold border border-border/60 bg-muted/40 text-muted-foreground"
-            >
-              {ex}
-            </span>
-          ))}
-        </div>
-      )}
-    </div>
-  );
-}
-
 // ─── Main Page ────────────────────────────────────────────────────────────────
 function Page() {
   const [username, setUsername] = useState("");
@@ -448,7 +404,34 @@ function Page() {
       </Panel>
 
       {/* ── Results ── */}
-      {!data && <EmptyState isPending={mutation.isPending} />}
+      {!data && mutation.isPending && (
+        <PageLoadingState
+          title="Analyzing profile…"
+          subtitle="We're fetching repositories, computing stats, and generating AI insights."
+        />
+      )}
+      {!data && !mutation.isPending && (
+        <PageEmptyState
+          title="Enter a GitHub username"
+          subtitle="DevAI will fetch the profile, analyze repositories, and write an honest AI review."
+          icon={Github}
+        >
+          <div className="flex flex-wrap gap-2 justify-center mt-6">
+            <span className="text-xs text-muted-foreground font-semibold uppercase tracking-widest mr-1">
+              Try:
+            </span>
+            {["torvalds", "gaearon", "sindresorhus", "tj"].map((ex) => (
+              <span
+                key={ex}
+                className="px-3 py-1 rounded-full text-xs font-bold border border-border/60 bg-muted/40 text-muted-foreground cursor-pointer hover:bg-muted"
+                onClick={() => setUsername(ex)}
+              >
+                {ex}
+              </span>
+            ))}
+          </div>
+        </PageEmptyState>
+      )}
 
       {data && (
         <div className="space-y-6" style={{ animation: "fadeSlideIn 0.5s ease-out both" }}>

@@ -1,8 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { RouteErrorBoundary } from "@/components/ErrorBoundary";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useState, useEffect, useRef } from "react";
 import { generateMockInterviewQuestions, evaluateMockInterview } from "@/lib/ai.functions";
+import { PageLoadingState } from "@/components/LoadingStates";
 import { Label } from "@/components/ui/label";
 import {
   Select,
@@ -37,6 +39,7 @@ import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/mock-interview")({
   head: () => ({ meta: [{ title: "Mock Interview Simulator — DevAI" }] }),
+  errorComponent: RouteErrorBoundary,
   component: MockInterviewPage,
 });
 
@@ -231,35 +234,6 @@ function ScoreMetric({
             boxShadow: `0 0 6px ${color}50`,
           }}
         />
-      </div>
-    </div>
-  );
-}
-
-// ─── Loading state ────────────────────────────────────────────────────────────
-function LoadingState({ title, subtitle }: { title: string; subtitle: string }) {
-  return (
-    <div className="flex flex-col items-center justify-center py-24 text-center gap-5">
-      <div className="relative">
-        <div
-          className="h-20 w-20 rounded-3xl grid place-items-center"
-          style={{
-            background: "linear-gradient(135deg,rgba(99,102,241,0.15),rgba(139,92,246,0.1))",
-            border: "1px solid rgba(99,102,241,0.2)",
-          }}
-        >
-          <Loader2 className="h-9 w-9 animate-spin text-primary" />
-        </div>
-        <div
-          className="absolute inset-0 rounded-3xl animate-pulse opacity-50"
-          style={{
-            background: "radial-gradient(circle,rgba(99,102,241,0.15) 0%,transparent 70%)",
-          }}
-        />
-      </div>
-      <div>
-        <p className="text-xl font-black text-foreground">{title}</p>
-        <p className="text-sm text-muted-foreground max-w-sm mt-1.5 leading-relaxed">{subtitle}</p>
       </div>
     </div>
   );
@@ -576,9 +550,9 @@ function MockInterviewPage() {
 
       {/* ──────────────────────── GENERATING ──────────────────────── */}
       {status === "generating" && (
-        <LoadingState
-          title="Preparing your interview…"
-          subtitle="Our AI is reading your profile and generating tailored questions based on your role, level, and interview type."
+        <PageLoadingState
+          title="Analyzing Profile..."
+          subtitle="Building a custom interview based on your skills and experience."
         />
       )}
 
@@ -722,9 +696,9 @@ function MockInterviewPage() {
 
       {/* ──────────────────────── EVALUATING ──────────────────────── */}
       {status === "evaluating" && (
-        <LoadingState
-          title="Evaluating your performance…"
-          subtitle="Analyzing technical accuracy, communication style, confidence signals, and problem-solving depth."
+        <PageLoadingState
+          title="Evaluating Answer..."
+          subtitle="Analyzing technical depth, clarity, and completeness."
         />
       )}
 

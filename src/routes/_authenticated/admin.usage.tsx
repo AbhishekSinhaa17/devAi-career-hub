@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { RouteErrorBoundary } from "@/components/ErrorBoundary";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useRef, useState } from "react";
@@ -39,6 +40,7 @@ import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/admin/usage")({
   head: () => ({ meta: [{ title: "API Usage — DevAI Admin" }] }),
+  errorComponent: RouteErrorBoundary,
   component: UsagePage,
 });
 
