@@ -130,6 +130,8 @@ export const setUserAdmin = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     await assertAdmin(context);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const action = data.makeAdmin ? "grant_admin" : "revoke_admin";
+    
     if (data.makeAdmin) {
       const { error } = await supabaseAdmin
         .from("user_roles")
@@ -143,6 +145,15 @@ export const setUserAdmin = createServerFn({ method: "POST" })
         .eq("role", "admin");
       if (error) throw new Error(error.message);
     }
+
+    // Insert audit log
+    await supabaseAdmin.from("admin_audit_logs").insert({
+      admin_id: context.userId,
+      action: action,
+      target_id: data.userId,
+      metadata: { target: data.userId, granted: data.makeAdmin }
+    });
+
     return { ok: true };
   });
 

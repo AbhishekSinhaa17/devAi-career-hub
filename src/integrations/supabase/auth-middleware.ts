@@ -9,8 +9,9 @@ import type { Database } from './types'
 export const requireSupabaseAuth = createMiddleware({ type: 'function' }).server(
   async ({ next }) => {
     
-    const SUPABASE_URL = process.env.SUPABASE_URL;
-    const SUPABASE_PUBLISHABLE_KEY = process.env.SUPABASE_PUBLISHABLE_KEY;
+    const { env } = await import("@/env");
+    const SUPABASE_URL = env.VITE_SUPABASE_URL || "https://dummy.supabase.co";
+    const SUPABASE_PUBLISHABLE_KEY = env.VITE_SUPABASE_ANON_KEY || "dummy";
 
     if (!SUPABASE_URL || !SUPABASE_PUBLISHABLE_KEY) {
       const missing = [

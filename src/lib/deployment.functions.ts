@@ -64,7 +64,8 @@ export const startDeployment = createServerFn({ method: "POST" })
           })
           .eq("id", deploymentData.id);
       } catch (err) {
-        console.error("Background deployment error", err);
+        const { logger } = await import("./logger.server");
+        logger.error({ err, userId: context.userId }, "Background deployment error");
       }
     }, 12000); // Simulate a 12-second build process
 

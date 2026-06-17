@@ -54,7 +54,8 @@ async function logUsage(ctx: LogContext, usage: AiUsage, status: string) {
       duration_ms: usage.duration_ms,
     });
   } catch (err) {
-    console.error("logUsage failed", err);
+    const { logger } = await import("./logger.server");
+    logger.error({ err, endpoint: ctx.endpoint }, "logUsage failed");
   }
 }
 
@@ -139,8 +140,13 @@ async function rawCall(opts: {
       
       const fetchOpts = { ...opts, signal: controller.signal };
 
+      const { env } = await import("@/env");
+      const { logger } = await import("./logger.server");
+      const reqId = crypto.randomUUID();
+      const reqLogger = logger.child({ reqId, endpoint: opts.log?.endpoint });
+
       // Try Gemini first
-      const geminiKey = process.env.GEMINI_API_KEY;
+      const geminiKey = env.GEMINI_API_KEY;
       if (geminiKey) {
         try {
           const model = (opts.model && opts.model.includes("gemini")) ? opts.model : DEFAULT_GEMINI_MODEL;
@@ -148,13 +154,13 @@ async function rawCall(opts: {
           clearTimeout(timeoutId);
           return res;
         } catch (err: any) {
-          if (err.name !== "AbortError") console.warn("Gemini call failed, falling back to Groq", err);
+          if (err.name !== "AbortError") reqLogger.warn({ err }, "Gemini call failed, falling back to Groq");
           lastError = err;
         }
       }
 
       // Fallback to Groq
-      const groqKey = process.env.GROQ_API_KEY;
+      const groqKey = env.GROQ_API_KEY;
       if (groqKey) {
         try {
           const model = DEFAULT_GROQ_MODEL;
@@ -162,7 +168,7 @@ async function rawCall(opts: {
           clearTimeout(timeoutId);
           return res;
         } catch (err: any) {
-          if (err.name !== "AbortError") console.warn("Groq call failed", err);
+          if (err.name !== "AbortError") reqLogger.warn({ err }, "Groq call failed");
           lastError = err;
         }
       }
@@ -267,7 +273,8 @@ export async function callAiJson<T>(opts: {
         throw new Error("AI returned malformed JSON");
       }
     } catch (err: any) {
-      console.warn(`JSON parsing or AI call failed on attempt ${attempt}:`, err);
+      const { logger } = await import("./logger.server");
+      logger.warn({ err, attempt, endpoint: opts.log?.endpoint }, "JSON parsing or AI call failed");
       lastErr = err;
       if (err.message !== "AI returned malformed JSON" || attempt === 2) {
         break; // Don't retry if it's not a JSON error, or if we're out of retries

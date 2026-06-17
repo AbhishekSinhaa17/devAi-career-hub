@@ -190,6 +190,7 @@ export async function logRateLimitRejection(
       duration_ms: 0,
     });
   } catch (err) {
-    console.error("[RateLimiter] Failed to log rejection:", err);
+    const { logger } = await import("./logger.server");
+    logger.error({ err, userId, endpoint }, "[RateLimiter] Failed to log rejection");
   }
 }

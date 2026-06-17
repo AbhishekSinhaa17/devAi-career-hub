@@ -10,6 +10,24 @@ import {
 import { useEffect, type ReactNode } from "react";
 import { Toaster } from "@/components/ui/sonner";
 import { supabase } from "@/integrations/supabase/client";
+import * as Sentry from "@sentry/react";
+import posthog from "posthog-js";
+
+if (typeof document !== "undefined") {
+  if (import.meta.env.VITE_SENTRY_DSN) {
+    Sentry.init({
+      dsn: import.meta.env.VITE_SENTRY_DSN,
+      integrations: [],
+      tracesSampleRate: 1.0,
+    });
+  }
+  if (import.meta.env.VITE_POSTHOG_KEY) {
+    posthog.init(import.meta.env.VITE_POSTHOG_KEY, {
+      api_host: import.meta.env.VITE_POSTHOG_HOST || "https://us.i.posthog.com",
+      person_profiles: "identified_only",
+    });
+  }
+}
 
 import appCss from "../styles.css?url";
 
@@ -111,10 +129,22 @@ function RootComponent() {
   const router = useRouter();
 
   useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       if (event !== "SIGNED_IN" && event !== "SIGNED_OUT" && event !== "USER_UPDATED") return;
       router.invalidate();
-      if (event !== "SIGNED_OUT") queryClient.invalidateQueries();
+      
+      if (event === "SIGNED_IN" && session?.user) {
+        if (import.meta.env.VITE_POSTHOG_KEY) {
+          posthog.identify(session.user.id, { email: session.user.email });
+        }
+        if (import.meta.env.VITE_SENTRY_DSN) {
+          Sentry.setUser({ id: session.user.id, email: session.user.email });
+        }
+      } else if (event === "SIGNED_OUT") {
+        queryClient.invalidateQueries();
+        if (import.meta.env.VITE_POSTHOG_KEY) posthog.reset();
+        if (import.meta.env.VITE_SENTRY_DSN) Sentry.setUser(null);
+      }
     });
     return () => subscription.unsubscribe();
   }, [router, queryClient]);
