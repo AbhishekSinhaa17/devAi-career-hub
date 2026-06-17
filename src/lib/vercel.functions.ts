@@ -38,14 +38,14 @@ export const triggerVercelDeployment = createServerFn({ method: "POST" })
 
     // 2. Generate actual React+Vite files dynamically
     const files = generatePortfolioFiles(resumeData);
-    const projectName = \`portfolio-\${portfolioData.github_username.toLowerCase().replace(/[^a-z0-9]/g, "-")}\`;
+    const projectName = `portfolio-${portfolioData.github_username.toLowerCase().replace(/[^a-z0-9]/g, "-")}`;
 
     // 3. Trigger actual Vercel deployment
     const token = getVercelToken();
-    const response = await fetch(\`\${VERCEL_API_URL}/v13/deployments\`, {
+    const response = await fetch(`${VERCEL_API_URL}/v13/deployments`, {
       method: "POST",
       headers: {
-        Authorization: \`Bearer \${token}\`,
+        Authorization: `Bearer ${token}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
@@ -60,7 +60,7 @@ export const triggerVercelDeployment = createServerFn({ method: "POST" })
     if (!response.ok) {
       const errText = await response.text();
       console.error("Vercel Deployment Error:", errText);
-      throw new Error(\`Vercel API Error: \${response.statusText}. Please check logs.\`);
+      throw new Error(`Vercel API Error: ${response.statusText}. Please check logs.`);
     }
 
     const vercelData = await response.json();
@@ -74,7 +74,7 @@ export const triggerVercelDeployment = createServerFn({ method: "POST" })
         provider: "Vercel",
         deployment_id: vercelData.id,
         status: "building",
-        deployment_url: \`https://\${vercelData.url}\`,
+        deployment_url: `https://${vercelData.url}`,
       })
       .select()
       .single();
@@ -110,9 +110,9 @@ export const checkVercelStatus = createServerFn({ method: "GET" })
     if (deploymentData.status === "building" && deploymentData.deployment_id) {
       try {
         const token = getVercelToken();
-        const response = await fetch(\`\${VERCEL_API_URL}/v13/deployments/\${deploymentData.deployment_id}\`, {
+        const response = await fetch(`${VERCEL_API_URL}/v13/deployments/${deploymentData.deployment_id}`, {
           headers: {
-            Authorization: \`Bearer \${token}\`,
+            Authorization: `Bearer ${token}`,
           },
         });
 
@@ -122,7 +122,7 @@ export const checkVercelStatus = createServerFn({ method: "GET" })
           
           if (vData.readyState === "READY") {
             try {
-              const liveUrl = \`https://\${vData.url}\`;
+              const liveUrl = `https://${vData.url}`;
               const checkRes = await fetch(liveUrl);
               if (checkRes.ok) {
                 newStatus = "success";

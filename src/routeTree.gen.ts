@@ -25,6 +25,7 @@ import { Route as AuthenticatedGithubResumeRouteImport } from './routes/_authent
 import { Route as AuthenticatedGithubRouteImport } from './routes/_authenticated/github'
 import { Route as AuthenticatedDeveloperScoreRouteImport } from './routes/_authenticated/developer-score'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
+import { Route as AuthenticatedCopilotRouteImport } from './routes/_authenticated/copilot'
 import { Route as AuthenticatedCodeReviewRouteImport } from './routes/_authenticated/code-review'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as AuthenticatedPortfolioDeploymentIdRouteImport } from './routes/_authenticated/portfolio-deployment.$id'
@@ -114,6 +115,11 @@ const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   path: '/dashboard',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedCopilotRoute = AuthenticatedCopilotRouteImport.update({
+  id: '/copilot',
+  path: '/copilot',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedCodeReviewRoute = AuthenticatedCodeReviewRouteImport.update({
   id: '/code-review',
   path: '/code-review',
@@ -148,6 +154,7 @@ export interface FileRoutesByFullPath {
   '/signup': typeof SignupRoute
   '/admin': typeof AuthenticatedAdminRouteWithChildren
   '/code-review': typeof AuthenticatedCodeReviewRoute
+  '/copilot': typeof AuthenticatedCopilotRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/developer-score': typeof AuthenticatedDeveloperScoreRoute
   '/github': typeof AuthenticatedGithubRoute
@@ -170,6 +177,7 @@ export interface FileRoutesByTo {
   '/signup': typeof SignupRoute
   '/admin': typeof AuthenticatedAdminRouteWithChildren
   '/code-review': typeof AuthenticatedCodeReviewRoute
+  '/copilot': typeof AuthenticatedCopilotRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/developer-score': typeof AuthenticatedDeveloperScoreRoute
   '/github': typeof AuthenticatedGithubRoute
@@ -194,6 +202,7 @@ export interface FileRoutesById {
   '/signup': typeof SignupRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRouteWithChildren
   '/_authenticated/code-review': typeof AuthenticatedCodeReviewRoute
+  '/_authenticated/copilot': typeof AuthenticatedCopilotRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/developer-score': typeof AuthenticatedDeveloperScoreRoute
   '/_authenticated/github': typeof AuthenticatedGithubRoute
@@ -218,6 +227,7 @@ export interface FileRouteTypes {
     | '/signup'
     | '/admin'
     | '/code-review'
+    | '/copilot'
     | '/dashboard'
     | '/developer-score'
     | '/github'
@@ -240,6 +250,7 @@ export interface FileRouteTypes {
     | '/signup'
     | '/admin'
     | '/code-review'
+    | '/copilot'
     | '/dashboard'
     | '/developer-score'
     | '/github'
@@ -263,6 +274,7 @@ export interface FileRouteTypes {
     | '/signup'
     | '/_authenticated/admin'
     | '/_authenticated/code-review'
+    | '/_authenticated/copilot'
     | '/_authenticated/dashboard'
     | '/_authenticated/developer-score'
     | '/_authenticated/github'
@@ -402,6 +414,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/copilot': {
+      id: '/_authenticated/copilot'
+      path: '/copilot'
+      fullPath: '/copilot'
+      preLoaderRoute: typeof AuthenticatedCopilotRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/code-review': {
       id: '/_authenticated/code-review'
       path: '/code-review'
@@ -456,6 +475,7 @@ const AuthenticatedAdminRouteWithChildren =
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedAdminRoute: typeof AuthenticatedAdminRouteWithChildren
   AuthenticatedCodeReviewRoute: typeof AuthenticatedCodeReviewRoute
+  AuthenticatedCopilotRoute: typeof AuthenticatedCopilotRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedDeveloperScoreRoute: typeof AuthenticatedDeveloperScoreRoute
   AuthenticatedGithubRoute: typeof AuthenticatedGithubRoute
@@ -473,6 +493,7 @@ interface AuthenticatedRouteRouteChildren {
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAdminRoute: AuthenticatedAdminRouteWithChildren,
   AuthenticatedCodeReviewRoute: AuthenticatedCodeReviewRoute,
+  AuthenticatedCopilotRoute: AuthenticatedCopilotRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedDeveloperScoreRoute: AuthenticatedDeveloperScoreRoute,
   AuthenticatedGithubRoute: AuthenticatedGithubRoute,

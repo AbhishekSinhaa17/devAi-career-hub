@@ -19,6 +19,7 @@ import {
   Zap,
   Menu,
   X,
+  Bot,
 } from "lucide-react";
 import { type ReactNode, useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
@@ -325,6 +326,7 @@ const NAV_SECTIONS = [
     items: [
       { to: "/", icon: Home, label: "Home" },
       { to: "/dashboard", icon: LayoutDashboard, label: "Dashboard" },
+      { to: "/copilot", icon: Bot, label: "AI Copilot" },
     ],
   },
   {
@@ -628,10 +630,10 @@ export function AppShell({ children }: { children: ReactNode }) {
   // Mobile bottom bar items (first 5 most important)
   const mobileBottomItems: NavItem[] = [
     { to: "/dashboard", icon: LayoutDashboard, label: "Dashboard" },
+    { to: "/copilot", icon: Bot, label: "Copilot" },
     { to: "/github", icon: Github, label: "GitHub" },
     { to: "/developer-score", icon: Activity, label: "Score" },
     { to: "/job-match", icon: Briefcase, label: "Jobs" },
-    { to: "/profile", icon: User, label: "Profile" },
   ];
 
   return (
