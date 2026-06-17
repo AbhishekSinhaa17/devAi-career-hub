@@ -19,9 +19,32 @@ export const analyzeGithub = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .validator((d: unknown) => z.object({ username: z.string().trim().min(1).max(40) }).parse(d))
   .handler(async ({ data, context }) => {
-    const { callAiJson } = await import("./ai-gateway.server");
-    const username = data.username;
+    const username = data.username.toLowerCase();
 
+    // ── Cache Check ────────────────────────────────────────────────────────
+    const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+    const { data: cached } = await context.supabase
+      .from("github_analyses")
+      .select("*")
+      .eq("user_id", context.userId)
+      .ilike("github_username", username)
+      .gte("created_at", oneDayAgo)
+      .order("created_at", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
+    if (cached) {
+      return {
+        stats: cached.stats,
+        score: cached.score,
+        summary: cached.summary,
+        strengths: cached.strengths,
+        weaknesses: cached.weaknesses,
+        suggestions: cached.suggestions,
+      };
+    }
+
+    const { callAiJson } = await import("./ai-gateway.server");
     const user = await fetchGitHubUser(username);
     const repos = (await fetchGitHubRepos(username, { perPage: 100, sort: "updated" })).filter(
       (r) => !r.fork,
@@ -42,7 +65,7 @@ export const analyzeGithub = createServerFn({ method: "POST" })
       .slice()
       .sort((a, b) => b.stargazers_count - a.stargazers_count)
       .slice(0, 8)
-      .map((r) => ({ name: r.name, desc: r.description, stars: r.stargazers_count, lang: r.language }));
+      .map((r) => ({ name: r.name, desc: r.description ? r.description.slice(0, 500) : "", stars: r.stargazers_count, lang: r.language }));
 
     const stats = {
       avatar_url: user.avatar_url,
@@ -139,6 +162,27 @@ export const scoreResume = createServerFn({ method: "POST" })
       .parse(d),
   )
   .handler(async ({ data, context }) => {
+    const crypto = await import("crypto");
+    const resumeHash = crypto.createHash("md5").update(JSON.stringify(data.resume)).digest("hex");
+
+    // ── Cache Check ────────────────────────────────────────────────────────
+    const { data: cached } = await context.supabase
+      .from("resumes")
+      .select("score, ai_suggestions")
+      .eq("user_id", context.userId)
+      .eq("resume_hash", resumeHash)
+      .order("updated_at", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
+    if (cached && cached.score) {
+      return {
+        score: cached.score,
+        suggestions: cached.ai_suggestions || [],
+        missingSkills: [], // Resumes table doesn't store missingSkills directly, but we return empty to satisfy schema
+      };
+    }
+
     const { callAiJson } = await import("./ai-gateway.server");
     const rawAi = await callAiJson<unknown>({
       messages: [
@@ -188,7 +232,7 @@ export const reviewCode = createServerFn({ method: "POST" })
   .validator((d: unknown) =>
     z
       .object({
-        code: z.string().min(1).max(20000),
+        code: z.string().min(1, "Code cannot be empty.").max(8000, "Code is too large. Maximum allowed size is 8,000 characters for optimal AI review."),
         language: z.string().default("javascript"),
       })
       .parse(d),
@@ -504,14 +548,38 @@ export const analyzeJobMatch = createServerFn({ method: "POST" })
   .validator((d: unknown) =>
     z
       .object({
-        resumeText: z.string().min(10),
+        resumeText: z.string().min(10, "Resume text is too short.").max(8000, "Resume text is too large. Maximum allowed size is 8,000 characters."),
         resumeFileName: z.string().min(1),
-        jobDescription: z.string().min(10),
+        jobDescription: z.string().min(10, "Job description is too short.").max(8000, "Job description is too large. Maximum allowed size is 8,000 characters."),
         jobRole: z.string().min(1),
       })
       .parse(d),
   )
   .handler(async ({ data, context }) => {
+    const crypto = await import("crypto");
+    const hashKey = crypto.createHash("md5").update(data.resumeText + data.jobDescription).digest("hex");
+
+    // ── Cache Check ────────────────────────────────────────────────────────
+    const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
+    const { data: cached } = await context.supabase
+      .from("job_matches")
+      .select("*")
+      .eq("user_id", context.userId)
+      .eq("hash_key", hashKey)
+      .gte("created_at", thirtyDaysAgo)
+      .order("created_at", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
+    if (cached) {
+      return {
+        ...(cached.analysis as JobMatchResponse),
+        atsScore: cached.ats_score,
+        hiringProbability: cached.hiring_probability,
+        interviewReadiness: cached.interview_readiness,
+      };
+    }
+
     const { callAiJson } = await import("./ai-gateway.server");
     const rawAi = await callAiJson<unknown>({
       messages: [
@@ -563,16 +631,6 @@ export const analyzeJobMatch = createServerFn({ method: "POST" })
 
     const ai = JobMatchSchema.parse(rawAi);
 
-    const analysis = {
-      matchingSkills: ai.matchingSkills,
-      missingSkills: ai.missingSkills,
-      strengths: ai.strengths,
-      weaknesses: ai.weaknesses,
-      suggestions: ai.suggestions,
-      recommendedProjects: ai.recommendedProjects,
-      recommendedSkills: ai.recommendedSkills,
-    };
-
     const inserted = await context.supabase.from("job_matches").insert({
       user_id: context.userId,
       job_role: data.jobRole,
@@ -583,7 +641,8 @@ export const analyzeJobMatch = createServerFn({ method: "POST" })
       hiring_probability: ai.hiringProbability,
       interview_readiness: ai.interviewReadiness,
       ai_summary: ai.summary,
-      analysis: analysis as any,
+      analysis: ai as never,
+      hash_key: hashKey,
     }).select().single();
 
     return { id: inserted.data?.id, ...ai };
@@ -776,6 +835,9 @@ export const saveResume = createServerFn({ method: "POST" })
       .parse(d),
   )
   .handler(async ({ data, context }) => {
+    const crypto = await import("crypto");
+    const resumeHash = crypto.createHash("md5").update(JSON.stringify(data.content)).digest("hex");
+
     if (data.id) {
       const { data: updated, error } = await context.supabase
         .from("resumes")
@@ -784,6 +846,7 @@ export const saveResume = createServerFn({ method: "POST" })
           content: data.content as never,
           score: data.score,
           ai_suggestions: data.ai_suggestions,
+          resume_hash: resumeHash,
           updated_at: new Date().toISOString(),
         })
         .eq("id", data.id)
@@ -801,6 +864,7 @@ export const saveResume = createServerFn({ method: "POST" })
           content: data.content as never,
           score: data.score,
           ai_suggestions: data.ai_suggestions,
+          resume_hash: resumeHash,
         })
         .select()
         .single();
@@ -922,7 +986,7 @@ export const generateGithubResume = createServerFn({ method: "POST" })
       .slice(0, 10)
       .map(r => ({
         name: r.name,
-        desc: r.description,
+        desc: r.description ? r.description.slice(0, 500) : "",
         lang: r.language,
         topics: r.topics || [],
         stars: r.stargazers_count,

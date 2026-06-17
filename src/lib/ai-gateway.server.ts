@@ -35,6 +35,7 @@ export interface AiUsage {
 export interface LogContext {
   endpoint: string;
   userId: string | null;
+  clientIp?: string | null;
 }
 
 async function logUsage(ctx: LogContext, usage: AiUsage, status: string) {
@@ -42,6 +43,7 @@ async function logUsage(ctx: LogContext, usage: AiUsage, status: string) {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     await supabaseAdmin.from("ai_usage_events").insert({
       user_id: ctx.userId,
+      client_ip: ctx.clientIp ?? null,
       endpoint: ctx.endpoint,
       model: usage.model,
       prompt_tokens: usage.prompt_tokens,
@@ -64,6 +66,7 @@ async function executeProviderCall(
     messages: AiMessage[];
     jsonSchema?: { name: string; schema: Record<string, unknown> };
     temperature?: number;
+    signal?: AbortSignal;
   }
 ): Promise<{ text: string; usage: AiUsage }> {
   const body: Record<string, unknown> = { model, messages: opts.messages };
@@ -93,6 +96,7 @@ async function executeProviderCall(
     method: "POST",
     headers: { "Content-Type": "application/json", Authorization: `Bearer ${key}` },
     body: JSON.stringify(body),
+    signal: opts.signal,
   });
 
   if (!res.ok) {
@@ -125,33 +129,66 @@ async function rawCall(opts: {
   temperature?: number;
 }): Promise<{ text: string; usage: AiUsage }> {
   let lastError: unknown;
+  const maxRetries = 2;
+  const baseDelay = 1000;
 
-  // Try Gemini first
-  const geminiKey = process.env.GEMINI_API_KEY;
-  if (geminiKey) {
+  for (let attempt = 0; attempt <= maxRetries; attempt++) {
     try {
-      const model = (opts.model && opts.model.includes("gemini")) ? opts.model : DEFAULT_GEMINI_MODEL;
-      return await executeProviderCall(GEMINI_ENDPOINT, geminiKey, model, opts);
-    } catch (err) {
-      console.warn("Gemini call failed, falling back to Groq", err);
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 15000); // 15s timeout
+      
+      const fetchOpts = { ...opts, signal: controller.signal };
+
+      // Try Gemini first
+      const geminiKey = process.env.GEMINI_API_KEY;
+      if (geminiKey) {
+        try {
+          const model = (opts.model && opts.model.includes("gemini")) ? opts.model : DEFAULT_GEMINI_MODEL;
+          const res = await executeProviderCall(GEMINI_ENDPOINT, geminiKey, model, fetchOpts);
+          clearTimeout(timeoutId);
+          return res;
+        } catch (err: any) {
+          if (err.name !== "AbortError") console.warn("Gemini call failed, falling back to Groq", err);
+          lastError = err;
+        }
+      }
+
+      // Fallback to Groq
+      const groqKey = process.env.GROQ_API_KEY;
+      if (groqKey) {
+        try {
+          const model = DEFAULT_GROQ_MODEL;
+          const res = await executeProviderCall(GROQ_ENDPOINT, groqKey, model, fetchOpts);
+          clearTimeout(timeoutId);
+          return res;
+        } catch (err: any) {
+          if (err.name !== "AbortError") console.warn("Groq call failed", err);
+          lastError = err;
+        }
+      }
+
+      clearTimeout(timeoutId);
+      if (lastError && (lastError as any).message?.includes("AI validation") || (lastError as any).message?.includes("AI rate limit hit")) {
+        throw lastError; // Don't retry validation errors or immediate 429s (handled by provider)
+      }
+      
+      throw lastError || new Error("No AI providers configured");
+
+    } catch (err: any) {
       lastError = err;
+      if (attempt < maxRetries && err.name !== "AbortError" && !err.message?.includes("AI validation")) {
+        // Exponential backoff
+        await new Promise(resolve => setTimeout(resolve, baseDelay * Math.pow(2, attempt)));
+      } else if (attempt === maxRetries || err.name === "AbortError") {
+        if (err.name === "AbortError") {
+          throw new Error("AI request timed out after 15 seconds. Please try again.");
+        }
+        throw err;
+      }
     }
   }
 
-  // Fallback to Groq
-  const groqKey = process.env.GROQ_API_KEY;
-  if (groqKey) {
-    try {
-      const model = DEFAULT_GROQ_MODEL;
-      return await executeProviderCall(GROQ_ENDPOINT, groqKey, model, opts);
-    } catch (err) {
-      console.warn("Groq call failed", err);
-      lastError = err;
-    }
-  }
-
-  if (lastError) throw lastError;
-  throw new Error("No AI providers configured (missing GEMINI_API_KEY or GROQ_API_KEY)");
+  throw lastError;
 }
 
 /**
@@ -176,6 +213,12 @@ export async function callAi(opts: {
   temperature?: number;
   log?: LogContext;
 }): Promise<string> {
+  const { getRequest } = await import("@tanstack/react-start/server");
+  if (opts.log && !opts.log.clientIp) {
+    const req = getRequest();
+    opts.log.clientIp = req?.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || req?.headers.get("x-real-ip")?.trim() || "unknown";
+  }
+
   // Enforce rate limits before calling the AI provider
   await enforceRateLimit(opts.log);
 
@@ -201,27 +244,45 @@ export async function callAiJson<T>(opts: {
   schema: { name: string; schema: Record<string, unknown> };
   log?: LogContext;
 }): Promise<T> {
+  const { getRequest } = await import("@tanstack/react-start/server");
+  if (opts.log && !opts.log.clientIp) {
+    const req = getRequest();
+    opts.log.clientIp = req?.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || req?.headers.get("x-real-ip")?.trim() || "unknown";
+  }
+
   // Enforce rate limits before calling the AI provider
   await enforceRateLimit(opts.log);
 
-  try {
-    const { text, usage } = await rawCall({ ...opts, jsonSchema: opts.schema });
-    if (opts.log) await logUsage(opts.log, usage, "success");
+  let lastErr: unknown;
+  for (let attempt = 1; attempt <= 2; attempt++) {
     try {
-      return JSON.parse(text) as T;
-    } catch {
-      const match = text.match(/\{[\s\S]*\}/);
-      if (match) return JSON.parse(match[0]) as T;
-      throw new Error("Failed to parse AI JSON response");
+      const { text, usage } = await rawCall({ ...opts, jsonSchema: opts.schema });
+      if (opts.log && attempt === 1) await logUsage(opts.log, usage, "success");
+      
+      try {
+        return JSON.parse(text) as T;
+      } catch {
+        const match = text.match(/\{[\s\S]*\}/);
+        if (match) return JSON.parse(match[0]) as T;
+        throw new Error("AI returned malformed JSON");
+      }
+    } catch (err: any) {
+      console.warn(`JSON parsing or AI call failed on attempt ${attempt}:`, err);
+      lastErr = err;
+      if (err.message !== "AI returned malformed JSON" || attempt === 2) {
+        break; // Don't retry if it's not a JSON error, or if we're out of retries
+      }
     }
-  } catch (err) {
-    if (opts.log) {
-      await logUsage(
-        opts.log,
-        { model: opts.model ?? DEFAULT_GEMINI_MODEL, prompt_tokens: 0, completion_tokens: 0, total_tokens: 0, cost_usd: 0, duration_ms: 0 },
-        "error",
-      );
-    }
-    throw err;
   }
+
+  if (opts.log) {
+    await logUsage(
+      opts.log,
+      { model: opts.model ?? DEFAULT_GEMINI_MODEL, prompt_tokens: 0, completion_tokens: 0, total_tokens: 0, cost_usd: 0, duration_ms: 0 },
+      "error",
+    );
+  }
+  
+  // Return a generic error to the client instead of crashing hard with raw malformed JSON
+  throw new Error("AI provider returned invalid data. Please try again.");
 }

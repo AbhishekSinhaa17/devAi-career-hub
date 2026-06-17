@@ -41,6 +41,7 @@ export type Database = {
     Tables: {
       ai_usage_events: {
         Row: {
+          client_ip: string | null
           completion_tokens: number
           cost_usd: number
           created_at: string
@@ -54,6 +55,7 @@ export type Database = {
           user_id: string | null
         }
         Insert: {
+          client_ip?: string | null
           completion_tokens?: number
           cost_usd?: number
           created_at?: string
@@ -67,6 +69,7 @@ export type Database = {
           user_id?: string | null
         }
         Update: {
+          client_ip?: string | null
           completion_tokens?: number
           cost_usd?: number
           created_at?: string
@@ -386,6 +389,7 @@ export type Database = {
           analysis: Json
           ats_score: number
           created_at: string
+          hash_key: string | null
           hiring_probability: number
           id: string
           interview_readiness: number
@@ -400,6 +404,7 @@ export type Database = {
           analysis?: Json
           ats_score: number
           created_at?: string
+          hash_key?: string | null
           hiring_probability: number
           id?: string
           interview_readiness: number
@@ -414,6 +419,7 @@ export type Database = {
           analysis?: Json
           ats_score?: number
           created_at?: string
+          hash_key?: string | null
           hiring_probability?: number
           id?: string
           interview_readiness?: number
@@ -577,6 +583,7 @@ export type Database = {
           content: Json
           created_at: string
           id: string
+          resume_hash: string | null
           score: number
           title: string
           updated_at: string
@@ -587,6 +594,7 @@ export type Database = {
           content?: Json
           created_at?: string
           id?: string
+          resume_hash?: string | null
           score?: number
           title?: string
           updated_at?: string
@@ -597,6 +605,7 @@ export type Database = {
           content?: Json
           created_at?: string
           id?: string
+          resume_hash?: string | null
           score?: number
           title?: string
           updated_at?: string
