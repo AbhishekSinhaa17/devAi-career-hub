@@ -173,6 +173,7 @@ function AdminAnalyticsPage() {
           { label: "Avg Req/User", value: data.kpis.avgAiRequestsPerUser.toFixed(1), icon: BarChart3, color: "text-purple-500" },
           { label: "Most Used", value: data.kpis.mostUsedFeature, icon: Zap, color: "text-amber-500" },
           { label: "Fastest Growth", value: data.kpis.fastestGrowingFeature, icon: TrendingUp, color: "text-pink-500" },
+          { label: "Avg Health Score", value: data.kpis.avgHealthScore?.toString() || "0", icon: Activity, color: "text-emerald-500" },
         ].map((kpi, idx) => (
           <div key={idx} className="p-5 rounded-2xl border border-border/40 bg-white/50 dark:bg-[#0d0d1a]/50 backdrop-blur-sm print:border-gray-300">
             <div className="flex items-center gap-3 mb-3">
@@ -305,6 +306,54 @@ function AdminAnalyticsPage() {
               <Bar dataKey="total" name="AI Requests" fill="#6366f1" radius={[4, 4, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
+        </div>
+      </div>
+
+      {/* ── Health Score Insights ── */}
+      <div className="grid lg:grid-cols-2 gap-6">
+        <div className="p-6 rounded-2xl border border-border/40 bg-white/50 dark:bg-[#0d0d1a]/50 backdrop-blur-sm print:border-gray-300 flex flex-col">
+          <h3 className="text-lg font-bold mb-6 flex items-center gap-2">
+            <Activity className="h-5 w-5 text-emerald-500" /> Health Score Distribution
+          </h3>
+          <div className="flex-1 min-h-[300px]">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={data.healthDistribution} margin={{ top: 10, right: 10, left: -20, bottom: 0 }} layout="vertical">
+                <CartesianGrid strokeDasharray="3 3" stroke="rgba(150,150,150,0.1)" horizontal={false} />
+                <XAxis type="number" axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: "currentColor", opacity: 0.5 }} />
+                <YAxis dataKey="range" type="category" axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: "currentColor", opacity: 0.5 }} />
+                <Tooltip
+                  cursor={{ fill: "rgba(150,150,150,0.05)" }}
+                  contentStyle={{ backgroundColor: "rgba(13, 13, 26, 0.9)", borderRadius: "12px", border: "1px solid rgba(255,255,255,0.1)", color: "#fff" }}
+                />
+                <Bar dataKey="count" name="Users" fill="#10b981" radius={[0, 4, 4, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+
+        <div className="p-6 rounded-2xl border border-border/40 bg-white/50 dark:bg-[#0d0d1a]/50 backdrop-blur-sm print:border-gray-300">
+          <h3 className="text-lg font-bold mb-6 flex items-center gap-2">
+            <Users className="h-5 w-5 text-amber-500" /> Top Performing Developers
+          </h3>
+          <div className="space-y-4">
+            {data.topPerformers?.map((u: any, idx: number) => (
+              <div key={u.userId} className="flex items-center justify-between p-4 rounded-xl border border-border/40 bg-muted/30">
+                <div className="flex items-center gap-3">
+                  <div className="h-8 w-8 rounded-lg bg-indigo-500/10 text-indigo-500 font-black grid place-items-center text-xs">
+                    #{idx + 1}
+                  </div>
+                  <div>
+                    <p className="font-bold text-sm">User {u.userId.split("-")[0]}</p>
+                    <p className="text-[10px] text-muted-foreground">ID: {u.userId}</p>
+                  </div>
+                </div>
+                <div className="font-black text-xl text-emerald-500">{u.score}</div>
+              </div>
+            ))}
+            {(!data.topPerformers || data.topPerformers.length === 0) && (
+              <p className="text-sm text-muted-foreground">No health scores generated yet.</p>
+            )}
+          </div>
         </div>
       </div>
 

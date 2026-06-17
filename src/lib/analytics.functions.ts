@@ -34,7 +34,10 @@ export interface AnalyticsResponse {
     avgAiRequestsPerUser: number;
     mostUsedFeature: string;
     fastestGrowingFeature: string;
+    avgHealthScore?: number;
   };
+  healthDistribution?: { range: string; count: number }[];
+  topPerformers?: { userId: string; score: number }[];
   features: FeatureMetric[];
   dailyActivity: DailyActivity[];
   lastUpdated: string;
@@ -132,7 +135,41 @@ export const getGlobalAnalytics = createServerFn({ method: "GET" })
       { name: "Code Review", table: "code_reviews" },
       { name: "Mock Interview", table: "mock_interviews" },
       { name: "Career Roadmap", table: "roadmaps" },
+      { name: "Health Score", table: "developer_health_scores" },
     ];
+
+    const fetchHealthMetrics = async () => {
+      const { data } = await supabaseAdmin.from("developer_health_scores").select("user_id, overall_score");
+      if (!data || data.length === 0) {
+         return { avg: 0, dist: [], top: [] };
+      }
+      
+      let sum = 0;
+      const ranges = { "0-20": 0, "21-40": 0, "41-60": 0, "61-80": 0, "81-100": 0 };
+      const userScores: Record<string, number> = {};
+
+      data.forEach(d => {
+        sum += d.overall_score;
+        if (d.overall_score <= 20) ranges["0-20"]++;
+        else if (d.overall_score <= 40) ranges["21-40"]++;
+        else if (d.overall_score <= 60) ranges["41-60"]++;
+        else if (d.overall_score <= 80) ranges["61-80"]++;
+        else ranges["81-100"]++;
+
+        if (!userScores[d.user_id] || userScores[d.user_id] < d.overall_score) {
+           userScores[d.user_id] = d.overall_score;
+        }
+      });
+
+      const top = Object.entries(userScores)
+        .map(([userId, score]) => ({ userId, score }))
+        .sort((a, b) => b.score - a.score)
+        .slice(0, 5);
+
+      const dist = Object.entries(ranges).map(([range, count]) => ({ range, count }));
+
+      return { avg: Math.round(sum / data.length), dist, top };
+    };
 
     // Execute massive parallel fetch for performance
     const [
@@ -140,12 +177,14 @@ export const getGlobalAnalytics = createServerFn({ method: "GET" })
       activeUsers7d,
       totalAiRequests,
       dailyActivity,
+      healthMetrics,
       ...featureResults
     ] = await Promise.all([
       countUsers(),
       countActiveUsers(),
       countTable("ai_usage_events"),
       fetchDailyActivity(),
+      fetchHealthMetrics(),
       ...featureTables.map(async (ft) => {
         const [total, last30, prev30] = await Promise.all([
           countTable(ft.table),
@@ -201,9 +240,12 @@ export const getGlobalAnalytics = createServerFn({ method: "GET" })
         avgAiRequestsPerUser: totalUsers > 0 ? totalAiRequests / totalUsers : 0,
         mostUsedFeature,
         fastestGrowingFeature,
+        avgHealthScore: healthMetrics.avg,
       },
       features,
       dailyActivity,
+      healthDistribution: healthMetrics.dist,
+      topPerformers: healthMetrics.top,
       lastUpdated: new Date().toISOString(),
     };
   });

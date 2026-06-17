@@ -344,6 +344,7 @@ const NAV_SECTIONS = [
       { to: "/roadmap", icon: Map, label: "Roadmap" },
       { to: "/job-match", icon: Briefcase, label: "Job Match" },
       { to: "/developer-score", icon: Activity, label: "Developer Score" },
+      { to: "/health-score", icon: Activity, label: "Health Score" },
     ],
   },
   {

@@ -19,6 +19,7 @@ import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticate
 import { Route as AuthenticatedMockInterviewRouteImport } from './routes/_authenticated/mock-interview'
 import { Route as AuthenticatedJobMatchRouteImport } from './routes/_authenticated/job-match'
 import { Route as AuthenticatedInterviewRouteImport } from './routes/_authenticated/interview'
+import { Route as AuthenticatedHealthScoreRouteImport } from './routes/_authenticated/health-score'
 import { Route as AuthenticatedGithubResumeRouteImport } from './routes/_authenticated/github-resume'
 import { Route as AuthenticatedGithubRouteImport } from './routes/_authenticated/github'
 import { Route as AuthenticatedDeveloperScoreRouteImport } from './routes/_authenticated/developer-score'
@@ -78,6 +79,12 @@ const AuthenticatedInterviewRoute = AuthenticatedInterviewRouteImport.update({
   path: '/interview',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedHealthScoreRoute =
+  AuthenticatedHealthScoreRouteImport.update({
+    id: '/health-score',
+    path: '/health-score',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedGithubResumeRoute =
   AuthenticatedGithubResumeRouteImport.update({
     id: '/github-resume',
@@ -132,6 +139,7 @@ export interface FileRoutesByFullPath {
   '/developer-score': typeof AuthenticatedDeveloperScoreRoute
   '/github': typeof AuthenticatedGithubRoute
   '/github-resume': typeof AuthenticatedGithubResumeRoute
+  '/health-score': typeof AuthenticatedHealthScoreRoute
   '/interview': typeof AuthenticatedInterviewRoute
   '/job-match': typeof AuthenticatedJobMatchRoute
   '/mock-interview': typeof AuthenticatedMockInterviewRoute
@@ -151,6 +159,7 @@ export interface FileRoutesByTo {
   '/developer-score': typeof AuthenticatedDeveloperScoreRoute
   '/github': typeof AuthenticatedGithubRoute
   '/github-resume': typeof AuthenticatedGithubResumeRoute
+  '/health-score': typeof AuthenticatedHealthScoreRoute
   '/interview': typeof AuthenticatedInterviewRoute
   '/job-match': typeof AuthenticatedJobMatchRoute
   '/mock-interview': typeof AuthenticatedMockInterviewRoute
@@ -172,6 +181,7 @@ export interface FileRoutesById {
   '/_authenticated/developer-score': typeof AuthenticatedDeveloperScoreRoute
   '/_authenticated/github': typeof AuthenticatedGithubRoute
   '/_authenticated/github-resume': typeof AuthenticatedGithubResumeRoute
+  '/_authenticated/health-score': typeof AuthenticatedHealthScoreRoute
   '/_authenticated/interview': typeof AuthenticatedInterviewRoute
   '/_authenticated/job-match': typeof AuthenticatedJobMatchRoute
   '/_authenticated/mock-interview': typeof AuthenticatedMockInterviewRoute
@@ -193,6 +203,7 @@ export interface FileRouteTypes {
     | '/developer-score'
     | '/github'
     | '/github-resume'
+    | '/health-score'
     | '/interview'
     | '/job-match'
     | '/mock-interview'
@@ -212,6 +223,7 @@ export interface FileRouteTypes {
     | '/developer-score'
     | '/github'
     | '/github-resume'
+    | '/health-score'
     | '/interview'
     | '/job-match'
     | '/mock-interview'
@@ -232,6 +244,7 @@ export interface FileRouteTypes {
     | '/_authenticated/developer-score'
     | '/_authenticated/github'
     | '/_authenticated/github-resume'
+    | '/_authenticated/health-score'
     | '/_authenticated/interview'
     | '/_authenticated/job-match'
     | '/_authenticated/mock-interview'
@@ -321,6 +334,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedInterviewRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/health-score': {
+      id: '/_authenticated/health-score'
+      path: '/health-score'
+      fullPath: '/health-score'
+      preLoaderRoute: typeof AuthenticatedHealthScoreRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/github-resume': {
       id: '/_authenticated/github-resume'
       path: '/github-resume'
@@ -400,6 +420,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedDeveloperScoreRoute: typeof AuthenticatedDeveloperScoreRoute
   AuthenticatedGithubRoute: typeof AuthenticatedGithubRoute
   AuthenticatedGithubResumeRoute: typeof AuthenticatedGithubResumeRoute
+  AuthenticatedHealthScoreRoute: typeof AuthenticatedHealthScoreRoute
   AuthenticatedInterviewRoute: typeof AuthenticatedInterviewRoute
   AuthenticatedJobMatchRoute: typeof AuthenticatedJobMatchRoute
   AuthenticatedMockInterviewRoute: typeof AuthenticatedMockInterviewRoute
@@ -415,6 +436,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedDeveloperScoreRoute: AuthenticatedDeveloperScoreRoute,
   AuthenticatedGithubRoute: AuthenticatedGithubRoute,
   AuthenticatedGithubResumeRoute: AuthenticatedGithubResumeRoute,
+  AuthenticatedHealthScoreRoute: AuthenticatedHealthScoreRoute,
   AuthenticatedInterviewRoute: AuthenticatedInterviewRoute,
   AuthenticatedJobMatchRoute: AuthenticatedJobMatchRoute,
   AuthenticatedMockInterviewRoute: AuthenticatedMockInterviewRoute,
