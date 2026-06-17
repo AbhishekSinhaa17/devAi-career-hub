@@ -472,6 +472,8 @@ export type Database = {
           created_at: string
           deployment_id: string
           deployment_url: string | null
+          build_duration: number | null
+          deployed_at: string | null
           id: string
           portfolio_id: string
           provider: string
@@ -483,6 +485,8 @@ export type Database = {
           created_at?: string
           deployment_id: string
           deployment_url?: string | null
+          build_duration?: number | null
+          deployed_at?: string | null
           id?: string
           portfolio_id: string
           provider: string
@@ -494,6 +498,8 @@ export type Database = {
           created_at?: string
           deployment_id?: string
           deployment_url?: string | null
+          build_duration?: number | null
+          deployed_at?: string | null
           id?: string
           portfolio_id?: string
           provider?: string

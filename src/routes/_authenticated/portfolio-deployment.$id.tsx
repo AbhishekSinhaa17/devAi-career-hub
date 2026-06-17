@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { RouteErrorBoundary } from "@/components/ErrorBoundary";
-import { useQuery, useMutation } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useState, useEffect } from "react";
 import { getDeploymentsByPortfolio } from "@/lib/deployment.functions";
@@ -43,6 +43,7 @@ function PortfolioDeploymentPage() {
   const startFn = useServerFn(triggerVercelDeployment);
   const statusFn = useServerFn(checkVercelStatus);
   const historyFn = useServerFn(getDeploymentsByPortfolio);
+  const queryClient = useQueryClient();
 
   const { data: history, refetch: refetchHistory } = useQuery({
     queryKey: ["deployments", id],
@@ -92,11 +93,13 @@ function PortfolioDeploymentPage() {
       setShowConfetti(true);
       setTimeout(() => setShowConfetti(false), 8000);
       refetchHistory();
+      queryClient.invalidateQueries({ queryKey: ["deployments"] });
     } else if (deploymentStatus?.status === "failed" && activeDeploymentId) {
       setLogs((prev) => [...prev, "Deployment failed! Check build output."]);
       refetchHistory();
+      queryClient.invalidateQueries({ queryKey: ["deployments"] });
     }
-  }, [deploymentStatus?.status, activeDeploymentId, refetchHistory]);
+  }, [deploymentStatus?.status, activeDeploymentId, refetchHistory, queryClient]);
 
   const copyUrl = (url: string) => {
     navigator.clipboard.writeText(url);
@@ -221,7 +224,13 @@ function PortfolioDeploymentPage() {
                     <p className="text-muted-foreground mt-2">Deployed successfully to {latestDeployment.provider}.</p>
                   </div>
                   
-                  <div className="flex items-center justify-center gap-2">
+                  {latestDeployment.build_duration && (
+                    <div className="inline-block bg-muted/50 border rounded-xl px-4 py-2 mt-4 text-sm font-semibold text-foreground/80">
+                      Deployment Time: <span className="text-primary">{Math.round(latestDeployment.build_duration / 1000)} seconds</span>
+                    </div>
+                  )}
+
+                  <div className="flex items-center justify-center gap-2 mt-4">
                     <div className="px-4 py-2 bg-background border rounded-lg text-sm font-mono text-muted-foreground break-all max-w-sm flex-1 text-left">
                       {latestDeployment.deployment_url}
                     </div>
@@ -229,6 +238,10 @@ function PortfolioDeploymentPage() {
                       <Copy className="h-5 w-5" />
                     </button>
                   </div>
+                  
+                  <p className="text-xs text-muted-foreground italic max-w-sm mx-auto">
+                    Deployment completed. It may take a few moments for DNS propagation to fully resolve the URL.
+                  </p>
 
                   <div className="flex justify-center gap-4 pt-4">
                     <a

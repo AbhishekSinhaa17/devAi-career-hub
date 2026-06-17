@@ -120,19 +120,11 @@ export const checkVercelStatus = createServerFn({ method: "GET" })
           const vData = await response.json();
           let newStatus = "building";
           
-          if (vData.readyState === "READY") {
-            try {
-              const liveUrl = `https://${vData.url}`;
-              const checkRes = await fetch(liveUrl);
-              if (checkRes.ok) {
-                newStatus = "success";
-              }
-              // If not ok or errors out, remain 'building' until DNS propagates and URL is reachable
-            } catch (err) {
-              // Ignore fetch errors during propagation
-            }
+          if (vData.readyState === "READY" || vData.readyState === "READY_FOR_DEPLOY") {
+            newStatus = "success";
+          } else if (vData.readyState === "ERROR" || vData.readyState === "CANCELED") {
+            newStatus = "failed";
           }
-          else if (vData.readyState === "ERROR" || vData.readyState === "CANCELED") newStatus = "failed";
 
           // If status changed, update DB
           if (newStatus !== "building") {
