@@ -9,7 +9,7 @@ export const getHealthScoreHistory = createServerFn({ method: "GET" })
   .handler(async ({ context }) => {
     const { supabase, userId } = context;
     const { data, error } = await supabase
-      .from("developer_health_scores" as any)
+      .from("developer_health_scores")
       .select("*")
       .eq("user_id", userId)
       .order("created_at", { ascending: false });
@@ -64,7 +64,7 @@ export const generateHealthScore = createServerFn({ method: "POST" })
 
     const aiRes = await callAiJson<{ strengths: string[]; weaknesses: string[]; recommendations: string[] }>({
       messages: [{ role: "user", content: prompt }],
-      endpoint: "/api/ai/health",
+      log: { endpoint: "/api/ai/health", userId },
       userId,
     });
 
@@ -82,7 +82,7 @@ export const generateHealthScore = createServerFn({ method: "POST" })
     };
 
     const { data: inserted, error } = await supabase
-      .from("developer_health_scores" as any)
+      .from("developer_health_scores")
       .insert(newScore)
       .select("*")
       .single();

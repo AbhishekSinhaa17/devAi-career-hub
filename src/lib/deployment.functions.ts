@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { supabaseAdmin } from "@/integrations/supabase/client.server";
 
 function generateDeploymentId() {
   return "dpl_" + Math.random().toString(36).substring(2, 15);
@@ -106,8 +107,8 @@ export const getDeploymentsByPortfolio = createServerFn({ method: "GET" })
 
 export const getPublicPortfolio = createServerFn({ method: "GET" })
   .validator((d: unknown) => z.object({ id: z.string().uuid() }).parse(d))
-  .handler(async ({ data, context }) => {
-    const { data: portfolioData, error } = await context.supabase
+  .handler(async ({ data }) => {
+    const { data: portfolioData, error } = await supabaseAdmin
       .from("github_resumes")
       .select("*")
       .eq("id", data.id)

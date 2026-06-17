@@ -599,7 +599,7 @@ function GithubResumePage() {
                   />
 
                   <ActionButton
-                    onClick={() => navigate({ to: "/portfolio-deployment/$id", params: { id: data.id } })}
+                    onClick={() => navigate({ to: "/portfolio-deployment/$id", params: { id: data.id || "" } })}
                     icon={Rocket}
                     title="Deploy Portfolio"
                     desc="Instantly deploy this generated portfolio to a live URL."

@@ -1061,7 +1061,7 @@ function UsagePage() {
                     {u.profile?.avatar_url ? (
                       <img
                         src={u.profile.avatar_url}
-                        alt=""
+                        alt="User avatar"
                         className="h-8 w-8 rounded-full flex-shrink-0"
                         style={{ border: "1px solid rgba(255,255,255,0.1)" }}
                       />

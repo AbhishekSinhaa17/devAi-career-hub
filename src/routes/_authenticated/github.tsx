@@ -450,7 +450,7 @@ function Page() {
                 <div className="relative flex-shrink-0">
                   <img
                     src={data.stats.avatar_url}
-                    alt=""
+                    alt={`${username}'s avatar`}
                     className="h-20 w-20 rounded-2xl object-cover"
                     style={{
                       border: "2px solid rgba(99,102,241,0.3)",

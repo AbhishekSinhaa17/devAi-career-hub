@@ -224,7 +224,7 @@ function CopilotPage() {
 
   const startMut = useMutation({
     mutationFn: (title?: string) => startFn({ data: { title: title || "New Conversation" } }),
-    onSuccess: (data: any) => {
+    onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ["copilotHistory"] });
       setActiveConvId(data.id);
       setOptimisticMsgs([]);
@@ -240,7 +240,7 @@ function CopilotPage() {
       ]);
       setInputMsg("");
     },
-    onSuccess: (data: any) => {
+    onSuccess: (data) => {
       setOptimisticMsgs((prev) => [...prev, data]);
       queryClient.invalidateQueries({ queryKey: ["copilotMsgs", activeConvId] });
     },
@@ -274,8 +274,8 @@ function CopilotPage() {
     if (!msg) return;
     if (!activeConvId) {
       startMut.mutate("Career Discussion", {
-        onSuccess: (conv: any) => {
-          sendFn({ data: { conversationId: conv.id, message: msg } }).then((data: any) => {
+        onSuccess: (conv) => {
+          sendFn({ data: { conversationId: conv.id, message: msg } }).then((data) => {
             setOptimisticMsgs([{ id: "opt-user-1", role: "user", content: msg }, data]);
             queryClient.invalidateQueries({
               queryKey: ["copilotMsgs", conv.id],
@@ -293,8 +293,8 @@ function CopilotPage() {
     (prompt: string) => {
       if (!activeConvId) {
         startMut.mutate(prompt, {
-          onSuccess: (conv: any) => {
-            sendFn({ data: { conversationId: conv.id, message: prompt } }).then((data: any) => {
+          onSuccess: (conv) => {
+            sendFn({ data: { conversationId: conv.id, message: prompt } }).then((data) => {
               setOptimisticMsgs([{ id: "opt-user-1", role: "user", content: prompt }, data]);
               queryClient.invalidateQueries({
                 queryKey: ["copilotMsgs", conv.id],
@@ -403,7 +403,7 @@ function CopilotPage() {
               <p className="text-[10px] font-bold text-slate-400 dark:text-slate-600 uppercase tracking-widest px-3 pb-1 pt-2">
                 Recent
               </p>
-              {history.map((conv: any) => (
+              {history.map((conv) => (
                 <ConvItem
                   key={conv.id}
                   conv={conv}

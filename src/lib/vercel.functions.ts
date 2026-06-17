@@ -32,7 +32,7 @@ export const triggerVercelDeployment = createServerFn({ method: "POST" })
 
     // Combine username for template
     const resumeData = {
-      ...portfolioData.resume_data,
+      ...(typeof portfolioData.resume_data === 'object' && portfolioData.resume_data !== null ? portfolioData.resume_data : {}),
       github_username: portfolioData.github_username,
     };
 

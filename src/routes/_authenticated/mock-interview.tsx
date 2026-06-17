@@ -322,6 +322,9 @@ function MockInterviewPage() {
   const [report, setReport] = useState<any>(null);
 
   // ─── Voice Feature State ───
+  const [detailedFeedback, setDetailedFeedback] = useState<
+    { ai_score?: number; question?: string; question_index?: number; user_answer: string; ai_feedback: string; feedback?: string }[]
+  >([]);
   const [isRecording, setIsRecording] = useState(false);
   const [isSpeaking, setIsSpeaking] = useState(false);
   const recognitionRef = useRef<any>(null);

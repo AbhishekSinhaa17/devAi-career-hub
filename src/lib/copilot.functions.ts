@@ -38,13 +38,12 @@ export const startCopilotConversation = createServerFn({ method: "POST" })
 
     // 2. Create Conversation
     const { data: convData, error } = await context.supabase
-      .from("copilot_conversations" as any)
+      .from("copilot_conversations")
       .insert({
         user_id: context.userId,
         title: data.title || "Career Discussion",
         context_snapshot: snapshot as any,
-      })
-      .select()
+      }).select()
       .single();
 
     if (error) throw new Error("Failed to start conversation");
@@ -55,7 +54,7 @@ export const getCopilotHistory = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
     const { data, error } = await context.supabase
-      .from("copilot_conversations" as any)
+      .from("copilot_conversations")
       .select("id, title, created_at")
       .eq("user_id", context.userId)
       .order("created_at", { ascending: false });
@@ -69,7 +68,7 @@ export const getCopilotMessages = createServerFn({ method: "GET" })
   .validator((d: unknown) => z.object({ conversationId: z.string().uuid() }).parse(d))
   .handler(async ({ data, context }) => {
     const { data: msgs, error } = await context.supabase
-      .from("copilot_messages" as any)
+      .from("copilot_messages")
       .select("id, role, content, created_at")
       .eq("conversation_id", data.conversationId)
       .eq("user_id", context.userId)
@@ -91,7 +90,7 @@ export const sendCopilotMessage = createServerFn({ method: "POST" })
 
     // 1. Verify and fetch conversation
     const { data: conv, error: convErr } = await db
-      .from("copilot_conversations" as any)
+      .from("copilot_conversations")
       .select("context_snapshot")
       .eq("id", data.conversationId)
       .eq("user_id", userId)
@@ -100,7 +99,7 @@ export const sendCopilotMessage = createServerFn({ method: "POST" })
     if (convErr || !conv) throw new Error("Conversation not found");
 
     // 2. Save User Message
-    await db.from("copilot_messages" as any).insert({
+    await db.from("copilot_messages").insert({
       conversation_id: data.conversationId,
       user_id: userId,
       role: "user",
@@ -109,7 +108,7 @@ export const sendCopilotMessage = createServerFn({ method: "POST" })
 
     // 3. Fetch past messages (limit to last 10 to save tokens)
     const { data: pastMsgs } = await db
-      .from("copilot_messages" as any)
+      .from("copilot_messages")
       .select("role, content")
       .eq("conversation_id", data.conversationId)
       .eq("user_id", userId)
@@ -142,7 +141,7 @@ ${JSON.stringify(conv.context_snapshot, null, 2)}
     });
 
     // 6. Save Assistant Message
-    const { data: savedMsg } = await db.from("copilot_messages" as any).insert({
+    const { data: savedMsg } = await db.from("copilot_messages").insert({
       conversation_id: data.conversationId,
       user_id: userId,
       role: "assistant",
