@@ -322,6 +322,7 @@ export type Database = {
           github_username: string
           id: string
           insights: Json
+          is_public: boolean
           profile_strength: number
           resume_data: Json
           user_id: string
@@ -333,6 +334,7 @@ export type Database = {
           github_username: string
           id?: string
           insights?: Json
+          is_public?: boolean
           profile_strength?: number
           resume_data: Json
           user_id: string
@@ -344,6 +346,7 @@ export type Database = {
           github_username?: string
           id?: string
           insights?: Json
+          is_public?: boolean
           profile_strength?: number
           resume_data?: Json
           user_id?: string
