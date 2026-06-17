@@ -22,6 +22,7 @@ import {
   Wand2,
   ExternalLink,
   ArrowRight,
+  Rocket,
 } from "lucide-react";
 import {
   Dialog,
@@ -595,6 +596,14 @@ function GithubResumePage() {
                     title={saveMutation.isPending ? "Saving…" : "Save to My Resumes"}
                     desc="Store this resume in your library with its ATS score."
                     tone="neutral"
+                  />
+
+                  <ActionButton
+                    onClick={() => navigate({ to: "/portfolio-deployment/$id", params: { id: data.id } })}
+                    icon={Rocket}
+                    title="Deploy Portfolio"
+                    desc="Instantly deploy this generated portfolio to a live URL."
+                    tone="success"
                   />
 
                   <ActionButton

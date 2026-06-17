@@ -136,6 +136,7 @@ export const getGlobalAnalytics = createServerFn({ method: "GET" })
       { name: "Mock Interview", table: "mock_interviews" },
       { name: "Career Roadmap", table: "roadmaps" },
       { name: "Health Score", table: "developer_health_scores" },
+      { name: "Portfolio Deploy", table: "portfolio_deployments" },
     ];
 
     const fetchHealthMetrics = async () => {

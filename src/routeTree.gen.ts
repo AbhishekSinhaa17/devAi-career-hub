@@ -13,6 +13,7 @@ import { Route as SignupRouteImport } from './routes/signup'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as PIdRouteImport } from './routes/p.$id'
 import { Route as AuthenticatedRoadmapRouteImport } from './routes/_authenticated/roadmap'
 import { Route as AuthenticatedResumeRouteImport } from './routes/_authenticated/resume'
 import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
@@ -26,6 +27,7 @@ import { Route as AuthenticatedDeveloperScoreRouteImport } from './routes/_authe
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedCodeReviewRouteImport } from './routes/_authenticated/code-review'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
+import { Route as AuthenticatedPortfolioDeploymentIdRouteImport } from './routes/_authenticated/portfolio-deployment.$id'
 import { Route as AuthenticatedAdminUsageRouteImport } from './routes/_authenticated/admin.usage'
 import { Route as AuthenticatedAdminAnalyticsRouteImport } from './routes/_authenticated/admin.analytics'
 
@@ -46,6 +48,11 @@ const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PIdRoute = PIdRouteImport.update({
+  id: '/p/$id',
+  path: '/p/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedRoadmapRoute = AuthenticatedRoadmapRouteImport.update({
@@ -117,6 +124,12 @@ const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
   path: '/admin',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedPortfolioDeploymentIdRoute =
+  AuthenticatedPortfolioDeploymentIdRouteImport.update({
+    id: '/portfolio-deployment/$id',
+    path: '/portfolio-deployment/$id',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedAdminUsageRoute = AuthenticatedAdminUsageRouteImport.update({
   id: '/usage',
   path: '/usage',
@@ -146,8 +159,10 @@ export interface FileRoutesByFullPath {
   '/profile': typeof AuthenticatedProfileRoute
   '/resume': typeof AuthenticatedResumeRoute
   '/roadmap': typeof AuthenticatedRoadmapRoute
+  '/p/$id': typeof PIdRoute
   '/admin/analytics': typeof AuthenticatedAdminAnalyticsRoute
   '/admin/usage': typeof AuthenticatedAdminUsageRoute
+  '/portfolio-deployment/$id': typeof AuthenticatedPortfolioDeploymentIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -166,8 +181,10 @@ export interface FileRoutesByTo {
   '/profile': typeof AuthenticatedProfileRoute
   '/resume': typeof AuthenticatedResumeRoute
   '/roadmap': typeof AuthenticatedRoadmapRoute
+  '/p/$id': typeof PIdRoute
   '/admin/analytics': typeof AuthenticatedAdminAnalyticsRoute
   '/admin/usage': typeof AuthenticatedAdminUsageRoute
+  '/portfolio-deployment/$id': typeof AuthenticatedPortfolioDeploymentIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -188,8 +205,10 @@ export interface FileRoutesById {
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
   '/_authenticated/resume': typeof AuthenticatedResumeRoute
   '/_authenticated/roadmap': typeof AuthenticatedRoadmapRoute
+  '/p/$id': typeof PIdRoute
   '/_authenticated/admin/analytics': typeof AuthenticatedAdminAnalyticsRoute
   '/_authenticated/admin/usage': typeof AuthenticatedAdminUsageRoute
+  '/_authenticated/portfolio-deployment/$id': typeof AuthenticatedPortfolioDeploymentIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -210,8 +229,10 @@ export interface FileRouteTypes {
     | '/profile'
     | '/resume'
     | '/roadmap'
+    | '/p/$id'
     | '/admin/analytics'
     | '/admin/usage'
+    | '/portfolio-deployment/$id'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -230,8 +251,10 @@ export interface FileRouteTypes {
     | '/profile'
     | '/resume'
     | '/roadmap'
+    | '/p/$id'
     | '/admin/analytics'
     | '/admin/usage'
+    | '/portfolio-deployment/$id'
   id:
     | '__root__'
     | '/'
@@ -251,8 +274,10 @@ export interface FileRouteTypes {
     | '/_authenticated/profile'
     | '/_authenticated/resume'
     | '/_authenticated/roadmap'
+    | '/p/$id'
     | '/_authenticated/admin/analytics'
     | '/_authenticated/admin/usage'
+    | '/_authenticated/portfolio-deployment/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -260,6 +285,7 @@ export interface RootRouteChildren {
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   LoginRoute: typeof LoginRoute
   SignupRoute: typeof SignupRoute
+  PIdRoute: typeof PIdRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -290,6 +316,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/p/$id': {
+      id: '/p/$id'
+      path: '/p/$id'
+      fullPath: '/p/$id'
+      preLoaderRoute: typeof PIdRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated/roadmap': {
@@ -383,6 +416,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/portfolio-deployment/$id': {
+      id: '/_authenticated/portfolio-deployment/$id'
+      path: '/portfolio-deployment/$id'
+      fullPath: '/portfolio-deployment/$id'
+      preLoaderRoute: typeof AuthenticatedPortfolioDeploymentIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/admin/usage': {
       id: '/_authenticated/admin/usage'
       path: '/usage'
@@ -427,6 +467,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
   AuthenticatedResumeRoute: typeof AuthenticatedResumeRoute
   AuthenticatedRoadmapRoute: typeof AuthenticatedRoadmapRoute
+  AuthenticatedPortfolioDeploymentIdRoute: typeof AuthenticatedPortfolioDeploymentIdRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
@@ -443,6 +484,8 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedProfileRoute: AuthenticatedProfileRoute,
   AuthenticatedResumeRoute: AuthenticatedResumeRoute,
   AuthenticatedRoadmapRoute: AuthenticatedRoadmapRoute,
+  AuthenticatedPortfolioDeploymentIdRoute:
+    AuthenticatedPortfolioDeploymentIdRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =
@@ -453,6 +496,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   LoginRoute: LoginRoute,
   SignupRoute: SignupRoute,
+  PIdRoute: PIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

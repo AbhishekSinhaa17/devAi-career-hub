@@ -144,9 +144,10 @@ function ScoreRing({ score }: { score: number }) {
               y1={y1}
               x2={x2}
               y2={y2}
-              stroke="white"
+              stroke="currentColor"
               strokeWidth={1}
-              opacity={0.1}
+              opacity={0.15}
+              className="text-slate-900 dark:text-white"
             />
           );
         })}
@@ -565,18 +566,19 @@ function HealthScorePage() {
                   </defs>
                   <CartesianGrid
                     strokeDasharray="3 3"
-                    stroke="rgba(255,255,255,0.04)"
+                    stroke="var(--color-border)"
                     vertical={false}
+                    opacity={0.3}
                   />
                   <XAxis
                     dataKey="date"
-                    tick={{ fill: "rgba(255,255,255,0.25)", fontSize: 11, fontWeight: 600 }}
+                    tick={{ fill: "var(--color-muted-foreground)", fontSize: 11, fontWeight: 600 }}
                     axisLine={false}
                     tickLine={false}
                   />
                   <YAxis
                     domain={[0, 100]}
-                    tick={{ fill: "rgba(255,255,255,0.25)", fontSize: 11, fontWeight: 600 }}
+                    tick={{ fill: "var(--color-muted-foreground)", fontSize: 11, fontWeight: 600 }}
                     axisLine={false}
                     tickLine={false}
                   />
