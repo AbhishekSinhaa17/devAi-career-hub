@@ -34,6 +34,9 @@ import {
   Shield,
   TrendingUp,
   ArrowRight,
+  Volume2,
+  Square,
+  VolumeX,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -304,21 +307,109 @@ function TimerDisplay({ seconds }: { seconds: number }) {
 // ─── Main Page ────────────────────────────────────────────────────────────────
 function MockInterviewPage() {
   const queryClient = useQueryClient();
-  const [role, setRole] = useState(ROLES[2]);
-  const [level, setLevel] = useState(LEVELS[1]);
-  const [type, setType] = useState(TYPES[0]);
+  const [status, setStatus] = useState<"setup" | "generating" | "interview" | "evaluating" | "report">("setup");
+  const [role, setRole] = useState("Full Stack Developer");
+  const [level, setLevel] = useState("Intermediate");
+  const [type, setType] = useState("Technical Interview");
   const [timerOpt, setTimerOpt] = useState(0);
 
-  const [interviewId, setInterviewId] = useState<string | null>(null);
   const [questions, setQuestions] = useState<any[]>([]);
-  const [currentQ, setCurrentQ] = useState(0);
   const [answers, setAnswers] = useState<string[]>([]);
+  const [currentQ, setCurrentQ] = useState(0);
+  const [interviewId, setInterviewId] = useState("");
+
   const [timeRemaining, setTimeRemaining] = useState<number | null>(null);
-  const [report, setReport] = useState<any | null>(null);
-  const [detailedFeedback, setDetailedFeedback] = useState<any[]>([]);
-  const [status, setStatus] = useState<
-    "setup" | "generating" | "interview" | "evaluating" | "report"
-  >("setup");
+  const [report, setReport] = useState<any>(null);
+
+  // ─── Voice Feature State ───
+  const [isRecording, setIsRecording] = useState(false);
+  const [isSpeaking, setIsSpeaking] = useState(false);
+  const recognitionRef = useRef<any>(null);
+  const currentQRef = useRef(currentQ);
+  const prevAnswerRef = useRef("");
+
+  useEffect(() => {
+    currentQRef.current = currentQ;
+  }, [currentQ]);
+
+  // Voice Initialization
+  useEffect(() => {
+    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    if (SpeechRecognition) {
+      const recognition = new SpeechRecognition();
+      recognition.continuous = true;
+      recognition.interimResults = true;
+      
+      recognition.onresult = (event: any) => {
+        let currentTranscript = '';
+        for (let i = 0; i < event.results.length; i++) {
+          currentTranscript += event.results[i][0].transcript;
+        }
+        setAnswers(prev => {
+          const next = [...prev];
+          const prefix = prevAnswerRef.current ? prevAnswerRef.current + " " : "";
+          next[currentQRef.current] = prefix + currentTranscript;
+          return next;
+        });
+      };
+      
+      recognition.onerror = (event: any) => {
+        if (event.error === 'not-allowed') {
+          toast.error("Microphone permission denied.");
+        }
+        setIsRecording(false);
+      };
+      
+      recognition.onend = () => {
+        setIsRecording(false);
+      };
+      
+      recognitionRef.current = recognition;
+    }
+    
+    return () => {
+      if (recognitionRef.current) recognitionRef.current.stop();
+      if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+    };
+  }, []);
+
+  const speakQuestion = (text: string) => {
+    if ('speechSynthesis' in window) {
+      window.speechSynthesis.cancel();
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.onstart = () => setIsSpeaking(true);
+      utterance.onend = () => setIsSpeaking(false);
+      utterance.onerror = () => setIsSpeaking(false);
+      window.speechSynthesis.speak(utterance);
+    }
+  };
+
+  const stopSpeaking = () => {
+    if ('speechSynthesis' in window) {
+      window.speechSynthesis.cancel();
+      setIsSpeaking(false);
+    }
+  };
+
+  const toggleRecording = () => {
+    if (isRecording) {
+      recognitionRef.current?.stop();
+      setIsRecording(false);
+    } else {
+      if (!recognitionRef.current) {
+        toast.error("Speech recognition not supported. Please use Chrome or Edge.");
+        return;
+      }
+      prevAnswerRef.current = answers[currentQRef.current] || "";
+      try {
+        recognitionRef.current.start();
+        setIsRecording(true);
+        if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+        setIsSpeaking(false);
+      } catch(e) {}
+    }
+  };
+
   const [mounted, setMounted] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -343,7 +434,7 @@ function MockInterviewPage() {
       setCurrentQ(0);
       setStatus("interview");
       if (timerOpt > 0) setTimeRemaining(timerOpt);
-      else setTimeRemaining(null);
+      speakQuestion((data.questions as any[])[0].question);
     },
     onError: (e: Error) => {
       setStatus("setup");
@@ -374,7 +465,7 @@ function MockInterviewPage() {
       return;
     }
     const iv = setInterval(() => setTimeRemaining((t) => (t ? t - 1 : 0)), 1000);
-    return () => clearInterval(iv);
+    return () => clearTimeout(iv);
   }, [timeRemaining, status]);
 
   // Auto-focus textarea when question changes
@@ -385,11 +476,24 @@ function MockInterviewPage() {
   }, [currentQ, status]);
 
   const handleNext = () => {
-    if (currentQ < questions.length - 1) setCurrentQ(currentQ + 1);
-    else evalMutation.mutate();
+    if (isRecording) toggleRecording();
+    stopSpeaking();
+    if (currentQ < questions.length - 1) {
+      setCurrentQ((c) => c + 1);
+      if (timerOpt > 0) setTimeRemaining(timerOpt);
+      speakQuestion(questions[currentQ + 1].question);
+    } else {
+      evalMutation.mutate();
+    }
   };
   const handlePrev = () => {
-    if (currentQ > 0) setCurrentQ(currentQ - 1);
+    if (isRecording) toggleRecording();
+    stopSpeaking();
+    if (currentQ > 0) {
+      setCurrentQ((c) => c - 1);
+      if (timerOpt > 0) setTimeRemaining(timerOpt);
+      speakQuestion(questions[currentQ - 1].question);
+    }
   };
 
   const answeredCount = answers.filter((a) => a.trim()).length;
@@ -499,9 +603,9 @@ function MockInterviewPage() {
                 <Mic className="h-4 w-4 text-primary" />
               </div>
               <p className="text-xs text-muted-foreground leading-relaxed">
-                <span className="font-bold text-foreground">Voice interviews coming soon.</span>{" "}
-                Type your answers fully as if speaking aloud. AI evaluates technical accuracy,
-                communication clarity, and problem-solving depth.
+                <span className="font-bold text-foreground">Interactive Voice Experience!</span>{" "}
+                Speak your answers out loud naturally. The AI evaluates technical accuracy,
+                communication skills, confidence, and completeness.
               </p>
             </div>
 
@@ -617,16 +721,65 @@ function MockInterviewPage() {
               </div>
 
               {/* Question text */}
-              <h2 className="text-xl font-black text-foreground leading-relaxed">
-                {questions[currentQ].question}
-              </h2>
+              <div className="flex items-start justify-between gap-4">
+                <h2 className="text-xl font-black text-foreground leading-relaxed flex-1">
+                  {questions[currentQ].question}
+                </h2>
+                <button
+                  onClick={() => {
+                    if (isSpeaking) stopSpeaking();
+                    else speakQuestion(questions[currentQ].question);
+                  }}
+                  className={`h-10 w-10 shrink-0 rounded-full flex items-center justify-center transition-colors ${
+                    isSpeaking 
+                      ? "bg-indigo-500 text-white shadow-[0_0_15px_rgba(99,102,241,0.5)] animate-pulse" 
+                      : "bg-muted/50 text-muted-foreground hover:bg-muted"
+                  }`}
+                >
+                  {isSpeaking ? <VolumeX className="h-4 w-4" /> : <Volume2 className="h-4 w-4" />}
+                </button>
+              </div>
 
               {/* Answer area */}
-              <div className="space-y-2 group/f">
-                <Label className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground group-focus-within/f:text-primary transition-colors">
-                  Your Answer
-                </Label>
-                <div className="relative">
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <Label className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground">
+                    Your Answer
+                  </Label>
+                  <button
+                    onClick={toggleRecording}
+                    className={`h-10 px-4 rounded-full text-xs font-bold flex items-center gap-2 transition-all ${
+                      isRecording
+                        ? "bg-red-500 text-white shadow-[0_0_20px_rgba(239,68,68,0.5)]"
+                        : "bg-emerald-500/10 text-emerald-600 hover:bg-emerald-500/20"
+                    }`}
+                  >
+                    {isRecording ? (
+                      <>
+                        <Square className="h-3 w-3 fill-current animate-pulse" /> Stop Recording
+                      </>
+                    ) : (
+                      <>
+                        <Mic className="h-3 w-3" /> Start Recording
+                      </>
+                    )}
+                  </button>
+                </div>
+                
+                {isRecording && (
+                  <div className="flex items-center gap-1 h-6 px-2">
+                    {[...Array(6)].map((_, i) => (
+                      <div 
+                        key={i} 
+                        className="w-1 bg-red-400 rounded-full animate-pulse" 
+                        style={{ height: `${Math.max(20, Math.random() * 100)}%`, animationDelay: `${i * 0.1}s` }}
+                      />
+                    ))}
+                    <span className="text-[10px] text-red-500 font-bold ml-2 animate-pulse uppercase tracking-widest">Listening...</span>
+                  </div>
+                )}
+
+                <div className="relative group/f">
                   <textarea
                     ref={textareaRef}
                     value={answers[currentQ]}
@@ -635,13 +788,14 @@ function MockInterviewPage() {
                       next[currentQ] = e.target.value;
                       setAnswers(next);
                     }}
-                    placeholder="Type your answer here — be as detailed as you would in a real interview…"
-                    className="w-full rounded-xl border border-border/60 bg-background/60 p-5 text-sm text-foreground placeholder:text-muted-foreground/50 leading-relaxed resize-y focus:outline-none focus:border-primary/60 focus:bg-background transition-all duration-300 font-medium"
-                    style={{ minHeight: "220px" }}
+                    placeholder={isRecording ? "Listening to your voice..." : "Press 'Start Recording' to speak your answer, or type it here..."}
+                    className={`w-full rounded-xl border p-5 text-sm leading-relaxed resize-y focus:outline-none transition-all duration-300 font-medium ${
+                      isRecording 
+                        ? "border-red-500/50 bg-red-500/5 text-foreground placeholder:text-red-500/50" 
+                        : "border-border/60 bg-background/60 text-foreground placeholder:text-muted-foreground/50 focus:border-primary/60 focus:bg-background"
+                    }`}
+                    style={{ minHeight: "180px" }}
                   />
-                  <div className="absolute bottom-0 inset-x-0 h-px scale-x-0 group-focus-within/f:scale-x-100 transition-transform duration-300 bg-gradient-to-r from-transparent via-primary/60 to-transparent rounded-full" />
-
-                  {/* Char count */}
                   <div className="absolute bottom-3 right-3 text-[10px] text-muted-foreground/60 font-mono">
                     {answers[currentQ]?.length ?? 0} chars
                   </div>
@@ -767,9 +921,9 @@ function MockInterviewPage() {
                   color="#f59e0b"
                 />
                 <ScoreMetric
-                  label="Industry Readiness"
-                  value={report.industryReadiness}
-                  icon={TrendingUp}
+                  label="Completeness"
+                  value={report.completenessScore}
+                  icon={CheckCircle2}
                   color="#38bdf8"
                 />
               </div>

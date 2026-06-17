@@ -1100,7 +1100,7 @@ export const evaluateMockInterview = createServerFn({ method: "POST" })
       communicationScore: number;
       problemSolvingScore: number;
       confidenceScore: number;
-      industryReadiness: number;
+      completenessScore: number;
       strengths: string[];
       weaknesses: string[];
       improvements: string[];
@@ -1129,7 +1129,7 @@ export const evaluateMockInterview = createServerFn({ method: "POST" })
             communicationScore: { type: "integer" },
             problemSolvingScore: { type: "integer" },
             confidenceScore: { type: "integer" },
-            industryReadiness: { type: "integer" },
+            completenessScore: { type: "integer" },
             strengths: { type: "array", items: { type: "string" } },
             weaknesses: { type: "array", items: { type: "string" } },
             improvements: { type: "array", items: { type: "string" } },
@@ -1149,8 +1149,8 @@ export const evaluateMockInterview = createServerFn({ method: "POST" })
             },
           },
           required: [
-            "overallScore", "technicalScore", "communicationScore", "problemSolvingScore", 
-            "confidenceScore", "industryReadiness", "strengths", "weaknesses", 
+            "overallScore", "technicalScore", "communicationScore", "problemSolvingScore",              "confidenceScore",
+              "completenessScore", "strengths", "weaknesses", 
             "improvements", "recommendedTopics", "nextSteps", "evaluations"
           ],
         },
@@ -1171,7 +1171,7 @@ export const evaluateMockInterview = createServerFn({ method: "POST" })
       communicationScore: ai.communicationScore,
       problemSolvingScore: ai.problemSolvingScore,
       confidenceScore: ai.confidenceScore,
-      industryReadiness: ai.industryReadiness,
+      completenessScore: ai.completenessScore,
       strengths: ai.strengths,
       weaknesses: ai.weaknesses,
       improvements: ai.improvements,
@@ -1195,7 +1195,7 @@ export const evaluateMockInterview = createServerFn({ method: "POST" })
       if (ai.overallScore >= 75 && !badges.includes("Interview Ready")) badges.push("Interview Ready");
       if (ai.communicationScore >= 85 && !badges.includes("Strong Communicator")) badges.push("Strong Communicator");
       if (ai.problemSolvingScore >= 85 && !badges.includes("Problem Solver")) badges.push("Problem Solver");
-      if (ai.industryReadiness >= 85 && !badges.includes("Industry Ready")) badges.push("Industry Ready");
+      if (ai.completenessScore >= 85 && !badges.includes("Industry Ready")) badges.push("Industry Ready");
 
       const newTotal = (profile.total_interviews || 0) + 1;
       const newStreak = (profile.interview_streak || 0) + 1;
