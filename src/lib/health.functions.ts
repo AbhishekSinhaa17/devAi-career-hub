@@ -26,11 +26,41 @@ export const generateHealthScore = createServerFn({ method: "POST" })
 
     // Fetch highest scores for each feature
     const [gh, res, mock, job, port] = await Promise.all([
-      supabase.from("github_analyses").select("score").eq("user_id", userId).order("score", { ascending: false }).limit(1).maybeSingle(),
-      supabase.from("resumes").select("score").eq("user_id", userId).order("score", { ascending: false }).limit(1).maybeSingle(),
-      supabase.from("mock_interviews").select("overall_score").eq("user_id", userId).order("overall_score", { ascending: false }).limit(1).maybeSingle(),
-      supabase.from("job_matches").select("hiring_probability").eq("user_id", userId).order("hiring_probability", { ascending: false }).limit(1).maybeSingle(),
-      supabase.from("github_resumes").select("profile_strength").eq("user_id", userId).order("profile_strength", { ascending: false }).limit(1).maybeSingle(),
+      supabase
+        .from("github_analyses")
+        .select("score")
+        .eq("user_id", userId)
+        .order("score", { ascending: false })
+        .limit(1)
+        .maybeSingle(),
+      supabase
+        .from("resumes")
+        .select("score")
+        .eq("user_id", userId)
+        .order("score", { ascending: false })
+        .limit(1)
+        .maybeSingle(),
+      supabase
+        .from("mock_interviews")
+        .select("overall_score")
+        .eq("user_id", userId)
+        .order("overall_score", { ascending: false })
+        .limit(1)
+        .maybeSingle(),
+      supabase
+        .from("job_matches")
+        .select("hiring_probability")
+        .eq("user_id", userId)
+        .order("hiring_probability", { ascending: false })
+        .limit(1)
+        .maybeSingle(),
+      supabase
+        .from("github_resumes")
+        .select("profile_strength")
+        .eq("user_id", userId)
+        .order("profile_strength", { ascending: false })
+        .limit(1)
+        .maybeSingle(),
     ]);
 
     const github_score = gh.data?.score || 0;
@@ -41,11 +71,11 @@ export const generateHealthScore = createServerFn({ method: "POST" })
 
     // Weightage
     const overall_score = Math.round(
-      (github_score * 0.25) +
-      (resume_score * 0.20) +
-      (interview_score * 0.25) +
-      (job_match_score * 0.20) +
-      (portfolio_score * 0.10)
+      github_score * 0.25 +
+        resume_score * 0.2 +
+        interview_score * 0.25 +
+        job_match_score * 0.2 +
+        portfolio_score * 0.1,
     );
 
     // AI Generation
@@ -62,10 +92,25 @@ export const generateHealthScore = createServerFn({ method: "POST" })
       Format as JSON: { "strengths": string[], "weaknesses": string[], "recommendations": string[] }
     `;
 
-    const aiRes = await callAiJson<{ strengths: string[]; weaknesses: string[]; recommendations: string[] }>({
+    const aiRes = await callAiJson<{
+      strengths: string[];
+      weaknesses: string[];
+      recommendations: string[];
+    }>({
       messages: [{ role: "user", content: prompt }],
+      schema: {
+        name: "HealthScoreAnalysis",
+        schema: {
+          type: "object",
+          properties: {
+            strengths: { type: "array", items: { type: "string" } },
+            weaknesses: { type: "array", items: { type: "string" } },
+            recommendations: { type: "array", items: { type: "string" } },
+          },
+          required: ["strengths", "weaknesses", "recommendations"],
+        },
+      },
       log: { endpoint: "/api/ai/health", userId },
-      userId,
     });
 
     const newScore = {
