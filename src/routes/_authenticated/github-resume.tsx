@@ -4,6 +4,7 @@ import { useMutation } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useMemo, useState } from "react";
 import { generateGithubResume, saveResume, generateCoverLetter } from "@/lib/ai.functions";
+import { setPortfolioVisibility } from "@/lib/deployment.functions";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import {
@@ -232,6 +233,7 @@ function GithubResumePage() {
   const [coverLetter, setCoverLetter] = useState<string | null>(null);
   const [isCoverLetterOpen, setIsCoverLetterOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
+  const [isPublic, setIsPublic] = useState(false);
 
   const navigate = useNavigate();
 
@@ -243,6 +245,7 @@ function GithubResumePage() {
   const genResumeFn = useServerFn(generateGithubResume);
   const saveResumeFn = useServerFn(saveResume);
   const genCoverLetterFn = useServerFn(generateCoverLetter);
+  const setVisibilityFn = useServerFn(setPortfolioVisibility);
 
   const mutation = useMutation({
     mutationFn: () => genResumeFn({ data: { username } }),
@@ -279,6 +282,18 @@ function GithubResumePage() {
     onSuccess: (data) => {
       setCoverLetter(data.coverLetter);
       setIsCoverLetterOpen(true);
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+  const visibilityMutation = useMutation({
+    mutationFn: () => {
+      if (!mutation.data?.id) throw new Error("No portfolio ID");
+      return setVisibilityFn({ data: { portfolioId: mutation.data.id, isPublic: !isPublic } });
+    },
+    onSuccess: () => {
+      setIsPublic(!isPublic);
+      toast.success(isPublic ? "Portfolio is now private" : "Portfolio is now public");
     },
     onError: (e: Error) => toast.error(e.message),
   });
@@ -605,6 +620,17 @@ function GithubResumePage() {
                     desc="Instantly deploy this generated portfolio to a live URL."
                     tone="success"
                   />
+
+                  {data.id && (
+                    <ActionButton
+                      onClick={() => visibilityMutation.mutate()}
+                      disabled={visibilityMutation.isPending}
+                      icon={isPublic ? ExternalLink : Save}
+                      title={visibilityMutation.isPending ? "Updating…" : isPublic ? "Make Private" : "Make Public"}
+                      desc={isPublic ? "Currently accessible via UUID link." : "Allow sharing via UUID link."}
+                      tone={isPublic ? "primary" : "neutral"}
+                    />
+                  )}
 
                   <ActionButton
                     onClick={handleEditInBuilder}

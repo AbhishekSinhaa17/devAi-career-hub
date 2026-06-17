@@ -26,7 +26,7 @@ import {
   BarChart3,
   ExternalLink,
 } from "lucide-react";
-import { Bar, BarChart, ResponsiveContainer, Tooltip, XAxis, YAxis, Cell } from "recharts";
+import { Bar, BarChart, ResponsiveContainer, Tooltip, XAxis, YAxis, Cell, TooltipProps } from "recharts";
 
 export const Route = createFileRoute("/_authenticated/github")({
   head: () => ({ meta: [{ title: "GitHub Analyzer — DevAI" }] }),
@@ -105,7 +105,7 @@ function ScoreRing({ score }: { score: number }) {
 }
 
 // ─── Custom bar tooltip ───────────────────────────────────────────────────────
-function CustomBarTooltip({ active, payload }: any) {
+function CustomBarTooltip({ active, payload }: TooltipProps<number, string>) {
   if (!active || !payload?.length) return null;
   return (
     <div className="rounded-xl border border-border/60 bg-background/95 backdrop-blur-xl px-3 py-2 shadow-2xl text-sm">
@@ -548,7 +548,7 @@ function Page() {
                 </div>
               </div>
               <div className="flex gap-1.5 flex-wrap justify-end max-w-xs">
-                {data.stats.languages.slice(0, 4).map((l: any, i: number) => (
+                {data.stats.languages.slice(0, 4).map((l: { name: string; count: number }, i: number) => (
                   <div key={l.name} className="flex items-center gap-1">
                     <div
                       className="h-2 w-2 rounded-full"
@@ -587,7 +587,7 @@ function Page() {
                     cursor={{ fill: "rgba(99,102,241,0.05)" }}
                   />
                   <Bar dataKey="count" radius={[8, 8, 0, 0]}>
-                    {data.stats.languages.map((_: any, i: number) => (
+                    {data.stats.languages.map((_: { name: string; count: number }, i: number) => (
                       <Cell key={i} fill={LANG_COLORS[i % LANG_COLORS.length]} />
                     ))}
                   </Bar>

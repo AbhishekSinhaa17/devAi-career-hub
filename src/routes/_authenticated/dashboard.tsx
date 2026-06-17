@@ -28,12 +28,18 @@ import {
   Cpu,
 } from "lucide-react";
 import {
+  Bar,
   PolarAngleAxis,
   PolarGrid,
+  PolarRadiusAxis,
   Radar,
   RadarChart,
+  ReferenceLine,
   ResponsiveContainer,
   Tooltip,
+  XAxis,
+  YAxis,
+  TooltipProps,
 } from "recharts";
 import { useState, useEffect, useRef } from "react";
 
@@ -257,7 +263,7 @@ function MetricCard({
 }
 
 // ─── Radar chart custom tooltip ───────────────────────────────────────────────
-function CustomTooltip({ active, payload }: any) {
+function CustomTooltip({ active, payload }: TooltipProps<number, string>) {
   if (!active || !payload?.length) return null;
   return (
     <div className="rounded-xl border border-slate-200 dark:border-white/[0.08] bg-white/95 dark:bg-[#0f0f1e]/95 backdrop-blur-xl px-3 py-2 text-sm shadow-xl dark:shadow-2xl">

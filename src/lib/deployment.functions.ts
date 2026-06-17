@@ -1,7 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-import { supabaseAdmin } from "@/integrations/supabase/client.server";
 
 function generateDeploymentId() {
   return "dpl_" + Math.random().toString(36).substring(2, 15);
@@ -108,12 +107,43 @@ export const getDeploymentsByPortfolio = createServerFn({ method: "GET" })
 export const getPublicPortfolio = createServerFn({ method: "GET" })
   .validator((d: unknown) => z.object({ id: z.string().uuid() }).parse(d))
   .handler(async ({ data }) => {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { data: portfolioData, error } = await supabaseAdmin
       .from("github_resumes")
       .select("*")
       .eq("id", data.id)
+      .eq("is_public", true)
       .single();
 
-    if (error) throw new Error("Portfolio not found");
-    return portfolioData;
+    if (error) throw new Error("Portfolio not found or is not public");
+
+    // Sanitize PII
+    const safeData = {
+      ...portfolioData,
+      insights: undefined, // remove private AI insights
+    };
+
+    if (safeData.resume_data && typeof safeData.resume_data === "object") {
+      const resume = safeData.resume_data as any;
+      if (resume.personalInfo) {
+        resume.personalInfo.email = undefined;
+        resume.personalInfo.phone = undefined;
+      }
+    }
+
+    return safeData;
+  });
+
+export const setPortfolioVisibility = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .validator((d: unknown) => z.object({ portfolioId: z.string().uuid(), isPublic: z.boolean() }).parse(d))
+  .handler(async ({ data, context }) => {
+    const { error } = await context.supabase
+      .from("github_resumes")
+      .update({ is_public: data.isPublic })
+      .eq("id", data.portfolioId)
+      .eq("user_id", context.userId);
+      
+    if (error) throw new Error("Failed to update visibility");
+    return { success: true };
   });

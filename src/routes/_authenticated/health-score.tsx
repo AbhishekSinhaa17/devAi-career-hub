@@ -32,6 +32,7 @@ import {
   CartesianGrid,
   ResponsiveContainer,
   Tooltip,
+  TooltipProps,
 } from "recharts";
 import { toast } from "sonner";
 import { format } from "date-fns";
@@ -272,7 +273,7 @@ function MetricCard({
 }
 
 // ─── Custom Tooltip ────────────────────────────────────────────────────────────
-function CustomTooltip({ active, payload, label }: any) {
+function CustomTooltip({ active, payload, label }: TooltipProps<number, string>) {
   if (!active || !payload?.length) return null;
   return (
     <div className="px-3 py-2 rounded-xl border border-slate-200 dark:border-white/10 bg-white/90 dark:bg-[#0d0d1a]/90 backdrop-blur-md shadow-2xl">

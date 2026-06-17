@@ -3,7 +3,12 @@ import { RouteErrorBoundary } from "@/components/ErrorBoundary";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useState, useEffect, useRef } from "react";
-import { generateMockInterviewQuestions, evaluateMockInterview } from "@/lib/ai.functions";
+import {
+  generateMockInterviewQuestions,
+  evaluateMockInterview,
+  type MockInterviewQuestionsResponse,
+  type MockInterviewEvaluationResponse,
+} from "@/lib/ai.functions";
 import { PageLoadingState } from "@/components/LoadingStates";
 import { Label } from "@/components/ui/label";
 import {
@@ -42,9 +47,8 @@ import {
   RefreshCw,
   Shield,
   TrendingUp,
-  Volume2,
-  Square,
-  VolumeX,
+  MessageSquare,
+  AlertCircle,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -379,13 +383,13 @@ function MockInterviewPage() {
   const [type, setType] = useState("Technical Interview");
   const [timerOpt, setTimerOpt] = useState(0);
 
-  const [questions, setQuestions] = useState<any[]>([]);
+  const [questions, setQuestions] = useState<MockInterviewQuestionsResponse["questions"]>([]);
   const [answers, setAnswers] = useState<string[]>([]);
   const [currentQ, setCurrentQ] = useState(0);
   const [interviewId, setInterviewId] = useState("");
 
   const [timeRemaining, setTimeRemaining] = useState<number | null>(null);
-  const [report, setReport] = useState<any>(null);
+  const [report, setReport] = useState<Omit<MockInterviewEvaluationResponse, "evaluations"> | null>(null);
 
   // ─── Voice Feature State ───
   const [detailedFeedback, setDetailedFeedback] = useState<
@@ -498,12 +502,13 @@ function MockInterviewPage() {
     onMutate: () => setStatus("generating"),
     onSuccess: (data) => {
       setInterviewId(data.id);
-      setQuestions(data.questions as any[]);
-      setAnswers(new Array((data.questions as any[]).length).fill(""));
+      const qs = data.questions as MockInterviewQuestionsResponse["questions"];
+      setQuestions(qs);
+      setAnswers(new Array(qs.length).fill(""));
       setCurrentQ(0);
       setStatus("interview");
       if (timerOpt > 0) setTimeRemaining(timerOpt);
-      speakQuestion((data.questions as any[])[0].question);
+      speakQuestion(qs[0].question);
     },
     onError: (e: Error) => {
       setStatus("setup");

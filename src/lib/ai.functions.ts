@@ -5,6 +5,16 @@ import { fetchGitHubUser, fetchGitHubRepos } from "./github-client.server";
 
 // ---------- GitHub Analyzer ----------
 
+export const GithubAnalysisSchema = z.object({
+  score: z.number(),
+  summary: z.string(),
+  strengths: z.array(z.string()),
+  weaknesses: z.array(z.string()),
+  suggestions: z.array(z.string()),
+});
+
+export type GithubAnalysisResponse = z.infer<typeof GithubAnalysisSchema>;
+
 export const analyzeGithub = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .validator((d: unknown) => z.object({ username: z.string().trim().min(1).max(40) }).parse(d))
@@ -46,13 +56,7 @@ export const analyzeGithub = createServerFn({ method: "POST" })
       top_repos: topRepos,
     };
 
-    const ai = await callAiJson<{
-      score: number;
-      summary: string;
-      strengths: string[];
-      weaknesses: string[];
-      suggestions: string[];
-    }>({
+    const rawAi = await callAiJson<unknown>({
       messages: [
         {
           role: "system",
@@ -82,6 +86,8 @@ export const analyzeGithub = createServerFn({ method: "POST" })
       log: { endpoint: "analyzeGithub", userId: context.userId },
     });
 
+    const ai = GithubAnalysisSchema.parse(rawAi);
+
     await context.supabase.from("github_analyses").insert({
       user_id: context.userId,
       github_username: username,
@@ -97,6 +103,14 @@ export const analyzeGithub = createServerFn({ method: "POST" })
   });
 
 // ---------- Resume scoring & suggestions ----------
+
+export const ResumeScoreSchema = z.object({
+  score: z.number(),
+  suggestions: z.array(z.string()),
+  missingSkills: z.array(z.string()),
+});
+
+export type ResumeScoreResponse = z.infer<typeof ResumeScoreSchema>;
 
 export const scoreResume = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
@@ -126,7 +140,7 @@ export const scoreResume = createServerFn({ method: "POST" })
   )
   .handler(async ({ data, context }) => {
     const { callAiJson } = await import("./ai-gateway.server");
-    return await callAiJson<{ score: number; suggestions: string[]; missingSkills: string[] }>({
+    const rawAi = await callAiJson<unknown>({
       messages: [
         {
           role: "system",
@@ -153,9 +167,21 @@ export const scoreResume = createServerFn({ method: "POST" })
       },
       log: { endpoint: "scoreResume", userId: context.userId },
     });
+    return ResumeScoreSchema.parse(rawAi);
   });
 
 // ---------- Code review ----------
+
+export const CodeReviewSchema = z.object({
+  overall: z.string(),
+  bugs: z.array(z.string()),
+  security: z.array(z.string()),
+  performance: z.array(z.string()),
+  cleanCode: z.array(z.string()),
+  bestPractices: z.array(z.string()),
+});
+
+export type CodeReviewResponse = z.infer<typeof CodeReviewSchema>;
 
 export const reviewCode = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
@@ -169,14 +195,7 @@ export const reviewCode = createServerFn({ method: "POST" })
   )
   .handler(async ({ data, context }) => {
     const { callAiJson } = await import("./ai-gateway.server");
-    const feedback = await callAiJson<{
-      overall: string;
-      bugs: string[];
-      security: string[];
-      performance: string[];
-      cleanCode: string[];
-      bestPractices: string[];
-    }>({
+    const rawFeedback = await callAiJson<unknown>({
       messages: [
         {
           role: "system",
@@ -206,6 +225,8 @@ export const reviewCode = createServerFn({ method: "POST" })
       },
       log: { endpoint: "reviewCode", userId: context.userId },
     });
+
+    const feedback = CodeReviewSchema.parse(rawFeedback);
 
     await context.supabase.from("code_reviews").insert({
       user_id: context.userId,
@@ -284,6 +305,22 @@ export const generateInterview = createServerFn({ method: "POST" })
 
 // ---------- Roadmap ----------
 
+export const RoadmapSchema = z.object({
+  timeline: z.string(),
+  phases: z.array(
+    z.object({
+      title: z.string(),
+      duration: z.string(),
+      skills: z.array(z.string()),
+      projects: z.array(z.string()),
+      resources: z.array(z.string()),
+    })
+  ),
+  certifications: z.array(z.string()),
+});
+
+export type RoadmapResponse = z.infer<typeof RoadmapSchema>;
+
 export const generateRoadmap = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .validator((d: unknown) =>
@@ -291,17 +328,7 @@ export const generateRoadmap = createServerFn({ method: "POST" })
   )
   .handler(async ({ data, context }) => {
     const { callAiJson } = await import("./ai-gateway.server");
-    const roadmap = await callAiJson<{
-      timeline: string;
-      phases: Array<{
-        title: string;
-        duration: string;
-        skills: string[];
-        projects: string[];
-        resources: string[];
-      }>;
-      certifications: string[];
-    }>({
+    const rawRoadmap = await callAiJson<unknown>({
       messages: [
         {
           role: "system",
@@ -341,6 +368,8 @@ export const generateRoadmap = createServerFn({ method: "POST" })
       },
       log: { endpoint: "generateRoadmap", userId: context.userId },
     });
+
+    const roadmap = RoadmapSchema.parse(rawRoadmap);
 
     await context.supabase.from("roadmaps").insert({
       user_id: context.userId,
@@ -454,6 +483,22 @@ export const updateProfile = createServerFn({ method: "POST" })
 
 // ---------- Job Match Analyzer ----------
 
+export const JobMatchSchema = z.object({
+  atsScore: z.number(),
+  hiringProbability: z.number(),
+  interviewReadiness: z.number(),
+  matchingSkills: z.array(z.string()),
+  missingSkills: z.array(z.string()),
+  strengths: z.array(z.string()),
+  weaknesses: z.array(z.string()),
+  suggestions: z.array(z.string()),
+  summary: z.string(),
+  recommendedProjects: z.array(z.string()),
+  recommendedSkills: z.array(z.string()),
+});
+
+export type JobMatchResponse = z.infer<typeof JobMatchSchema>;
+
 export const analyzeJobMatch = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .validator((d: unknown) =>
@@ -468,19 +513,7 @@ export const analyzeJobMatch = createServerFn({ method: "POST" })
   )
   .handler(async ({ data, context }) => {
     const { callAiJson } = await import("./ai-gateway.server");
-    const ai = await callAiJson<{
-      atsScore: number;
-      hiringProbability: number;
-      interviewReadiness: number;
-      matchingSkills: string[];
-      missingSkills: string[];
-      strengths: string[];
-      weaknesses: string[];
-      suggestions: string[];
-      summary: string;
-      recommendedProjects: string[];
-      recommendedSkills: string[];
-    }>({
+    const rawAi = await callAiJson<unknown>({
       messages: [
         {
           role: "system",
@@ -528,6 +561,8 @@ export const analyzeJobMatch = createServerFn({ method: "POST" })
       log: { endpoint: "analyzeJobMatch", userId: context.userId },
     });
 
+    const ai = JobMatchSchema.parse(rawAi);
+
     const analysis = {
       matchingSkills: ai.matchingSkills,
       missingSkills: ai.missingSkills,
@@ -569,6 +604,24 @@ export const getJobMatchesHistory = createServerFn({ method: "GET" })
 
 // ---------- Developer Health Score ----------
 
+export const DeveloperScoreSchema = z.object({
+  overallScore: z.number(),
+  strengths: z.array(z.string()),
+  weaknesses: z.array(z.string()),
+  recommendations: z.array(z.string()),
+  suggestedProjects: z.array(z.string()),
+  certifications: z.array(z.string()),
+  jobRoles: z.array(z.string()),
+  insights: z.object({
+    why: z.string(),
+    biggestStrength: z.string(),
+    biggestWeakness: z.string(),
+    fastestImprovement: z.string(),
+  }),
+});
+
+export type DeveloperScoreResponse = z.infer<typeof DeveloperScoreSchema>;
+
 export const generateDeveloperScore = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
@@ -608,21 +661,7 @@ export const generateDeveloperScore = createServerFn({ method: "POST" })
       githubScore * 0.25 + resumeScore * 0.20 + jobMatchScore * 0.25 + interviewScore * 0.20 + profileScore * 0.10
     );
 
-    const ai = await callAiJson<{
-      overallScore: number;
-      strengths: string[];
-      weaknesses: string[];
-      recommendations: string[];
-      suggestedProjects: string[];
-      certifications: string[];
-      jobRoles: string[];
-      insights: {
-        why: string;
-        biggestStrength: string;
-        biggestWeakness: string;
-        fastestImprovement: string;
-      };
-    }>({
+    const rawAi = await callAiJson<unknown>({
       messages: [
         {
           role: "system",
@@ -685,6 +724,8 @@ Return JSON with exactly these fields:
       },
       log: { endpoint: "generateDeveloperScore", userId },
     });
+
+    const ai = DeveloperScoreSchema.parse(rawAi);
 
     const inserted = await supabase.from("developer_scores").insert({
       user_id: userId,
@@ -838,6 +879,32 @@ Output a JSON with the key "coverLetter" containing the full text of the cover l
 
 // ---------- GitHub Resume Generator ----------
 
+export const GithubResumeSchema = z.object({
+  developerType: z.string(),
+  specialization: z.string(),
+  experienceLevel: z.string(),
+  professionalSummary: z.string(),
+  skills: z.array(z.string()),
+  projects: z.array(
+    z.object({
+      name: z.string(),
+      description: z.string(),
+      tech: z.string(),
+    })
+  ),
+  achievements: z.array(z.string()),
+  githubHighlights: z.array(z.string()),
+  recommendedRoles: z.array(z.string()),
+  recommendedProjects: z.array(z.string()),
+  recommendedCertifications: z.array(z.string()),
+  missingSkills: z.array(z.string()),
+  atsScore: z.number(),
+  completenessScore: z.number(),
+  badges: z.array(z.string()),
+});
+
+export type GithubResumeResponse = z.infer<typeof GithubResumeSchema>;
+
 export const generateGithubResume = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .validator((d: unknown) => z.object({ username: z.string().trim().min(1).max(40) }).parse(d))
@@ -867,23 +934,7 @@ export const generateGithubResume = createServerFn({ method: "POST" })
       if (r.language) langCounts[r.language] = (langCounts[r.language] ?? 0) + 1;
     }
 
-    const ai = await callAiJson<{
-      developerType: string;
-      specialization: string;
-      experienceLevel: string;
-      professionalSummary: string;
-      skills: string[];
-      projects: Array<{name: string, description: string, tech: string}>;
-      achievements: string[];
-      githubHighlights: string[];
-      recommendedRoles: string[];
-      recommendedProjects: string[];
-      recommendedCertifications: string[];
-      missingSkills: string[];
-      atsScore: number;
-      completenessScore: number;
-      badges: string[];
-    }>({
+    const rawAi = await callAiJson<unknown>({
       messages: [
         {
           role: "system",
@@ -943,6 +994,8 @@ Infer framework usage, specialization, and complexity from the repo descriptions
       log: { endpoint: "generateGithubResume", userId: context.userId },
     });
 
+    const ai = GithubResumeSchema.parse(rawAi);
+
     const profileStrength = Math.round(Math.min(100, (repos.length * 2) + (topReposDeep.reduce((a,b)=>a+b.stars, 0) * 5) + ai.completenessScore * 0.3));
 
     const resumeData = {
@@ -986,6 +1039,18 @@ Infer framework usage, specialization, and complexity from the repo descriptions
 
 // ---------- Mock Interview Simulator ----------
 
+export const MockInterviewQuestionsSchema = z.object({
+  questions: z.array(
+    z.object({
+      question: z.string(),
+      expected_answer: z.string(),
+      type: z.string(),
+    })
+  ),
+});
+
+export type MockInterviewQuestionsResponse = z.infer<typeof MockInterviewQuestionsSchema>;
+
 export const generateMockInterviewQuestions = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .validator((d: unknown) =>
@@ -1016,7 +1081,7 @@ Candidate GitHub Summary: ${ghRes.data?.summary || "N/A"}
 Candidate Resume Skills: ${JSON.stringify((resumeRes.data?.content as any)?.skills || [])}
 `;
 
-    const ai = await callAiJson<{ questions: { question: string; expected_answer: string; type: string }[] }>({
+    const rawAi = await callAiJson<unknown>({
       messages: [
         {
           role: "system",
@@ -1053,6 +1118,8 @@ Candidate Resume Skills: ${JSON.stringify((resumeRes.data?.content as any)?.skil
       log: { endpoint: "generateMockInterviewQuestions", userId },
     });
 
+    const ai = MockInterviewQuestionsSchema.parse(rawAi);
+
     const { data: inserted, error } = await supabase
       .from("mock_interviews")
       .insert({
@@ -1068,6 +1135,28 @@ Candidate Resume Skills: ${JSON.stringify((resumeRes.data?.content as any)?.skil
     if (error) throw new Error(error.message);
     return inserted;
   });
+
+export const MockInterviewEvaluationSchema = z.object({
+  overallScore: z.number(),
+  technicalScore: z.number(),
+  communicationScore: z.number(),
+  problemSolvingScore: z.number(),
+  confidenceScore: z.number(),
+  completenessScore: z.number(),
+  strengths: z.array(z.string()),
+  weaknesses: z.array(z.string()),
+  improvements: z.array(z.string()),
+  recommendedTopics: z.array(z.string()),
+  nextSteps: z.array(z.string()),
+  evaluations: z.array(
+    z.object({
+      feedback: z.string(),
+      score: z.number(),
+    })
+  ),
+});
+
+export type MockInterviewEvaluationResponse = z.infer<typeof MockInterviewEvaluationSchema>;
 
 export const evaluateMockInterview = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
@@ -1087,27 +1176,14 @@ export const evaluateMockInterview = createServerFn({ method: "POST" })
     const { data: interview } = await supabase.from("mock_interviews").select("*").eq("id", data.interviewId).single();
     if (!interview) throw new Error("Interview not found");
 
-    const qs = interview.questions as any[];
+    const qs = MockInterviewQuestionsSchema.parse({ questions: interview.questions }).questions;
     const qas = qs.map((q, i) => ({
       question: q.question,
       expected: q.expected_answer,
       user_answer: data.answers[i] || "",
     }));
 
-    const ai = await callAiJson<{
-      overallScore: number;
-      technicalScore: number;
-      communicationScore: number;
-      problemSolvingScore: number;
-      confidenceScore: number;
-      completenessScore: number;
-      strengths: string[];
-      weaknesses: string[];
-      improvements: string[];
-      recommendedTopics: string[];
-      nextSteps: string[];
-      evaluations: { feedback: string; score: number }[];
-    }>({
+    const rawAi = await callAiJson<unknown>({
       messages: [
         {
           role: "system",
@@ -1157,6 +1233,8 @@ export const evaluateMockInterview = createServerFn({ method: "POST" })
       },
       log: { endpoint: "evaluateMockInterview", userId },
     });
+
+    const ai = MockInterviewEvaluationSchema.parse(rawAi);
 
     const detailedAnswers = qas.map((qa, i) => ({
       question_index: i,
