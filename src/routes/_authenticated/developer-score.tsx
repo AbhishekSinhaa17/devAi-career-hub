@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { RouteErrorBoundary } from "@/components/ErrorBoundary";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { getDeveloperScoresHistory, generateDeveloperScore } from "@/lib/ai.functions";
 import { CircularProgress } from "@/components/ui/circular-progress";
 import { PageLoadingState, PageEmptyState } from "@/components/LoadingStates";
@@ -23,6 +23,7 @@ import {
   Target,
   Star,
   BarChart3,
+  Share,
 } from "lucide-react";
 import {
   PolarAngleAxis,
@@ -39,6 +40,7 @@ import {
 } from "recharts";
 import { toast } from "sonner";
 import { format } from "date-fns";
+import { toPng } from "html-to-image";
 
 export const Route = createFileRoute("/_authenticated/developer-score")({
   head: () => ({ meta: [{ title: "Developer Health Score — DevAI" }] }),
@@ -380,6 +382,7 @@ function ListItem({
 
 function DeveloperScore() {
   const [mounted, setMounted] = useState(false);
+  const scoreCardRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const t = setTimeout(() => setMounted(true), 60);
@@ -442,6 +445,21 @@ function DeveloperScore() {
     fastestImprovement: string;
   } | null;
 
+  const handleShare = async () => {
+    if (!scoreCardRef.current) return;
+    try {
+      const dataUrl = await toPng(scoreCardRef.current, { cacheBust: true });
+      const link = document.createElement("a");
+      link.download = "my-devai-score.png";
+      link.href = dataUrl;
+      link.click();
+      toast.success("Score card downloaded!");
+    } catch (err) {
+      toast.error("Failed to generate image.");
+      console.error(err);
+    }
+  };
+
   // ── Render ──────────────────────────────────────────────────────────────────
 
   return (
@@ -490,15 +508,23 @@ function DeveloperScore() {
           </div>
 
           {hasScore && (
-            <button
-              onClick={() => mutation.mutate()}
-              disabled={isGenerating}
-              className="btn-ghost flex items-center gap-2 h-10 px-4 rounded-xl font-bold text-sm t-body disabled:opacity-40 disabled:cursor-not-allowed"
-              style={{ animation: "fade-in 0.5s 0.3s ease both" }}
-            >
-              <RefreshCw className={`h-3.5 w-3.5 ${isGenerating ? "animate-spin" : ""}`} />
-              Recalculate
-            </button>
+            <div className="flex items-center gap-2" style={{ animation: "fade-in 0.5s 0.3s ease both" }}>
+              <button
+                onClick={handleShare}
+                className="btn-ghost flex items-center gap-2 h-10 px-4 rounded-xl font-bold text-sm t-body transition-colors"
+              >
+                <Share className="h-3.5 w-3.5" />
+                Share
+              </button>
+              <button
+                onClick={() => mutation.mutate()}
+                disabled={isGenerating}
+                className="btn-ghost flex items-center gap-2 h-10 px-4 rounded-xl font-bold text-sm t-body disabled:opacity-40 disabled:cursor-not-allowed"
+              >
+                <RefreshCw className={`h-3.5 w-3.5 ${isGenerating ? "animate-spin" : ""}`} />
+                Recalculate
+              </button>
+            </div>
           )}
         </header>
 
@@ -1167,6 +1193,82 @@ function DeveloperScore() {
           </>
         )}
       </div>
+
+      {/* ── Hidden Share Card ── */}
+      {hasScore && (
+        <div style={{ position: "absolute", left: "-9999px", top: "-9999px", pointerEvents: "none" }}>
+          <div
+            ref={scoreCardRef}
+            style={{
+              width: 800,
+              background: "#0a0a0a",
+              color: "white",
+              padding: "40px",
+              display: "flex",
+              flexDirection: "column",
+              gap: "40px",
+              fontFamily: "sans-serif",
+              overflow: "hidden",
+              position: "relative"
+            }}
+          >
+            {/* Decorative glow */}
+            <div style={{ position: "absolute", top: -100, right: -100, width: 400, height: 400, background: "radial-gradient(circle, rgba(99,102,241,0.2) 0%, transparent 70%)", borderRadius: "50%", zIndex: 0 }} />
+            
+            <div style={{ position: "relative", zIndex: 10 }}>
+              <div style={{ fontSize: "14px", fontWeight: "bold", letterSpacing: "2px", textTransform: "uppercase", color: "#818cf8", marginBottom: "8px" }}>
+                DevAI Developer Score
+              </div>
+              <div style={{ fontSize: "72px", fontWeight: 900, lineHeight: 1, background: "linear-gradient(135deg, #818cf8 0%, #a78bfa 45%, #34d399 100%)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
+                {currentScore!.overall_score}
+              </div>
+            </div>
+            
+            <div style={{ position: "relative", zIndex: 10, display: "flex", gap: "20px" }}>
+              {[
+                { label: "GitHub", val: currentScore!.github_score, c: "#8b5cf6" },
+                { label: "Resume", val: currentScore!.resume_score, c: "#10b981" },
+                { label: "Interview", val: currentScore!.interview_score, c: "#f472b6" },
+                { label: "Job Match", val: currentScore!.job_match_score, c: "#f59e0b" },
+              ].map((s) => (
+                <div key={s.label} style={{ flex: 1, background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "12px", padding: "16px" }}>
+                  <div style={{ fontSize: "12px", color: "rgba(255,255,255,0.6)", fontWeight: "bold", textTransform: "uppercase", marginBottom: "8px" }}>{s.label}</div>
+                  <div style={{ fontSize: "28px", fontWeight: 900, color: s.c }}>{s.val}</div>
+                </div>
+              ))}
+            </div>
+
+            {aiInsights && (
+              <div style={{ position: "relative", zIndex: 10, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: "16px", padding: "24px" }}>
+                <div style={{ fontSize: "14px", fontWeight: "bold", color: "#fbbf24", marginBottom: "16px", textTransform: "uppercase", letterSpacing: "1px" }}>AI Evaluation</div>
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "24px" }}>
+                  <div>
+                    <div style={{ fontSize: "11px", fontWeight: "bold", color: "rgba(255,255,255,0.5)", textTransform: "uppercase", marginBottom: "4px" }}>Why this score?</div>
+                    <p style={{ fontSize: "14px", lineHeight: 1.5, margin: 0, color: "rgba(255,255,255,0.9)" }}>{aiInsights.why}</p>
+                  </div>
+                  <div>
+                    <div style={{ fontSize: "11px", fontWeight: "bold", color: "rgba(255,255,255,0.5)", textTransform: "uppercase", marginBottom: "4px" }}>Fastest Way to Improve</div>
+                    <p style={{ fontSize: "14px", lineHeight: 1.5, margin: 0, color: "rgba(255,255,255,0.9)" }}>{aiInsights.fastestImprovement}</p>
+                  </div>
+                  <div>
+                    <div style={{ fontSize: "11px", fontWeight: "bold", color: "rgba(255,255,255,0.5)", textTransform: "uppercase", marginBottom: "4px" }}>Biggest Strength</div>
+                    <p style={{ fontSize: "14px", lineHeight: 1.5, margin: 0, color: "rgba(255,255,255,0.9)" }}>{aiInsights.biggestStrength}</p>
+                  </div>
+                  <div>
+                    <div style={{ fontSize: "11px", fontWeight: "bold", color: "rgba(255,255,255,0.5)", textTransform: "uppercase", marginBottom: "4px" }}>Biggest Weakness</div>
+                    <p style={{ fontSize: "14px", lineHeight: 1.5, margin: 0, color: "rgba(255,255,255,0.9)" }}>{aiInsights.biggestWeakness}</p>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            <div style={{ position: "relative", zIndex: 10, marginTop: "auto", paddingTop: "24px", borderTop: "1px solid rgba(255,255,255,0.1)", display: "flex", alignItems: "center", gap: "8px", fontSize: "14px", fontWeight: "bold", color: "rgba(255,255,255,0.4)" }}>
+              <Zap style={{ width: 16, height: 16, color: "#818cf8" }} />
+              devai.app
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 }

@@ -20,6 +20,7 @@ import {
   Menu,
   X,
   Bot,
+  Trophy,
 } from "lucide-react";
 import { type ReactNode, useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
@@ -347,6 +348,7 @@ const NAV_SECTIONS = [
       { to: "/job-match", icon: Briefcase, label: "Job Match" },
       { to: "/developer-score", icon: Activity, label: "Developer Score" },
       { to: "/health-score", icon: Activity, label: "Health Score" },
+      { to: "/leaderboard", icon: Trophy, label: "Leaderboard" },
     ],
   },
   {

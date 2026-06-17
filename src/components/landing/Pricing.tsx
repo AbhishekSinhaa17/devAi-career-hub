@@ -1,7 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
 import { Reveal } from "./shared";
-import { Check, Sparkles, Zap, Users } from "lucide-react";
+import { Check, Sparkles, Zap } from "lucide-react";
 
 export function Pricing() {
   const tiers = [
@@ -11,35 +11,34 @@ export function Pricing() {
       period: "forever",
       desc: "Everything you need to get started on your journey.",
       icon: Zap,
-      features: ["GitHub analysis", "1 resume", "10 code reviews / mo", "Roadmap generator"],
+      features: [
+        "20 AI requests/day",
+        "GitHub Analyzer",
+        "Resume Builder",
+        "Code Reviewer",
+        "Career Roadmap",
+      ],
       cta: "Start for free",
       featured: false,
     },
     {
       name: "Pro",
-      price: "$12",
+      price: "$9",
       period: "per month",
       desc: "The complete toolkit for developers actively job-hunting.",
       icon: Sparkles,
       features: [
-        "Unlimited resumes & scoring",
-        "Unlimited code reviews",
-        "Mock interviews",
-        "Portfolio builder",
-        "Priority AI",
+        "100 AI requests/day",
+        "Everything in Free",
+        "Mock Interviews",
+        "AI Copilot",
+        "Portfolio Deploy to Vercel",
+        "Job Match",
+        "Priority AI (Gemini 2.5 Flash)",
+        "Admin Analytics",
       ],
       cta: "Get Pro",
       featured: true,
-    },
-    {
-      name: "Team",
-      price: "$32",
-      period: "per month",
-      desc: "Built for bootcamps, cohorts, and small engineering teams.",
-      icon: Users,
-      features: ["Team analytics", "Shared interview banks", "Admin dashboard", "SSO ready"],
-      cta: "Contact sales",
-      featured: false,
     },
   ];
 
@@ -51,7 +50,7 @@ export function Pricing() {
         <div className="absolute bottom-0 left-0 h-[300px] w-[500px] rounded-full bg-primary/3 blur-[100px]" />
       </div>
 
-      <div className="mx-auto max-w-6xl px-6">
+      <div className="mx-auto max-w-4xl px-6">
         {/* Header */}
         <Reveal>
           <div className="text-center">
@@ -71,7 +70,7 @@ export function Pricing() {
         </Reveal>
 
         {/* Cards */}
-        <div className="mt-16 grid items-stretch gap-4 md:grid-cols-3">
+        <div className="mt-16 grid items-stretch gap-6 md:grid-cols-2">
           {tiers.map((t, i) => {
             const Icon = t.icon;
             return (
@@ -115,8 +114,8 @@ export function Pricing() {
                       {/* Features */}
                       <ul className="space-y-3.5 flex-1">
                         {t.features.map((f) => (
-                          <li key={f} className="flex items-center gap-3 text-sm">
-                            <span className="grid h-5 w-5 shrink-0 place-items-center rounded-full bg-primary/15 ring-1 ring-primary/25">
+                          <li key={f} className="flex items-start gap-3 text-sm">
+                            <span className="mt-0.5 grid h-5 w-5 shrink-0 place-items-center rounded-full bg-primary/15 ring-1 ring-primary/25">
                               <Check className="h-3 w-3 text-primary" />
                             </span>
                             <span className="font-medium">{f}</span>
@@ -165,8 +164,8 @@ export function Pricing() {
                     {/* Features */}
                     <ul className="space-y-3.5 flex-1">
                       {t.features.map((f) => (
-                        <li key={f} className="flex items-center gap-3 text-sm">
-                          <span className="grid h-5 w-5 shrink-0 place-items-center rounded-full bg-muted ring-1 ring-border/60">
+                        <li key={f} className="flex items-start gap-3 text-sm">
+                          <span className="mt-0.5 grid h-5 w-5 shrink-0 place-items-center rounded-full bg-muted ring-1 ring-border/60">
                             <Check className="h-3 w-3 text-muted-foreground" />
                           </span>
                           <span className="text-muted-foreground">{f}</span>
@@ -177,9 +176,9 @@ export function Pricing() {
                     {/* CTA */}
                     <Link to="/signup" className="mt-8 block">
                       <Button
-                        variant="outline"
-                        className="w-full h-12 rounded-xl text-sm font-semibold border-border/60 transition-all duration-300 group-hover:border-primary/30 group-hover:bg-primary/5 group-hover:text-primary"
-                        size="lg"
+                         variant="outline"
+                         className="w-full h-12 rounded-xl text-sm font-semibold border-border/60 transition-all duration-300 group-hover:border-primary/30 group-hover:bg-primary/5 group-hover:text-primary"
+                         size="lg"
                       >
                         {t.cta}
                       </Button>

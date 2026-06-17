@@ -2,7 +2,7 @@ import { z } from "zod";
 
 const envSchema = z.object({
   VITE_SUPABASE_URL: z.string().url("Must be a valid Supabase URL"),
-  VITE_SUPABASE_ANON_KEY: z.string().min(1, "Supabase Anon Key is required"),
+  VITE_SUPABASE_PUBLISHABLE_KEY: z.string().min(1, "Supabase Publishable Key is required"),
   SUPABASE_SERVICE_ROLE_KEY: z.string().optional(),
   GEMINI_API_KEY: z.string().optional(),
   GROQ_API_KEY: z.string().optional(),
@@ -17,7 +17,7 @@ const envSchema = z.object({
  */
 export const env = envSchema.parse({
   VITE_SUPABASE_URL: process.env.VITE_SUPABASE_URL || import.meta.env?.VITE_SUPABASE_URL,
-  VITE_SUPABASE_ANON_KEY: process.env.VITE_SUPABASE_ANON_KEY || import.meta.env?.VITE_SUPABASE_ANON_KEY,
+  VITE_SUPABASE_PUBLISHABLE_KEY: process.env.VITE_SUPABASE_PUBLISHABLE_KEY || import.meta.env?.VITE_SUPABASE_PUBLISHABLE_KEY,
   SUPABASE_SERVICE_ROLE_KEY: process.env.SUPABASE_SERVICE_ROLE_KEY,
   GEMINI_API_KEY: process.env.GEMINI_API_KEY,
   GROQ_API_KEY: process.env.GROQ_API_KEY,

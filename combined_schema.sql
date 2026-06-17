@@ -374,3 +374,17 @@ ALTER TABLE public.developer_health_scores ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Users manage own health scores" ON public.developer_health_scores
   FOR ALL TO authenticated USING (auth.uid() = user_id) WITH CHECK (auth.uid() = user_id);
 CREATE INDEX health_scores_user_idx ON public.developer_health_scores (user_id, created_at DESC);
+CREATE OR REPLACE VIEW public.leaderboard AS
+SELECT 
+  p.name,
+  p.avatar_url,
+  p.github_username,
+  ds.overall_score,
+  ds.github_score,
+  ds.resume_score,
+  ds.interview_score
+FROM public.developer_scores ds
+JOIN public.profiles p ON p.id = ds.user_id
+ORDER BY ds.overall_score DESC
+LIMIT 20;
+GRANT SELECT ON public.leaderboard TO authenticated;

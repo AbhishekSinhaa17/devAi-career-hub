@@ -18,6 +18,7 @@ import { Route as AuthenticatedRoadmapRouteImport } from './routes/_authenticate
 import { Route as AuthenticatedResumeRouteImport } from './routes/_authenticated/resume'
 import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
 import { Route as AuthenticatedMockInterviewRouteImport } from './routes/_authenticated/mock-interview'
+import { Route as AuthenticatedLeaderboardRouteImport } from './routes/_authenticated/leaderboard'
 import { Route as AuthenticatedJobMatchRouteImport } from './routes/_authenticated/job-match'
 import { Route as AuthenticatedInterviewRouteImport } from './routes/_authenticated/interview'
 import { Route as AuthenticatedHealthScoreRouteImport } from './routes/_authenticated/health-score'
@@ -75,6 +76,12 @@ const AuthenticatedMockInterviewRoute =
   AuthenticatedMockInterviewRouteImport.update({
     id: '/mock-interview',
     path: '/mock-interview',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedLeaderboardRoute =
+  AuthenticatedLeaderboardRouteImport.update({
+    id: '/leaderboard',
+    path: '/leaderboard',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 const AuthenticatedJobMatchRoute = AuthenticatedJobMatchRouteImport.update({
@@ -162,6 +169,7 @@ export interface FileRoutesByFullPath {
   '/health-score': typeof AuthenticatedHealthScoreRoute
   '/interview': typeof AuthenticatedInterviewRoute
   '/job-match': typeof AuthenticatedJobMatchRoute
+  '/leaderboard': typeof AuthenticatedLeaderboardRoute
   '/mock-interview': typeof AuthenticatedMockInterviewRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/resume': typeof AuthenticatedResumeRoute
@@ -185,6 +193,7 @@ export interface FileRoutesByTo {
   '/health-score': typeof AuthenticatedHealthScoreRoute
   '/interview': typeof AuthenticatedInterviewRoute
   '/job-match': typeof AuthenticatedJobMatchRoute
+  '/leaderboard': typeof AuthenticatedLeaderboardRoute
   '/mock-interview': typeof AuthenticatedMockInterviewRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/resume': typeof AuthenticatedResumeRoute
@@ -210,6 +219,7 @@ export interface FileRoutesById {
   '/_authenticated/health-score': typeof AuthenticatedHealthScoreRoute
   '/_authenticated/interview': typeof AuthenticatedInterviewRoute
   '/_authenticated/job-match': typeof AuthenticatedJobMatchRoute
+  '/_authenticated/leaderboard': typeof AuthenticatedLeaderboardRoute
   '/_authenticated/mock-interview': typeof AuthenticatedMockInterviewRoute
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
   '/_authenticated/resume': typeof AuthenticatedResumeRoute
@@ -235,6 +245,7 @@ export interface FileRouteTypes {
     | '/health-score'
     | '/interview'
     | '/job-match'
+    | '/leaderboard'
     | '/mock-interview'
     | '/profile'
     | '/resume'
@@ -258,6 +269,7 @@ export interface FileRouteTypes {
     | '/health-score'
     | '/interview'
     | '/job-match'
+    | '/leaderboard'
     | '/mock-interview'
     | '/profile'
     | '/resume'
@@ -282,6 +294,7 @@ export interface FileRouteTypes {
     | '/_authenticated/health-score'
     | '/_authenticated/interview'
     | '/_authenticated/job-match'
+    | '/_authenticated/leaderboard'
     | '/_authenticated/mock-interview'
     | '/_authenticated/profile'
     | '/_authenticated/resume'
@@ -363,6 +376,13 @@ declare module '@tanstack/react-router' {
       path: '/mock-interview'
       fullPath: '/mock-interview'
       preLoaderRoute: typeof AuthenticatedMockInterviewRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/leaderboard': {
+      id: '/_authenticated/leaderboard'
+      path: '/leaderboard'
+      fullPath: '/leaderboard'
+      preLoaderRoute: typeof AuthenticatedLeaderboardRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/job-match': {
@@ -483,6 +503,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedHealthScoreRoute: typeof AuthenticatedHealthScoreRoute
   AuthenticatedInterviewRoute: typeof AuthenticatedInterviewRoute
   AuthenticatedJobMatchRoute: typeof AuthenticatedJobMatchRoute
+  AuthenticatedLeaderboardRoute: typeof AuthenticatedLeaderboardRoute
   AuthenticatedMockInterviewRoute: typeof AuthenticatedMockInterviewRoute
   AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
   AuthenticatedResumeRoute: typeof AuthenticatedResumeRoute
@@ -501,6 +522,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedHealthScoreRoute: AuthenticatedHealthScoreRoute,
   AuthenticatedInterviewRoute: AuthenticatedInterviewRoute,
   AuthenticatedJobMatchRoute: AuthenticatedJobMatchRoute,
+  AuthenticatedLeaderboardRoute: AuthenticatedLeaderboardRoute,
   AuthenticatedMockInterviewRoute: AuthenticatedMockInterviewRoute,
   AuthenticatedProfileRoute: AuthenticatedProfileRoute,
   AuthenticatedResumeRoute: AuthenticatedResumeRoute,
