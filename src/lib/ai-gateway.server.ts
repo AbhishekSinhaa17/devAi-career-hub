@@ -322,6 +322,11 @@ export async function callAiJson<T>(opts: {
     );
   }
 
+  // Return the actual error if it's not a generic JSON parsing issue
+  if (lastErr instanceof Error && lastErr.message !== "AI returned malformed JSON") {
+    throw lastErr;
+  }
+
   // Return a generic error to the client instead of crashing hard with raw malformed JSON
   throw new Error("AI provider returned invalid data. Please try again.");
 }
