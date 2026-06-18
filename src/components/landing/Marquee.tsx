@@ -1,17 +1,15 @@
-import {
-  SiTypescript,
-  SiPython,
-  SiRust,
-  SiGo,
-  SiReact,
-  SiNodedotjs,
-  SiOpenjdk,
-  SiKotlin,
-  SiSwift,
-  SiCplusplus,
-  SiRuby,
-  SiPhp,
-} from "@icons-pack/react-simple-icons";
+import SiTypescript from "@icons-pack/react-simple-icons/icons/SiTypescript.mjs";
+import SiPython from "@icons-pack/react-simple-icons/icons/SiPython.mjs";
+import SiRust from "@icons-pack/react-simple-icons/icons/SiRust.mjs";
+import SiGo from "@icons-pack/react-simple-icons/icons/SiGo.mjs";
+import SiReact from "@icons-pack/react-simple-icons/icons/SiReact.mjs";
+import SiNodedotjs from "@icons-pack/react-simple-icons/icons/SiNodedotjs.mjs";
+import SiOpenjdk from "@icons-pack/react-simple-icons/icons/SiOpenjdk.mjs";
+import SiKotlin from "@icons-pack/react-simple-icons/icons/SiKotlin.mjs";
+import SiSwift from "@icons-pack/react-simple-icons/icons/SiSwift.mjs";
+import SiCplusplus from "@icons-pack/react-simple-icons/icons/SiCplusplus.mjs";
+import SiRuby from "@icons-pack/react-simple-icons/icons/SiRuby.mjs";
+import SiPhp from "@icons-pack/react-simple-icons/icons/SiPhp.mjs";
 
 const langs = [
   { name: "TypeScript", icon: SiTypescript, color: "#3178C6" },
