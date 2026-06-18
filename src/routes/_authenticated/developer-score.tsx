@@ -508,7 +508,10 @@ function DeveloperScore() {
           </div>
 
           {hasScore && (
-            <div className="flex items-center gap-2" style={{ animation: "fade-in 0.5s 0.3s ease both" }}>
+            <div
+              className="flex items-center gap-2"
+              style={{ animation: "fade-in 0.5s 0.3s ease both" }}
+            >
               <button
                 onClick={handleShare}
                 className="btn-ghost flex items-center gap-2 h-10 px-4 rounded-xl font-bold text-sm t-body transition-colors"
@@ -1196,7 +1199,9 @@ function DeveloperScore() {
 
       {/* ── Hidden Share Card ── */}
       {hasScore && (
-        <div style={{ position: "absolute", left: "-9999px", top: "-9999px", pointerEvents: "none" }}>
+        <div
+          style={{ position: "absolute", left: "-9999px", top: "-9999px", pointerEvents: "none" }}
+        >
           <div
             ref={scoreCardRef}
             style={{
@@ -1209,21 +1214,50 @@ function DeveloperScore() {
               gap: "40px",
               fontFamily: "sans-serif",
               overflow: "hidden",
-              position: "relative"
+              position: "relative",
             }}
           >
             {/* Decorative glow */}
-            <div style={{ position: "absolute", top: -100, right: -100, width: 400, height: 400, background: "radial-gradient(circle, rgba(99,102,241,0.2) 0%, transparent 70%)", borderRadius: "50%", zIndex: 0 }} />
-            
+            <div
+              style={{
+                position: "absolute",
+                top: -100,
+                right: -100,
+                width: 400,
+                height: 400,
+                background: "radial-gradient(circle, rgba(99,102,241,0.2) 0%, transparent 70%)",
+                borderRadius: "50%",
+                zIndex: 0,
+              }}
+            />
+
             <div style={{ position: "relative", zIndex: 10 }}>
-              <div style={{ fontSize: "14px", fontWeight: "bold", letterSpacing: "2px", textTransform: "uppercase", color: "#818cf8", marginBottom: "8px" }}>
+              <div
+                style={{
+                  fontSize: "14px",
+                  fontWeight: "bold",
+                  letterSpacing: "2px",
+                  textTransform: "uppercase",
+                  color: "#818cf8",
+                  marginBottom: "8px",
+                }}
+              >
                 DevAI Developer Score
               </div>
-              <div style={{ fontSize: "72px", fontWeight: 900, lineHeight: 1, background: "linear-gradient(135deg, #818cf8 0%, #a78bfa 45%, #34d399 100%)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
+              <div
+                style={{
+                  fontSize: "72px",
+                  fontWeight: 900,
+                  lineHeight: 1,
+                  background: "linear-gradient(135deg, #818cf8 0%, #a78bfa 45%, #34d399 100%)",
+                  WebkitBackgroundClip: "text",
+                  WebkitTextFillColor: "transparent",
+                }}
+              >
                 {currentScore!.overall_score}
               </div>
             </div>
-            
+
             <div style={{ position: "relative", zIndex: 10, display: "flex", gap: "20px" }}>
               {[
                 { label: "GitHub", val: currentScore!.github_score, c: "#8b5cf6" },
@@ -1231,38 +1265,167 @@ function DeveloperScore() {
                 { label: "Interview", val: currentScore!.interview_score, c: "#f472b6" },
                 { label: "Job Match", val: currentScore!.job_match_score, c: "#f59e0b" },
               ].map((s) => (
-                <div key={s.label} style={{ flex: 1, background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "12px", padding: "16px" }}>
-                  <div style={{ fontSize: "12px", color: "rgba(255,255,255,0.6)", fontWeight: "bold", textTransform: "uppercase", marginBottom: "8px" }}>{s.label}</div>
+                <div
+                  key={s.label}
+                  style={{
+                    flex: 1,
+                    background: "rgba(255,255,255,0.05)",
+                    border: "1px solid rgba(255,255,255,0.1)",
+                    borderRadius: "12px",
+                    padding: "16px",
+                  }}
+                >
+                  <div
+                    style={{
+                      fontSize: "12px",
+                      color: "rgba(255,255,255,0.6)",
+                      fontWeight: "bold",
+                      textTransform: "uppercase",
+                      marginBottom: "8px",
+                    }}
+                  >
+                    {s.label}
+                  </div>
                   <div style={{ fontSize: "28px", fontWeight: 900, color: s.c }}>{s.val}</div>
                 </div>
               ))}
             </div>
 
             {aiInsights && (
-              <div style={{ position: "relative", zIndex: 10, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: "16px", padding: "24px" }}>
-                <div style={{ fontSize: "14px", fontWeight: "bold", color: "#fbbf24", marginBottom: "16px", textTransform: "uppercase", letterSpacing: "1px" }}>AI Evaluation</div>
+              <div
+                style={{
+                  position: "relative",
+                  zIndex: 10,
+                  background: "rgba(255,255,255,0.03)",
+                  border: "1px solid rgba(255,255,255,0.08)",
+                  borderRadius: "16px",
+                  padding: "24px",
+                }}
+              >
+                <div
+                  style={{
+                    fontSize: "14px",
+                    fontWeight: "bold",
+                    color: "#fbbf24",
+                    marginBottom: "16px",
+                    textTransform: "uppercase",
+                    letterSpacing: "1px",
+                  }}
+                >
+                  AI Evaluation
+                </div>
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "24px" }}>
                   <div>
-                    <div style={{ fontSize: "11px", fontWeight: "bold", color: "rgba(255,255,255,0.5)", textTransform: "uppercase", marginBottom: "4px" }}>Why this score?</div>
-                    <p style={{ fontSize: "14px", lineHeight: 1.5, margin: 0, color: "rgba(255,255,255,0.9)" }}>{aiInsights.why}</p>
+                    <div
+                      style={{
+                        fontSize: "11px",
+                        fontWeight: "bold",
+                        color: "rgba(255,255,255,0.5)",
+                        textTransform: "uppercase",
+                        marginBottom: "4px",
+                      }}
+                    >
+                      Why this score?
+                    </div>
+                    <p
+                      style={{
+                        fontSize: "14px",
+                        lineHeight: 1.5,
+                        margin: 0,
+                        color: "rgba(255,255,255,0.9)",
+                      }}
+                    >
+                      {aiInsights.why}
+                    </p>
                   </div>
                   <div>
-                    <div style={{ fontSize: "11px", fontWeight: "bold", color: "rgba(255,255,255,0.5)", textTransform: "uppercase", marginBottom: "4px" }}>Fastest Way to Improve</div>
-                    <p style={{ fontSize: "14px", lineHeight: 1.5, margin: 0, color: "rgba(255,255,255,0.9)" }}>{aiInsights.fastestImprovement}</p>
+                    <div
+                      style={{
+                        fontSize: "11px",
+                        fontWeight: "bold",
+                        color: "rgba(255,255,255,0.5)",
+                        textTransform: "uppercase",
+                        marginBottom: "4px",
+                      }}
+                    >
+                      Fastest Way to Improve
+                    </div>
+                    <p
+                      style={{
+                        fontSize: "14px",
+                        lineHeight: 1.5,
+                        margin: 0,
+                        color: "rgba(255,255,255,0.9)",
+                      }}
+                    >
+                      {aiInsights.fastestImprovement}
+                    </p>
                   </div>
                   <div>
-                    <div style={{ fontSize: "11px", fontWeight: "bold", color: "rgba(255,255,255,0.5)", textTransform: "uppercase", marginBottom: "4px" }}>Biggest Strength</div>
-                    <p style={{ fontSize: "14px", lineHeight: 1.5, margin: 0, color: "rgba(255,255,255,0.9)" }}>{aiInsights.biggestStrength}</p>
+                    <div
+                      style={{
+                        fontSize: "11px",
+                        fontWeight: "bold",
+                        color: "rgba(255,255,255,0.5)",
+                        textTransform: "uppercase",
+                        marginBottom: "4px",
+                      }}
+                    >
+                      Biggest Strength
+                    </div>
+                    <p
+                      style={{
+                        fontSize: "14px",
+                        lineHeight: 1.5,
+                        margin: 0,
+                        color: "rgba(255,255,255,0.9)",
+                      }}
+                    >
+                      {aiInsights.biggestStrength}
+                    </p>
                   </div>
                   <div>
-                    <div style={{ fontSize: "11px", fontWeight: "bold", color: "rgba(255,255,255,0.5)", textTransform: "uppercase", marginBottom: "4px" }}>Biggest Weakness</div>
-                    <p style={{ fontSize: "14px", lineHeight: 1.5, margin: 0, color: "rgba(255,255,255,0.9)" }}>{aiInsights.biggestWeakness}</p>
+                    <div
+                      style={{
+                        fontSize: "11px",
+                        fontWeight: "bold",
+                        color: "rgba(255,255,255,0.5)",
+                        textTransform: "uppercase",
+                        marginBottom: "4px",
+                      }}
+                    >
+                      Biggest Weakness
+                    </div>
+                    <p
+                      style={{
+                        fontSize: "14px",
+                        lineHeight: 1.5,
+                        margin: 0,
+                        color: "rgba(255,255,255,0.9)",
+                      }}
+                    >
+                      {aiInsights.biggestWeakness}
+                    </p>
                   </div>
                 </div>
               </div>
             )}
 
-            <div style={{ position: "relative", zIndex: 10, marginTop: "auto", paddingTop: "24px", borderTop: "1px solid rgba(255,255,255,0.1)", display: "flex", alignItems: "center", gap: "8px", fontSize: "14px", fontWeight: "bold", color: "rgba(255,255,255,0.4)" }}>
+            <div
+              style={{
+                position: "relative",
+                zIndex: 10,
+                marginTop: "auto",
+                paddingTop: "24px",
+                borderTop: "1px solid rgba(255,255,255,0.1)",
+                display: "flex",
+                alignItems: "center",
+                gap: "8px",
+                fontSize: "14px",
+                fontWeight: "bold",
+                color: "rgba(255,255,255,0.4)",
+              }}
+            >
               <Zap style={{ width: 16, height: 16, color: "#818cf8" }} />
               devai.app
             </div>

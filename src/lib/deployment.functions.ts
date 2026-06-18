@@ -16,11 +16,13 @@ function generateDeploymentUrl(username: string, provider: string, portfolioId: 
 export const startDeployment = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .validator((d: unknown) =>
-    z.object({
-      portfolioId: z.string().uuid(),
-      provider: z.string(),
-      username: z.string(),
-    }).parse(d)
+    z
+      .object({
+        portfolioId: z.string().uuid(),
+        provider: z.string(),
+        username: z.string(),
+      })
+      .parse(d),
   )
   .handler(async ({ data, context }) => {
     const deploymentId = generateDeploymentId();
@@ -44,7 +46,7 @@ export const startDeployment = createServerFn({ method: "POST" })
 
     // In a real application, we would call the Vercel/Netlify API here.
     // For this implementation, we will simulate the deployment asynchronously.
-    
+
     // Simulate a build process taking some time.
     // Note: In an edge/serverless env, background tasks like this might be killed.
     // In a real app we'd use a queue or webhooks. This is just for demonstration.
@@ -137,14 +139,16 @@ export const getPublicPortfolio = createServerFn({ method: "GET" })
 
 export const setPortfolioVisibility = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .validator((d: unknown) => z.object({ portfolioId: z.string().uuid(), isPublic: z.boolean() }).parse(d))
+  .validator((d: unknown) =>
+    z.object({ portfolioId: z.string().uuid(), isPublic: z.boolean() }).parse(d),
+  )
   .handler(async ({ data, context }) => {
     const { error } = await context.supabase
       .from("github_resumes")
       .update({ is_public: data.isPublic })
       .eq("id", data.portfolioId)
       .eq("user_id", context.userId);
-      
+
     if (error) throw new Error("Failed to update visibility");
     return { success: true };
   });

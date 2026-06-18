@@ -44,7 +44,7 @@ export class GitHubApiError extends Error {
  */
 async function githubGet<T>(path: string, retries = 2): Promise<T> {
   const url = path.startsWith("http") ? path : `${GITHUB_API_BASE}${path}`;
-  
+
   for (let attempt = 0; attempt <= retries; attempt++) {
     const res = await fetch(url, { headers: getHeaders() });
 
@@ -90,7 +90,7 @@ async function githubGet<T>(path: string, retries = 2): Promise<T> {
       false,
     );
   }
-  
+
   throw new Error("Unreachable");
 }
 

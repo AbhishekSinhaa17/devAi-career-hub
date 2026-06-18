@@ -9,7 +9,17 @@ import {
   setUserAdmin,
   isAdmin as isAdminFn,
 } from "@/lib/admin.functions";
-import { Users, Github, FileText, Code2, MessageSquare, Map as MapIcon, ShieldAlert, Activity, BarChart3 } from "lucide-react";
+import {
+  Users,
+  Github,
+  FileText,
+  Code2,
+  MessageSquare,
+  Map as MapIcon,
+  ShieldAlert,
+  Activity,
+  BarChart3,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 
@@ -76,10 +86,25 @@ function AdminPage() {
 
   const stats = [
     { label: "Users", value: t?.users ?? 0, icon: Users },
-    { label: "GitHub Analyses", value: t?.githubAnalyses ?? 0, sub: `${w?.githubAnalyses ?? 0} / 7d`, icon: Github },
+    {
+      label: "GitHub Analyses",
+      value: t?.githubAnalyses ?? 0,
+      sub: `${w?.githubAnalyses ?? 0} / 7d`,
+      icon: Github,
+    },
     { label: "Resumes", value: t?.resumes ?? 0, sub: `${w?.resumes ?? 0} / 7d`, icon: FileText },
-    { label: "Code Reviews", value: t?.codeReviews ?? 0, sub: `${w?.codeReviews ?? 0} / 7d`, icon: Code2 },
-    { label: "Interviews", value: t?.interviews ?? 0, sub: `${w?.interviews ?? 0} / 7d`, icon: MessageSquare },
+    {
+      label: "Code Reviews",
+      value: t?.codeReviews ?? 0,
+      sub: `${w?.codeReviews ?? 0} / 7d`,
+      icon: Code2,
+    },
+    {
+      label: "Interviews",
+      value: t?.interviews ?? 0,
+      sub: `${w?.interviews ?? 0} / 7d`,
+      icon: MessageSquare,
+    },
     { label: "Roadmaps", value: t?.roadmaps ?? 0, sub: `${w?.roadmaps ?? 0} / 7d`, icon: MapIcon },
   ];
 
@@ -125,7 +150,9 @@ function AdminPage() {
         <header className="flex items-center justify-between border-b border-border px-5 py-3">
           <div>
             <h2 className="text-sm font-semibold">Users</h2>
-            <p className="text-xs text-muted-foreground">Latest 200 signups · grant or revoke admin</p>
+            <p className="text-xs text-muted-foreground">
+              Latest 200 signups · grant or revoke admin
+            </p>
           </div>
           <span className="text-xs text-muted-foreground">{users.data?.length ?? 0} shown</span>
         </header>
@@ -173,9 +200,7 @@ function AdminPage() {
                         size="sm"
                         variant={isAdm ? "outline" : "default"}
                         disabled={mut.isPending}
-                        onClick={() =>
-                          mut.mutate({ userId: u.id, makeAdmin: !isAdm })
-                        }
+                        onClick={() => mut.mutate({ userId: u.id, makeAdmin: !isAdm })}
                       >
                         {isAdm ? "Revoke admin" : "Make admin"}
                       </Button>
@@ -184,7 +209,11 @@ function AdminPage() {
                 );
               })}
               {users.isLoading && (
-                <tr><td colSpan={6} className="px-5 py-6 text-center text-muted-foreground">Loading…</td></tr>
+                <tr>
+                  <td colSpan={6} className="px-5 py-6 text-center text-muted-foreground">
+                    Loading…
+                  </td>
+                </tr>
               )}
             </tbody>
           </table>
@@ -201,13 +230,21 @@ function AdminPage() {
         </header>
         <ul className="divide-y divide-border">
           {(ai.data ?? []).map((r: any) => (
-            <li key={`${r._table}-${r.id}`} className="flex items-center justify-between px-5 py-2.5 text-sm">
+            <li
+              key={`${r._table}-${r.id}`}
+              className="flex items-center justify-between px-5 py-2.5 text-sm"
+            >
               <div className="flex items-center gap-3">
                 <span className="rounded bg-muted px-1.5 py-0.5 text-[10px] uppercase text-muted-foreground">
                   {r._table.replace("_", " ")}
                 </span>
                 <span className="text-muted-foreground">
-                  {r.github_username || r.title || r.role || r.path || r.language || r.id.slice(0, 8)}
+                  {r.github_username ||
+                    r.title ||
+                    r.role ||
+                    r.path ||
+                    r.language ||
+                    r.id.slice(0, 8)}
                 </span>
                 {typeof r.score === "number" && (
                   <span className="text-xs text-primary">score {r.score}</span>

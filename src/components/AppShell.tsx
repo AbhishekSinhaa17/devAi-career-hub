@@ -445,11 +445,17 @@ function NavLink({
     >
       <div className="flex items-center gap-3">
         {/* Icon badge */}
-        <div className={`nav-icon-badge h-6 w-6 rounded-lg flex items-center justify-center flex-shrink-0 transition-all duration-300 ${active ? "active" : ""}`}>
-          <Icon className={`nav-icon h-3.5 w-3.5 transition-colors duration-300 ${active ? "active" : ""}`} />
+        <div
+          className={`nav-icon-badge h-6 w-6 rounded-lg flex items-center justify-center flex-shrink-0 transition-all duration-300 ${active ? "active" : ""}`}
+        >
+          <Icon
+            className={`nav-icon h-3.5 w-3.5 transition-colors duration-300 ${active ? "active" : ""}`}
+          />
         </div>
 
-        <span className={`nav-label transition-colors duration-300 text-[13px] ${active ? "active" : ""}`}>
+        <span
+          className={`nav-label transition-colors duration-300 text-[13px] ${active ? "active" : ""}`}
+        >
           {item.label}
         </span>
       </div>
@@ -800,12 +806,18 @@ export function AppShell({ children }: { children: ReactNode }) {
               }}
             >
               {/* Icon */}
-              <div className={`mobile-icon-badge h-7 w-7 rounded-xl flex items-center justify-center transition-all duration-300 ${active ? "active" : ""}`}>
-                <Icon className={`mobile-icon h-3.5 w-3.5 transition-colors duration-300 ${active ? "active" : ""}`} />
+              <div
+                className={`mobile-icon-badge h-7 w-7 rounded-xl flex items-center justify-center transition-all duration-300 ${active ? "active" : ""}`}
+              >
+                <Icon
+                  className={`mobile-icon h-3.5 w-3.5 transition-colors duration-300 ${active ? "active" : ""}`}
+                />
               </div>
 
               {/* Label */}
-              <span className={`mobile-label text-[9px] font-black uppercase tracking-wide transition-colors duration-300 ${active ? "active" : ""}`}>
+              <span
+                className={`mobile-label text-[9px] font-black uppercase tracking-wide transition-colors duration-300 ${active ? "active" : ""}`}
+              >
                 {item.label.split(" ")[0]}
               </span>
 

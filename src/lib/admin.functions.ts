@@ -38,11 +38,26 @@ export const getAdminOverview = createServerFn({ method: "GET" })
 
     const since = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
     const recent = await Promise.all([
-      supabaseAdmin.from("github_analyses").select("id", { count: "exact", head: true }).gte("created_at", since),
-      supabaseAdmin.from("resumes").select("id", { count: "exact", head: true }).gte("created_at", since),
-      supabaseAdmin.from("code_reviews").select("id", { count: "exact", head: true }).gte("created_at", since),
-      supabaseAdmin.from("interview_sessions").select("id", { count: "exact", head: true }).gte("created_at", since),
-      supabaseAdmin.from("roadmaps").select("id", { count: "exact", head: true }).gte("created_at", since),
+      supabaseAdmin
+        .from("github_analyses")
+        .select("id", { count: "exact", head: true })
+        .gte("created_at", since),
+      supabaseAdmin
+        .from("resumes")
+        .select("id", { count: "exact", head: true })
+        .gte("created_at", since),
+      supabaseAdmin
+        .from("code_reviews")
+        .select("id", { count: "exact", head: true })
+        .gte("created_at", since),
+      supabaseAdmin
+        .from("interview_sessions")
+        .select("id", { count: "exact", head: true })
+        .gte("created_at", since),
+      supabaseAdmin
+        .from("roadmaps")
+        .select("id", { count: "exact", head: true })
+        .gte("created_at", since),
     ]);
 
     const roleCounts: Record<string, number> = {};
@@ -131,7 +146,7 @@ export const setUserAdmin = createServerFn({ method: "POST" })
     await assertAdmin(context);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const action = data.makeAdmin ? "grant_admin" : "revoke_admin";
-    
+
     if (data.makeAdmin) {
       const { error } = await supabaseAdmin
         .from("user_roles")
@@ -151,7 +166,7 @@ export const setUserAdmin = createServerFn({ method: "POST" })
       admin_id: context.userId,
       action: action,
       target_id: data.userId,
-      metadata: { target: data.userId, granted: data.makeAdmin }
+      metadata: { target: data.userId, granted: data.makeAdmin },
     });
 
     return { ok: true };
@@ -162,8 +177,10 @@ export const getApiUsageAnalytics = createServerFn({ method: "GET" })
   .validator((d: unknown) => {
     const obj = (d ?? {}) as { days?: number; startDate?: string; endDate?: string };
     const days = Math.min(Math.max(Number(obj.days ?? 30), 1), 365);
-    const startDate = obj.startDate && /^\d{4}-\d{2}-\d{2}$/.test(obj.startDate) ? obj.startDate : undefined;
-    const endDate = obj.endDate && /^\d{4}-\d{2}-\d{2}$/.test(obj.endDate) ? obj.endDate : undefined;
+    const startDate =
+      obj.startDate && /^\d{4}-\d{2}-\d{2}$/.test(obj.startDate) ? obj.startDate : undefined;
+    const endDate =
+      obj.endDate && /^\d{4}-\d{2}-\d{2}$/.test(obj.endDate) ? obj.endDate : undefined;
     return { days, startDate, endDate };
   })
   .handler(async ({ data, context }) => {
@@ -187,7 +204,9 @@ export const getApiUsageAnalytics = createServerFn({ method: "GET" })
 
     const { data: events, error } = await supabaseAdmin
       .from("ai_usage_events")
-      .select("endpoint, model, user_id, prompt_tokens, completion_tokens, total_tokens, cost_usd, status, duration_ms, created_at")
+      .select(
+        "endpoint, model, user_id, prompt_tokens, completion_tokens, total_tokens, cost_usd, status, duration_ms, created_at",
+      )
       .gte("created_at", since)
       .lte("created_at", until)
       .order("created_at", { ascending: false })
@@ -197,7 +216,10 @@ export const getApiUsageAnalytics = createServerFn({ method: "GET" })
     const rows = events ?? [];
 
     // Requests per day
-    const perDayMap = new Map<string, { date: string; requests: number; tokens: number; cost: number; errors: number }>();
+    const perDayMap = new Map<
+      string,
+      { date: string; requests: number; tokens: number; cost: number; errors: number }
+    >();
     const startBase = new Date(since);
     for (let i = 0; i < dayCount; i++) {
       const d = new Date(startBase.getTime() + i * 86400000);
@@ -215,10 +237,29 @@ export const getApiUsageAnalytics = createServerFn({ method: "GET" })
     }
 
     // By endpoint
-    const endpointMap = new Map<string, { endpoint: string; requests: number; tokens: number; cost: number; avgMs: number; errors: number; _ms: number }>();
+    const endpointMap = new Map<
+      string,
+      {
+        endpoint: string;
+        requests: number;
+        tokens: number;
+        cost: number;
+        avgMs: number;
+        errors: number;
+        _ms: number;
+      }
+    >();
     for (const r of rows) {
       const k = r.endpoint as string;
-      const e = endpointMap.get(k) ?? { endpoint: k, requests: 0, tokens: 0, cost: 0, avgMs: 0, errors: 0, _ms: 0 };
+      const e = endpointMap.get(k) ?? {
+        endpoint: k,
+        requests: 0,
+        tokens: 0,
+        cost: 0,
+        avgMs: 0,
+        errors: 0,
+        _ms: 0,
+      };
       e.requests += 1;
       e.tokens += r.total_tokens ?? 0;
       e.cost += Number(r.cost_usd ?? 0);
@@ -231,7 +272,10 @@ export const getApiUsageAnalytics = createServerFn({ method: "GET" })
       .sort((a, b) => b.requests - a.requests);
 
     // By model
-    const modelMap = new Map<string, { model: string; requests: number; tokens: number; cost: number }>();
+    const modelMap = new Map<
+      string,
+      { model: string; requests: number; tokens: number; cost: number }
+    >();
     for (const r of rows) {
       const k = r.model as string;
       const e = modelMap.get(k) ?? { model: k, requests: 0, tokens: 0, cost: 0 };
@@ -243,7 +287,10 @@ export const getApiUsageAnalytics = createServerFn({ method: "GET" })
     const byModel = [...modelMap.values()].sort((a, b) => b.cost - a.cost);
 
     // Top users
-    const userMap = new Map<string, { user_id: string; requests: number; tokens: number; cost: number }>();
+    const userMap = new Map<
+      string,
+      { user_id: string; requests: number; tokens: number; cost: number }
+    >();
     for (const r of rows) {
       const k = (r.user_id as string | null) ?? "anonymous";
       const e = userMap.get(k) ?? { user_id: k, requests: 0, tokens: 0, cost: 0 };

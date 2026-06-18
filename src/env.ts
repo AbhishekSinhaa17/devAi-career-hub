@@ -17,7 +17,8 @@ const envSchema = z.object({
  */
 export const env = envSchema.parse({
   VITE_SUPABASE_URL: process.env.VITE_SUPABASE_URL || import.meta.env?.VITE_SUPABASE_URL,
-  VITE_SUPABASE_PUBLISHABLE_KEY: process.env.VITE_SUPABASE_PUBLISHABLE_KEY || import.meta.env?.VITE_SUPABASE_PUBLISHABLE_KEY,
+  VITE_SUPABASE_PUBLISHABLE_KEY:
+    process.env.VITE_SUPABASE_PUBLISHABLE_KEY || import.meta.env?.VITE_SUPABASE_PUBLISHABLE_KEY,
   SUPABASE_SERVICE_ROLE_KEY: process.env.SUPABASE_SERVICE_ROLE_KEY,
   GEMINI_API_KEY: process.env.GEMINI_API_KEY,
   GROQ_API_KEY: process.env.GROQ_API_KEY,

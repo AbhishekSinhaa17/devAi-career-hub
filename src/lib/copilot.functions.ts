@@ -6,12 +6,48 @@ import { callAi } from "./ai-gateway.server";
 // Plain async helper — NOT a server function, just a regular function
 async function fetchContextSnapshotFromDb(userId: string, supabase: any) {
   const [ghRes, resumeRes, jobMatchRes, scoresRes, mockIntRes, portfolioRes] = await Promise.all([
-    supabase.from("github_resumes").select("developer_type, insights, resume_data").eq("user_id", userId).order("created_at", { ascending: false }).limit(1).maybeSingle(),
-    supabase.from("resumes").select("title, score, ai_suggestions").eq("user_id", userId).order("updated_at", { ascending: false }).limit(1).maybeSingle(),
-    supabase.from("job_matches").select("job_role, ats_score, analysis").eq("user_id", userId).order("created_at", { ascending: false }).limit(1).maybeSingle(),
-    supabase.from("developer_scores").select("overall_score").eq("user_id", userId).order("created_at", { ascending: false }).limit(1).maybeSingle(),
-    supabase.from("mock_interviews").select("job_role, overall_score, feedback").eq("user_id", userId).order("created_at", { ascending: false }).limit(1).maybeSingle(),
-    supabase.from("portfolio_deployments").select("provider, status, deployment_url").eq("user_id", userId).order("created_at", { ascending: false }).limit(1).maybeSingle(),
+    supabase
+      .from("github_resumes")
+      .select("developer_type, insights, resume_data")
+      .eq("user_id", userId)
+      .order("created_at", { ascending: false })
+      .limit(1)
+      .maybeSingle(),
+    supabase
+      .from("resumes")
+      .select("title, score, ai_suggestions")
+      .eq("user_id", userId)
+      .order("updated_at", { ascending: false })
+      .limit(1)
+      .maybeSingle(),
+    supabase
+      .from("job_matches")
+      .select("job_role, ats_score, analysis")
+      .eq("user_id", userId)
+      .order("created_at", { ascending: false })
+      .limit(1)
+      .maybeSingle(),
+    supabase
+      .from("developer_scores")
+      .select("overall_score")
+      .eq("user_id", userId)
+      .order("created_at", { ascending: false })
+      .limit(1)
+      .maybeSingle(),
+    supabase
+      .from("mock_interviews")
+      .select("job_role, overall_score, feedback")
+      .eq("user_id", userId)
+      .order("created_at", { ascending: false })
+      .limit(1)
+      .maybeSingle(),
+    supabase
+      .from("portfolio_deployments")
+      .select("provider, status, deployment_url")
+      .eq("user_id", userId)
+      .order("created_at", { ascending: false })
+      .limit(1)
+      .maybeSingle(),
   ]);
 
   return {
@@ -44,7 +80,9 @@ export const startCopilotConversation = createServerFn({ method: "POST" })
         user_id: context.userId,
         title: data.title || "Career Discussion",
         context_snapshot: snapshot as any,
-      }).select().single();
+      })
+      .select()
+      .single();
 
     if (error) throw new Error("Failed to start conversation");
     return convData;
@@ -80,10 +118,14 @@ export const getCopilotMessages = createServerFn({ method: "GET" })
 
 export const sendCopilotMessage = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .validator((d: unknown) => z.object({ 
-    conversationId: z.string().uuid(),
-    message: z.string().min(1)
-  }).parse(d))
+  .validator((d: unknown) =>
+    z
+      .object({
+        conversationId: z.string().uuid(),
+        message: z.string().min(1),
+      })
+      .parse(d),
+  )
   .handler(async ({ data, context }) => {
     const db = context.supabase;
     const userId = context.userId;
@@ -103,7 +145,7 @@ export const sendCopilotMessage = createServerFn({ method: "POST" })
       conversation_id: data.conversationId,
       user_id: userId,
       role: "user",
-      content: data.message
+      content: data.message,
     });
 
     // 3. Fetch past messages (limit to last 10 to save tokens)
@@ -117,7 +159,7 @@ export const sendCopilotMessage = createServerFn({ method: "POST" })
 
     const history = (pastMsgs || []).reverse().map((m: any) => ({
       role: m.role,
-      content: m.content
+      content: m.content,
     }));
 
     // 4. Construct AI Context
@@ -129,24 +171,25 @@ USER DATA SNAPSHOT:
 ${JSON.stringify(conv.context_snapshot, null, 2)}
 `;
 
-    const aiMessages = [
-      { role: "system", content: systemPrompt },
-      ...history
-    ];
+    const aiMessages = [{ role: "system", content: systemPrompt }, ...history];
 
     // 5. Call AI
     const responseText = await callAi({
       messages: aiMessages as any,
-      log: { endpoint: "copilotChat", userId }
+      log: { endpoint: "copilotChat", userId },
     });
 
     // 6. Save Assistant Message
-    const { data: savedMsg } = await db.from("copilot_messages").insert({
-      conversation_id: data.conversationId,
-      user_id: userId,
-      role: "assistant",
-      content: responseText
-    }).select().single();
+    const { data: savedMsg } = await db
+      .from("copilot_messages")
+      .insert({
+        conversation_id: data.conversationId,
+        user_id: userId,
+        role: "assistant",
+        content: responseText,
+      })
+      .select()
+      .single();
 
     // Log the usage to analytics happens inside callAi automatically if log is provided.
 

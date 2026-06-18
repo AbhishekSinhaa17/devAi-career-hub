@@ -15,6 +15,18 @@ export const GithubAnalysisSchema = z.object({
 
 export type GithubAnalysisResponse = z.infer<typeof GithubAnalysisSchema>;
 
+export interface GithubStats {
+  avatar_url: string;
+  name: string | null;
+  bio: string | null;
+  public_repos: number;
+  followers: number;
+  total_stars: number;
+  total_forks: number;
+  languages: Array<{ name: string; count: number }>;
+  top_repos: Array<{ name: string; desc: string; stars: number; lang: string | null }>;
+}
+
 export const analyzeGithub = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .validator((d: unknown) => z.object({ username: z.string().trim().min(1).max(40) }).parse(d))
@@ -35,7 +47,7 @@ export const analyzeGithub = createServerFn({ method: "POST" })
 
     if (cached) {
       return {
-        stats: cached.stats,
+        stats: cached.stats as unknown as GithubStats,
         score: cached.score,
         summary: cached.summary,
         strengths: cached.strengths,
@@ -65,7 +77,12 @@ export const analyzeGithub = createServerFn({ method: "POST" })
       .slice()
       .sort((a, b) => b.stargazers_count - a.stargazers_count)
       .slice(0, 8)
-      .map((r) => ({ name: r.name, desc: r.description ? r.description.slice(0, 500) : "", stars: r.stargazers_count, lang: r.language }));
+      .map((r) => ({
+        name: r.name,
+        desc: r.description ? r.description.slice(0, 500) : "",
+        stars: r.stargazers_count,
+        lang: r.language,
+      }));
 
     const stats = {
       avatar_url: user.avatar_url,
@@ -122,7 +139,7 @@ export const analyzeGithub = createServerFn({ method: "POST" })
       summary: ai.summary,
     });
 
-    return { stats, ...ai };
+    return { stats: stats as unknown as GithubStats, ...ai };
   });
 
 // ---------- Resume scoring & suggestions ----------
@@ -149,13 +166,22 @@ export const scoreResume = createServerFn({ method: "POST" })
           location: z.string().optional(),
           skills: z.array(z.string()).default([]),
           experience: z
-            .array(z.object({ role: z.string(), company: z.string(), period: z.string(), description: z.string() }))
+            .array(
+              z.object({
+                role: z.string(),
+                company: z.string(),
+                period: z.string(),
+                description: z.string(),
+              }),
+            )
             .default([]),
           education: z
             .array(z.object({ school: z.string(), degree: z.string(), period: z.string() }))
             .default([]),
           projects: z
-            .array(z.object({ name: z.string(), description: z.string(), tech: z.string().optional() }))
+            .array(
+              z.object({ name: z.string(), description: z.string(), tech: z.string().optional() }),
+            )
             .default([]),
         }),
       })
@@ -232,7 +258,13 @@ export const reviewCode = createServerFn({ method: "POST" })
   .validator((d: unknown) =>
     z
       .object({
-        code: z.string().min(1, "Code cannot be empty.").max(8000, "Code is too large. Maximum allowed size is 8,000 characters for optimal AI review."),
+        code: z
+          .string()
+          .min(1, "Code cannot be empty.")
+          .max(
+            8000,
+            "Code is too large. Maximum allowed size is 8,000 characters for optimal AI review.",
+          ),
         language: z.string().default("javascript"),
       })
       .parse(d),
@@ -304,7 +336,8 @@ export const generateInterview = createServerFn({ method: "POST" })
       messages: [
         {
           role: "system",
-          content: "You are an interview coach. Generate realistic, well-structured questions with model answers.",
+          content:
+            "You are an interview coach. Generate realistic, well-structured questions with model answers.",
         },
         {
           role: "user",
@@ -358,7 +391,7 @@ export const RoadmapSchema = z.object({
       skills: z.array(z.string()),
       projects: z.array(z.string()),
       resources: z.array(z.string()),
-    })
+    }),
   ),
   certifications: z.array(z.string()),
 });
@@ -376,7 +409,8 @@ export const generateRoadmap = createServerFn({ method: "POST" })
       messages: [
         {
           role: "system",
-          content: "You are a career mentor for developers. Create realistic, actionable learning roadmaps.",
+          content:
+            "You are a career mentor for developers. Create realistic, actionable learning roadmaps.",
         },
         {
           role: "user",
@@ -429,54 +463,63 @@ export const generateRoadmap = createServerFn({ method: "POST" })
 export const getDashboard = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
-    const [profile, gh, resume, reviews, interviews, devScores, ghResumes, mockInterviews] = await Promise.all([
-      context.supabase.from("profiles").select("*").eq("id", context.userId).maybeSingle(),
-      context.supabase
-        .from("github_analyses")
-        .select("score, github_username, created_at")
-        .eq("user_id", context.userId)
-        .order("created_at", { ascending: false })
-        .limit(1)
-        .maybeSingle(),
-      context.supabase
-        .from("resumes")
-        .select("score, title, updated_at")
-        .eq("user_id", context.userId)
-        .order("updated_at", { ascending: false })
-        .limit(1)
-        .maybeSingle(),
-      context.supabase.from("code_reviews").select("id", { count: "exact", head: true }).eq("user_id", context.userId),
-      context.supabase
-        .from("interview_sessions")
-        .select("id", { count: "exact", head: true })
-        .eq("user_id", context.userId),
-      context.supabase
-        .from("developer_scores")
-        .select("overall_score, created_at")
-        .eq("user_id", context.userId)
-        .order("created_at", { ascending: false })
-        .limit(2),
-      context.supabase
-        .from("github_resumes")
-        .select("developer_type, resume_data, badges, created_at")
-        .eq("user_id", context.userId)
-        .order("created_at", { ascending: false })
-        .limit(1)
-        .maybeSingle(),
-      context.supabase
-        .from("mock_interviews")
-        .select("overall_score, job_role, created_at")
-        .eq("user_id", context.userId)
-        .order("created_at", { ascending: false })
-        .limit(2),
-    ]);
+    const [profile, gh, resume, reviews, interviews, devScores, ghResumes, mockInterviews] =
+      await Promise.all([
+        context.supabase.from("profiles").select("*").eq("id", context.userId).maybeSingle(),
+        context.supabase
+          .from("github_analyses")
+          .select("score, github_username, created_at")
+          .eq("user_id", context.userId)
+          .order("created_at", { ascending: false })
+          .limit(1)
+          .maybeSingle(),
+        context.supabase
+          .from("resumes")
+          .select("score, title, updated_at")
+          .eq("user_id", context.userId)
+          .order("updated_at", { ascending: false })
+          .limit(1)
+          .maybeSingle(),
+        context.supabase
+          .from("code_reviews")
+          .select("id", { count: "exact", head: true })
+          .eq("user_id", context.userId),
+        context.supabase
+          .from("interview_sessions")
+          .select("id", { count: "exact", head: true })
+          .eq("user_id", context.userId),
+        context.supabase
+          .from("developer_scores")
+          .select("overall_score, created_at")
+          .eq("user_id", context.userId)
+          .order("created_at", { ascending: false })
+          .limit(2),
+        context.supabase
+          .from("github_resumes")
+          .select("developer_type, resume_data, badges, created_at")
+          .eq("user_id", context.userId)
+          .order("created_at", { ascending: false })
+          .limit(1)
+          .maybeSingle(),
+        context.supabase
+          .from("mock_interviews")
+          .select("overall_score, job_role, created_at")
+          .eq("user_id", context.userId)
+          .order("created_at", { ascending: false })
+          .limit(2),
+      ]);
 
     const p = profile.data;
-    const profileFields = [p?.name, p?.bio, p?.github_username, p?.skills?.length ? "skills" : null];
+    const profileFields = [
+      p?.name,
+      p?.bio,
+      p?.github_username,
+      p?.skills?.length ? "skills" : null,
+    ];
     const profileCompletion = Math.round(
       (profileFields.filter(Boolean).length / profileFields.length) * 100,
     );
-    
+
     let devScoreTrend = 0;
     if (devScores.data && devScores.data.length >= 2) {
       devScoreTrend = devScores.data[0].overall_score - devScores.data[1].overall_score;
@@ -484,7 +527,8 @@ export const getDashboard = createServerFn({ method: "GET" })
 
     let mockInterviewTrend = 0;
     if (mockInterviews.data && mockInterviews.data.length >= 2) {
-      mockInterviewTrend = mockInterviews.data[0].overall_score - mockInterviews.data[1].overall_score;
+      mockInterviewTrend =
+        mockInterviews.data[0].overall_score - mockInterviews.data[1].overall_score;
     }
 
     return {
@@ -548,16 +592,25 @@ export const analyzeJobMatch = createServerFn({ method: "POST" })
   .validator((d: unknown) =>
     z
       .object({
-        resumeText: z.string().min(10, "Resume text is too short.").max(8000, "Resume text is too large. Maximum allowed size is 8,000 characters."),
+        resumeText: z
+          .string()
+          .min(10, "Resume text is too short.")
+          .max(8000, "Resume text is too large. Maximum allowed size is 8,000 characters."),
         resumeFileName: z.string().min(1),
-        jobDescription: z.string().min(10, "Job description is too short.").max(8000, "Job description is too large. Maximum allowed size is 8,000 characters."),
+        jobDescription: z
+          .string()
+          .min(10, "Job description is too short.")
+          .max(8000, "Job description is too large. Maximum allowed size is 8,000 characters."),
         jobRole: z.string().min(1),
       })
       .parse(d),
   )
   .handler(async ({ data, context }) => {
     const crypto = await import("crypto");
-    const hashKey = crypto.createHash("md5").update(data.resumeText + data.jobDescription).digest("hex");
+    const hashKey = crypto
+      .createHash("md5")
+      .update(data.resumeText + data.jobDescription)
+      .digest("hex");
 
     // ── Cache Check ────────────────────────────────────────────────────────
     const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
@@ -631,19 +684,23 @@ export const analyzeJobMatch = createServerFn({ method: "POST" })
 
     const ai = JobMatchSchema.parse(rawAi);
 
-    const inserted = await context.supabase.from("job_matches").insert({
-      user_id: context.userId,
-      job_role: data.jobRole,
-      job_description: data.jobDescription,
-      resume_file_name: data.resumeFileName,
-      resume_text: data.resumeText,
-      ats_score: ai.atsScore,
-      hiring_probability: ai.hiringProbability,
-      interview_readiness: ai.interviewReadiness,
-      ai_summary: ai.summary,
-      analysis: ai as never,
-      hash_key: hashKey,
-    }).select().single();
+    const inserted = await context.supabase
+      .from("job_matches")
+      .insert({
+        user_id: context.userId,
+        job_role: data.jobRole,
+        job_description: data.jobDescription,
+        resume_file_name: data.resumeFileName,
+        resume_text: data.resumeText,
+        ats_score: ai.atsScore,
+        hiring_probability: ai.hiringProbability,
+        interview_readiness: ai.interviewReadiness,
+        ai_summary: ai.summary,
+        analysis: ai as never,
+        hash_key: hashKey,
+      })
+      .select()
+      .single();
 
     return { id: inserted.data?.id, ...ai };
   });
@@ -656,7 +713,7 @@ export const getJobMatchesHistory = createServerFn({ method: "GET" })
       .select("id, job_role, ats_score, resume_file_name, created_at")
       .eq("user_id", context.userId)
       .order("created_at", { ascending: false });
-      
+
     if (error) throw new Error(error.message);
     return data;
   });
@@ -690,10 +747,31 @@ export const generateDeveloperScore = createServerFn({ method: "POST" })
 
     // Fetch latest data
     const [ghRes, resumeRes, jobMatchRes, interviewRes, profileRes] = await Promise.all([
-      supabase.from("github_analyses").select("score, stats").eq("user_id", userId).order("created_at", { ascending: false }).limit(1).maybeSingle(),
-      supabase.from("resumes").select("score, content").eq("user_id", userId).order("updated_at", { ascending: false }).limit(1).maybeSingle(),
-      supabase.from("job_matches").select("ats_score, analysis, job_role").eq("user_id", userId).order("created_at", { ascending: false }).limit(1).maybeSingle(),
-      supabase.from("interview_sessions").select("id", { count: "exact", head: true }).eq("user_id", userId),
+      supabase
+        .from("github_analyses")
+        .select("score, stats")
+        .eq("user_id", userId)
+        .order("created_at", { ascending: false })
+        .limit(1)
+        .maybeSingle(),
+      supabase
+        .from("resumes")
+        .select("score, content")
+        .eq("user_id", userId)
+        .order("updated_at", { ascending: false })
+        .limit(1)
+        .maybeSingle(),
+      supabase
+        .from("job_matches")
+        .select("ats_score, analysis, job_role")
+        .eq("user_id", userId)
+        .order("created_at", { ascending: false })
+        .limit(1)
+        .maybeSingle(),
+      supabase
+        .from("interview_sessions")
+        .select("id", { count: "exact", head: true })
+        .eq("user_id", userId),
       supabase.from("profiles").select("*").eq("id", userId).maybeSingle(),
     ]);
 
@@ -706,25 +784,38 @@ export const generateDeveloperScore = createServerFn({ method: "POST" })
     const githubScore = gh?.score ?? 0;
     const resumeScore = resume?.score ?? 0;
     const jobMatchScore = jobMatch?.ats_score ?? 0;
-    
+
     // Interview score logic: use best_interview_score from profile if available, otherwise fallback to interview count
     const mockInterviewScore = profile?.best_interview_score ?? 0;
-    const interviewScore = mockInterviewScore > 0 ? mockInterviewScore : Math.min(100, interviewCount * 20);
+    const interviewScore =
+      mockInterviewScore > 0 ? mockInterviewScore : Math.min(100, interviewCount * 20);
 
-    const profileFields = [profile?.name, profile?.bio, profile?.github_username, profile?.skills?.length ? "skills" : null];
-    const profileScore = Math.round((profileFields.filter(Boolean).length / profileFields.length) * 100);
+    const profileFields = [
+      profile?.name,
+      profile?.bio,
+      profile?.github_username,
+      profile?.skills?.length ? "skills" : null,
+    ];
+    const profileScore = Math.round(
+      (profileFields.filter(Boolean).length / profileFields.length) * 100,
+    );
 
     // Weighted Overall Score
     // GitHub: 25%, Resume: 20%, Job Match: 25%, Interview: 20%, Profile: 10%
     const overallScore = Math.round(
-      githubScore * 0.25 + resumeScore * 0.20 + jobMatchScore * 0.25 + interviewScore * 0.20 + profileScore * 0.10
+      githubScore * 0.25 +
+        resumeScore * 0.2 +
+        jobMatchScore * 0.25 +
+        interviewScore * 0.2 +
+        profileScore * 0.1,
     );
 
     const rawAi = await callAiJson<unknown>({
       messages: [
         {
           role: "system",
-          content: "You are an elite career coach. Analyze the developer's component scores and profile to generate actionable insights, recommendations, and suggested next steps.",
+          content:
+            "You are an elite career coach. Analyze the developer's component scores and profile to generate actionable insights, recommendations, and suggested next steps.",
         },
         {
           role: "user",
@@ -777,7 +868,14 @@ Return JSON with exactly these fields:
             },
           },
           required: [
-            "overallScore", "strengths", "weaknesses", "recommendations", "suggestedProjects", "certifications", "jobRoles", "insights"
+            "overallScore",
+            "strengths",
+            "weaknesses",
+            "recommendations",
+            "suggestedProjects",
+            "certifications",
+            "jobRoles",
+            "insights",
           ],
         },
       },
@@ -786,22 +884,26 @@ Return JSON with exactly these fields:
 
     const ai = DeveloperScoreSchema.parse(rawAi);
 
-    const inserted = await supabase.from("developer_scores").insert({
-      user_id: userId,
-      overall_score: overallScore,
-      github_score: githubScore,
-      resume_score: resumeScore,
-      job_match_score: jobMatchScore,
-      interview_score: interviewScore,
-      profile_score: profileScore,
-      strengths: ai.strengths,
-      weaknesses: ai.weaknesses,
-      recommendations: ai.recommendations,
-      suggested_projects: ai.suggestedProjects,
-      certifications: ai.certifications,
-      job_roles: ai.jobRoles,
-      ai_insights: ai.insights,
-    }).select().single();
+    const inserted = await supabase
+      .from("developer_scores")
+      .insert({
+        user_id: userId,
+        overall_score: overallScore,
+        github_score: githubScore,
+        resume_score: resumeScore,
+        job_match_score: jobMatchScore,
+        interview_score: interviewScore,
+        profile_score: profileScore,
+        strengths: ai.strengths,
+        weaknesses: ai.weaknesses,
+        recommendations: ai.recommendations,
+        suggested_projects: ai.suggestedProjects,
+        certifications: ai.certifications,
+        job_roles: ai.jobRoles,
+        ai_insights: ai.insights,
+      })
+      .select()
+      .single();
 
     return inserted.data;
   });
@@ -814,7 +916,7 @@ export const getDeveloperScoresHistory = createServerFn({ method: "GET" })
       .select("*")
       .eq("user_id", context.userId)
       .order("created_at", { ascending: false });
-      
+
     if (error) throw new Error(error.message);
     return data;
   });
@@ -917,7 +1019,8 @@ export const generateCoverLetter = createServerFn({ method: "POST" })
       messages: [
         {
           role: "system",
-          content: "You are an expert career coach writing highly compelling, ATS-friendly cover letters.",
+          content:
+            "You are an expert career coach writing highly compelling, ATS-friendly cover letters.",
         },
         {
           role: "user",
@@ -954,7 +1057,7 @@ export const GithubResumeSchema = z.object({
       name: z.string(),
       description: z.string(),
       tech: z.string(),
-    })
+    }),
   ),
   achievements: z.array(z.string()),
   githubHighlights: z.array(z.string()),
@@ -984,13 +1087,13 @@ export const generateGithubResume = createServerFn({ method: "POST" })
     const topReposDeep = repos
       .sort((a, b) => b.stargazers_count - a.stargazers_count)
       .slice(0, 10)
-      .map(r => ({
+      .map((r) => ({
         name: r.name,
         desc: r.description ? r.description.slice(0, 500) : "",
         lang: r.language,
         topics: r.topics || [],
         stars: r.stargazers_count,
-        watchers: r.watchers_count
+        watchers: r.watchers_count,
       }));
 
     const langCounts: Record<string, number> = {};
@@ -1002,7 +1105,8 @@ export const generateGithubResume = createServerFn({ method: "POST" })
       messages: [
         {
           role: "system",
-          content: "You are an elite Tech Recruiter & AI Resume writer. Analyze GitHub repos (names, descriptions, topics) to deeply infer tech stack, specialization, complexity, architecture skills. Generate a professional JSON output. Add developer badges (e.g., 'React Expert').",
+          content:
+            "You are an elite Tech Recruiter & AI Resume writer. Analyze GitHub repos (names, descriptions, topics) to deeply infer tech stack, specialization, complexity, architecture skills. Generate a professional JSON output. Add developer badges (e.g., 'React Expert').",
         },
         {
           role: "user",
@@ -1035,7 +1139,7 @@ Infer framework usage, specialization, and complexity from the repo descriptions
                 },
                 required: ["name", "description", "tech"],
                 additionalProperties: false,
-              }
+              },
             },
             achievements: { type: "array", items: { type: "string" } },
             githubHighlights: { type: "array", items: { type: "string" } },
@@ -1048,10 +1152,21 @@ Infer framework usage, specialization, and complexity from the repo descriptions
             badges: { type: "array", items: { type: "string" } },
           },
           required: [
-            "developerType", "specialization", "experienceLevel", "professionalSummary",
-            "skills", "projects", "achievements", "githubHighlights", "recommendedRoles",
-            "recommendedProjects", "recommendedCertifications", "missingSkills", "atsScore",
-            "completenessScore", "badges"
+            "developerType",
+            "specialization",
+            "experienceLevel",
+            "professionalSummary",
+            "skills",
+            "projects",
+            "achievements",
+            "githubHighlights",
+            "recommendedRoles",
+            "recommendedProjects",
+            "recommendedCertifications",
+            "missingSkills",
+            "atsScore",
+            "completenessScore",
+            "badges",
           ],
         },
       },
@@ -1060,7 +1175,14 @@ Infer framework usage, specialization, and complexity from the repo descriptions
 
     const ai = GithubResumeSchema.parse(rawAi);
 
-    const profileStrength = Math.round(Math.min(100, (repos.length * 2) + (topReposDeep.reduce((a,b)=>a+b.stars, 0) * 5) + ai.completenessScore * 0.3));
+    const profileStrength = Math.round(
+      Math.min(
+        100,
+        repos.length * 2 +
+          topReposDeep.reduce((a, b) => a + b.stars, 0) * 5 +
+          ai.completenessScore * 0.3,
+      ),
+    );
 
     const resumeData = {
       fullName: username,
@@ -1088,17 +1210,28 @@ Infer framework usage, specialization, and complexity from the repo descriptions
       experienceLevel: ai.experienceLevel,
     };
 
-    const inserted = await context.supabase.from("github_resumes").insert({
-      user_id: context.userId,
-      github_username: username,
-      developer_type: ai.developerType,
-      profile_strength: profileStrength,
-      badges: ai.badges as never,
-      resume_data: resumeData as never,
-      insights: insights as never,
-    }).select().single();
+    const inserted = await context.supabase
+      .from("github_resumes")
+      .insert({
+        user_id: context.userId,
+        github_username: username,
+        developer_type: ai.developerType,
+        profile_strength: profileStrength,
+        badges: ai.badges as never,
+        resume_data: resumeData as never,
+        insights: insights as never,
+      })
+      .select()
+      .single();
 
-    return { id: inserted.data?.id, profileStrength, resumeData, insights, developerType: ai.developerType, badges: ai.badges };
+    return {
+      id: inserted.data?.id,
+      profileStrength,
+      resumeData,
+      insights,
+      developerType: ai.developerType,
+      badges: ai.badges,
+    };
   });
 
 // ---------- Mock Interview Simulator ----------
@@ -1109,7 +1242,7 @@ export const MockInterviewQuestionsSchema = z.object({
       question: z.string(),
       expected_answer: z.string(),
       type: z.string(),
-    })
+    }),
   ),
 });
 
@@ -1133,8 +1266,20 @@ export const generateMockInterviewQuestions = createServerFn({ method: "POST" })
 
     // Fetch context (github, resume)
     const [ghRes, resumeRes] = await Promise.all([
-      supabase.from("github_analyses").select("summary, strengths").eq("user_id", userId).order("created_at", { ascending: false }).limit(1).maybeSingle(),
-      supabase.from("resumes").select("content").eq("user_id", userId).order("updated_at", { ascending: false }).limit(1).maybeSingle(),
+      supabase
+        .from("github_analyses")
+        .select("summary, strengths")
+        .eq("user_id", userId)
+        .order("created_at", { ascending: false })
+        .limit(1)
+        .maybeSingle(),
+      supabase
+        .from("resumes")
+        .select("content")
+        .eq("user_id", userId)
+        .order("updated_at", { ascending: false })
+        .limit(1)
+        .maybeSingle(),
     ]);
 
     const promptContext = `
@@ -1149,7 +1294,8 @@ Candidate Resume Skills: ${JSON.stringify((resumeRes.data?.content as any)?.skil
       messages: [
         {
           role: "system",
-          content: "You are an expert technical interviewer. Generate 5 highly tailored interview questions based on the candidate's profile, requested role, and interview type. Include expected answers.",
+          content:
+            "You are an expert technical interviewer. Generate 5 highly tailored interview questions based on the candidate's profile, requested role, and interview type. Include expected answers.",
         },
         {
           role: "user",
@@ -1216,7 +1362,7 @@ export const MockInterviewEvaluationSchema = z.object({
     z.object({
       feedback: z.string(),
       score: z.number(),
-    })
+    }),
   ),
 });
 
@@ -1237,7 +1383,11 @@ export const evaluateMockInterview = createServerFn({ method: "POST" })
     const supabase = context.supabase;
     const userId = context.userId;
 
-    const { data: interview } = await supabase.from("mock_interviews").select("*").eq("id", data.interviewId).single();
+    const { data: interview } = await supabase
+      .from("mock_interviews")
+      .select("*")
+      .eq("id", data.interviewId)
+      .single();
     if (!interview) throw new Error("Interview not found");
 
     const qs = MockInterviewQuestionsSchema.parse({ questions: interview.questions }).questions;
@@ -1251,7 +1401,8 @@ export const evaluateMockInterview = createServerFn({ method: "POST" })
       messages: [
         {
           role: "system",
-          content: "You are an expert interviewer evaluating a candidate's answers. Grade strictly but fairly.",
+          content:
+            "You are an expert interviewer evaluating a candidate's answers. Grade strictly but fairly.",
         },
         {
           role: "user",
@@ -1289,9 +1440,18 @@ export const evaluateMockInterview = createServerFn({ method: "POST" })
             },
           },
           required: [
-            "overallScore", "technicalScore", "communicationScore", "problemSolvingScore",              "confidenceScore",
-              "completenessScore", "strengths", "weaknesses", 
-            "improvements", "recommendedTopics", "nextSteps", "evaluations"
+            "overallScore",
+            "technicalScore",
+            "communicationScore",
+            "problemSolvingScore",
+            "confidenceScore",
+            "completenessScore",
+            "strengths",
+            "weaknesses",
+            "improvements",
+            "recommendedTopics",
+            "nextSteps",
+            "evaluations",
           ],
         },
       },
@@ -1322,33 +1482,44 @@ export const evaluateMockInterview = createServerFn({ method: "POST" })
     };
 
     // Update interview record
-    await supabase.from("mock_interviews").update({
-      answers: detailedAnswers as never,
-      overall_score: ai.overallScore,
-      report: report as never,
-      status: "completed",
-    }).eq("id", data.interviewId);
+    await supabase
+      .from("mock_interviews")
+      .update({
+        answers: detailedAnswers as never,
+        overall_score: ai.overallScore,
+        report: report as never,
+        status: "completed",
+      })
+      .eq("id", data.interviewId);
 
     // Update Profile Stats and Gamification
     const { data: profile } = await supabase.from("profiles").select("*").eq("id", userId).single();
     if (profile) {
-      let badges = [...(profile.badges || [])];
-      if (ai.overallScore >= 50 && !badges.includes("Interview Beginner")) badges.push("Interview Beginner");
-      if (ai.overallScore >= 75 && !badges.includes("Interview Ready")) badges.push("Interview Ready");
-      if (ai.communicationScore >= 85 && !badges.includes("Strong Communicator")) badges.push("Strong Communicator");
-      if (ai.problemSolvingScore >= 85 && !badges.includes("Problem Solver")) badges.push("Problem Solver");
-      if (ai.completenessScore >= 85 && !badges.includes("Industry Ready")) badges.push("Industry Ready");
+      const badges = [...(profile.badges || [])];
+      if (ai.overallScore >= 50 && !badges.includes("Interview Beginner"))
+        badges.push("Interview Beginner");
+      if (ai.overallScore >= 75 && !badges.includes("Interview Ready"))
+        badges.push("Interview Ready");
+      if (ai.communicationScore >= 85 && !badges.includes("Strong Communicator"))
+        badges.push("Strong Communicator");
+      if (ai.problemSolvingScore >= 85 && !badges.includes("Problem Solver"))
+        badges.push("Problem Solver");
+      if (ai.completenessScore >= 85 && !badges.includes("Industry Ready"))
+        badges.push("Industry Ready");
 
       const newTotal = (profile.total_interviews || 0) + 1;
       const newStreak = (profile.interview_streak || 0) + 1;
       const newBest = Math.max(profile.best_interview_score || 0, ai.overallScore);
 
-      await supabase.from("profiles").update({
-        badges,
-        total_interviews: newTotal,
-        interview_streak: newStreak,
-        best_interview_score: newBest,
-      }).eq("id", userId);
+      await supabase
+        .from("profiles")
+        .update({
+          badges,
+          total_interviews: newTotal,
+          interview_streak: newStreak,
+          best_interview_score: newBest,
+        })
+        .eq("id", userId);
     }
 
     // Trigger Developer Score Update in background

@@ -3,28 +3,28 @@ import { TrendingUp, Users, Star, Zap, CheckCircle2, Activity } from "lucide-rea
 
 const stats = [
   {
-      v: "50K+",
-      l: "Repos analyzed",
-      icon: Activity,
-      color: "#10b981",
-      desc: "From open source to private",
-    },
-    {
-      v: "12K+",
-      l: "Resumes scored",
-      icon: CheckCircle2,
-      color: "#3b82f6",
-      desc: "ATS optimization verified",
-    },
-    {
-      v: "4.9/5",
-      l: "Dev rating",
-      icon: Star,
-      color: "#eab308",
-      desc: "Community driven feedback",
-    },
-    { v: "<3s", l: "AI latency", icon: Zap, color: "#ef4444", desc: "Real-time performance" },
-  ];
+    v: "50K+",
+    l: "Repos analyzed",
+    icon: Activity,
+    color: "#10b981",
+    desc: "From open source to private",
+  },
+  {
+    v: "12K+",
+    l: "Resumes scored",
+    icon: CheckCircle2,
+    color: "#3b82f6",
+    desc: "ATS optimization verified",
+  },
+  {
+    v: "4.9/5",
+    l: "Dev rating",
+    icon: Star,
+    color: "#eab308",
+    desc: "Community driven feedback",
+  },
+  { v: "<3s", l: "AI latency", icon: Zap, color: "#ef4444", desc: "Real-time performance" },
+];
 
 export function Stats() {
   return (

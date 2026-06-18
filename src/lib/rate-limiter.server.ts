@@ -36,17 +36,13 @@ function getLimits() {
  *                 If null/undefined, treated as a free/anonymous user.
  * @returns A RateLimitResult indicating whether the request is allowed.
  */
-export async function checkRateLimit(
-  userId: string | null | undefined,
-): Promise<RateLimitResult> {
+export async function checkRateLimit(userId: string | null | undefined): Promise<RateLimitResult> {
   const limits = getLimits();
 
   // Determine effective daily limit based on auth status
   const dailyLimit = userId ? limits.dailyAuth : limits.dailyFree;
 
-  const { supabaseAdmin } = await import(
-    "@/integrations/supabase/client.server"
-  );
+  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
   const request = getRequest();
   let clientIp = request?.headers.get("x-forwarded-for")?.split(",")[0]?.trim();
@@ -123,9 +119,7 @@ export async function checkRateLimit(
     const tomorrow = new Date(now);
     tomorrow.setUTCDate(tomorrow.getUTCDate() + 1);
     tomorrow.setUTCHours(0, 0, 0, 0);
-    const retryAfterSeconds = Math.ceil(
-      (tomorrow.getTime() - now.getTime()) / 1000,
-    );
+    const retryAfterSeconds = Math.ceil((tomorrow.getTime() - now.getTime()) / 1000);
 
     return {
       allowed: false,
@@ -168,9 +162,7 @@ export async function logRateLimitRejection(
   reason: string,
 ): Promise<void> {
   try {
-    const { supabaseAdmin } = await import(
-      "@/integrations/supabase/client.server"
-    );
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const request = getRequest();
     let clientIp = request?.headers.get("x-forwarded-for")?.split(",")[0]?.trim();
     if (!clientIp) {

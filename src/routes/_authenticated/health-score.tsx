@@ -243,9 +243,15 @@ function MetricCard({
         </span>
       </div>
 
-      <p className="text-xs font-semibold text-slate-500 dark:text-white/40 uppercase tracking-wider mb-1">{label}</p>
+      <p className="text-xs font-semibold text-slate-500 dark:text-white/40 uppercase tracking-wider mb-1">
+        {label}
+      </p>
       <div className="flex items-end justify-between">
-        <AnimatedCounter value={score} duration={1200} className="text-3xl font-black text-slate-900 dark:text-white" />
+        <AnimatedCounter
+          value={score}
+          duration={1200}
+          className="text-3xl font-black text-slate-900 dark:text-white"
+        />
         <ArrowUpRight className="h-4 w-4 text-slate-300 dark:text-white/20 group-hover:text-slate-500 dark:group-hover:text-white/40 transition-colors" />
       </div>
 
@@ -277,7 +283,9 @@ function CustomTooltip({ active, payload, label }: TooltipProps<number, string>)
   if (!active || !payload?.length) return null;
   return (
     <div className="px-3 py-2 rounded-xl border border-slate-200 dark:border-white/10 bg-white/90 dark:bg-[#0d0d1a]/90 backdrop-blur-md shadow-2xl">
-      <p className="text-[10px] font-bold text-slate-500 dark:text-white/40 uppercase tracking-wider mb-1">{label}</p>
+      <p className="text-[10px] font-bold text-slate-500 dark:text-white/40 uppercase tracking-wider mb-1">
+        {label}
+      </p>
       <p className="text-lg font-black text-slate-900 dark:text-white">{payload[0].value}</p>
     </div>
   );
@@ -483,7 +491,9 @@ function HealthScorePage() {
             </h1>
             <p className="text-sm text-slate-500 dark:text-white/35 mt-1.5">
               Last analysed{" "}
-              <span className="text-slate-700 dark:text-white/55">{format(new Date(latest.created_at), "PPp")}</span>
+              <span className="text-slate-700 dark:text-white/55">
+                {format(new Date(latest.created_at), "PPp")}
+              </span>
             </p>
           </div>
 
@@ -548,7 +558,9 @@ function HealthScorePage() {
                 <p className="text-xs font-bold text-slate-400 dark:text-white/30 uppercase tracking-[0.2em]">
                   Score History
                 </p>
-                <h3 className="text-lg font-bold text-slate-900 dark:text-white mt-0.5">Career Trajectory</h3>
+                <h3 className="text-lg font-bold text-slate-900 dark:text-white mt-0.5">
+                  Career Trajectory
+                </h3>
               </div>
               <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-indigo-500/10 border border-indigo-500/20">
                 <TrendingUp className="h-3.5 w-3.5 text-indigo-400" />

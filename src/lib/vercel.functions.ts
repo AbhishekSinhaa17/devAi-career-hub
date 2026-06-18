@@ -14,9 +14,11 @@ function getVercelToken() {
 export const triggerVercelDeployment = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .validator((d: unknown) =>
-    z.object({
-      portfolioId: z.string().uuid(),
-    }).parse(d)
+    z
+      .object({
+        portfolioId: z.string().uuid(),
+      })
+      .parse(d),
   )
   .handler(async ({ data, context }) => {
     // 1. Fetch the user's actual portfolio data
@@ -32,7 +34,9 @@ export const triggerVercelDeployment = createServerFn({ method: "POST" })
 
     // Combine username for template
     const resumeData = {
-      ...(typeof portfolioData.resume_data === 'object' && portfolioData.resume_data !== null ? portfolioData.resume_data : {}),
+      ...(typeof portfolioData.resume_data === "object" && portfolioData.resume_data !== null
+        ? portfolioData.resume_data
+        : {}),
       github_username: portfolioData.github_username,
     };
 
@@ -89,9 +93,11 @@ export const triggerVercelDeployment = createServerFn({ method: "POST" })
 export const checkVercelStatus = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .validator((d: unknown) =>
-    z.object({
-      id: z.string().uuid(),
-    }).parse(d)
+    z
+      .object({
+        id: z.string().uuid(),
+      })
+      .parse(d),
   )
   .handler(async ({ data, context }) => {
     // 1. Get deployment record
@@ -110,16 +116,19 @@ export const checkVercelStatus = createServerFn({ method: "GET" })
     if (deploymentData.status === "building" && deploymentData.deployment_id) {
       try {
         const token = getVercelToken();
-        const response = await fetch(`${VERCEL_API_URL}/v13/deployments/${deploymentData.deployment_id}`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
+        const response = await fetch(
+          `${VERCEL_API_URL}/v13/deployments/${deploymentData.deployment_id}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
           },
-        });
+        );
 
         if (response.ok) {
           const vData = await response.json();
           let newStatus = "building";
-          
+
           if (vData.readyState === "READY" || vData.readyState === "READY_FOR_DEPLOY") {
             newStatus = "success";
           } else if (vData.readyState === "ERROR" || vData.readyState === "CANCELED") {
@@ -146,7 +155,7 @@ export const checkVercelStatus = createServerFn({ method: "GET" })
               .eq("id", deploymentData.id)
               .select()
               .single();
-              
+
             return updated || deploymentData;
           }
         }

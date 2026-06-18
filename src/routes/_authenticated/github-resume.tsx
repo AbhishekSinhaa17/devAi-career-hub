@@ -614,7 +614,9 @@ function GithubResumePage() {
                   />
 
                   <ActionButton
-                    onClick={() => navigate({ to: "/portfolio-deployment/$id", params: { id: data.id || "" } })}
+                    onClick={() =>
+                      navigate({ to: "/portfolio-deployment/$id", params: { id: data.id || "" } })
+                    }
                     icon={Rocket}
                     title="Deploy Portfolio"
                     desc="Instantly deploy this generated portfolio to a live URL."
@@ -626,8 +628,18 @@ function GithubResumePage() {
                       onClick={() => visibilityMutation.mutate()}
                       disabled={visibilityMutation.isPending}
                       icon={isPublic ? ExternalLink : Save}
-                      title={visibilityMutation.isPending ? "Updating…" : isPublic ? "Make Private" : "Make Public"}
-                      desc={isPublic ? "Currently accessible via UUID link." : "Allow sharing via UUID link."}
+                      title={
+                        visibilityMutation.isPending
+                          ? "Updating…"
+                          : isPublic
+                            ? "Make Private"
+                            : "Make Public"
+                      }
+                      desc={
+                        isPublic
+                          ? "Currently accessible via UUID link."
+                          : "Allow sharing via UUID link."
+                      }
                       tone={isPublic ? "primary" : "neutral"}
                     />
                   )}

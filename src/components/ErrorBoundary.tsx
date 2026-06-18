@@ -1,13 +1,5 @@
 import { useRouter, Link } from "@tanstack/react-router";
-import {
-  AlertTriangle,
-  RefreshCw,
-  Home,
-  WifiOff,
-  Shield,
-  Bot,
-  ServerCrash,
-} from "lucide-react";
+import { AlertTriangle, RefreshCw, Home, WifiOff, Shield, Bot, ServerCrash } from "lucide-react";
 
 // ─── Error categorization ─────────────────────────────────────────────────────
 
@@ -29,10 +21,9 @@ function categorizeError(error: Error): ErrorInfo {
   if (msg.includes("daily ai limit") || msg.includes("rate limit")) {
     return {
       title: "AI Usage Limit Reached",
-      message:
-        error.message.includes("Daily")
-          ? error.message
-          : "You've made too many AI requests. Please wait a moment and try again.",
+      message: error.message.includes("Daily")
+        ? error.message
+        : "You've made too many AI requests. Please wait a moment and try again.",
       icon: Shield,
       accentColor: "#f59e0b",
     };
@@ -47,8 +38,7 @@ function categorizeError(error: Error): ErrorInfo {
   ) {
     return {
       title: "AI Service Unavailable",
-      message:
-        "Our AI service is temporarily unavailable. Please try again in a few moments.",
+      message: "Our AI service is temporarily unavailable. Please try again in a few moments.",
       icon: Bot,
       accentColor: "#8b5cf6",
     };
@@ -59,8 +49,7 @@ function categorizeError(error: Error): ErrorInfo {
     if (msg.includes("rate limit")) {
       return {
         title: "GitHub Rate Limit",
-        message:
-          "GitHub API rate limit exceeded. Please wait a few minutes and try again.",
+        message: "GitHub API rate limit exceeded. Please wait a few minutes and try again.",
         icon: Shield,
         accentColor: "#f59e0b",
       };
@@ -75,8 +64,7 @@ function categorizeError(error: Error): ErrorInfo {
     }
     return {
       title: "GitHub Error",
-      message:
-        "There was a problem communicating with GitHub. Please try again.",
+      message: "There was a problem communicating with GitHub. Please try again.",
       icon: AlertTriangle,
       accentColor: "#ef4444",
     };
@@ -86,8 +74,7 @@ function categorizeError(error: Error): ErrorInfo {
   if (msg.includes("unauthorized") || msg.includes("invalid token")) {
     return {
       title: "Session Expired",
-      message:
-        "Your session has expired. Please sign in again to continue.",
+      message: "Your session has expired. Please sign in again to continue.",
       icon: Shield,
       accentColor: "#f59e0b",
     };
@@ -96,8 +83,7 @@ function categorizeError(error: Error): ErrorInfo {
   if (msg.includes("supabase") || msg.includes("missing supabase")) {
     return {
       title: "Service Configuration Error",
-      message:
-        "A backend service is misconfigured. Please contact support if this persists.",
+      message: "A backend service is misconfigured. Please contact support if this persists.",
       icon: ServerCrash,
       accentColor: "#ef4444",
     };
@@ -112,8 +98,7 @@ function categorizeError(error: Error): ErrorInfo {
   ) {
     return {
       title: "Connection Error",
-      message:
-        "Unable to reach the server. Check your internet connection and try again.",
+      message: "Unable to reach the server. Check your internet connection and try again.",
       icon: WifiOff,
       accentColor: "#3b82f6",
     };
@@ -140,13 +125,7 @@ function categorizeError(error: Error): ErrorInfo {
  *     component: Page,
  *   });
  */
-export function RouteErrorBoundary({
-  error,
-  reset,
-}: {
-  error: Error;
-  reset: () => void;
-}) {
+export function RouteErrorBoundary({ error, reset }: { error: Error; reset: () => void }) {
   // Log full error internally (never exposed to user in production)
   console.error("[RouteErrorBoundary]", error);
 
@@ -169,16 +148,11 @@ export function RouteErrorBoundary({
             boxShadow: `0 0 40px ${info.accentColor}10`,
           }}
         >
-          <Icon
-            className="h-10 w-10"
-            style={{ color: info.accentColor }}
-          />
+          <Icon className="h-10 w-10" style={{ color: info.accentColor }} />
         </div>
 
         {/* Text */}
-        <h2 className="text-xl font-black tracking-tight text-foreground mb-2">
-          {info.title}
-        </h2>
+        <h2 className="text-xl font-black tracking-tight text-foreground mb-2">{info.title}</h2>
         <p className="text-sm text-muted-foreground leading-relaxed mb-8 max-w-sm mx-auto">
           {info.message}
         </p>

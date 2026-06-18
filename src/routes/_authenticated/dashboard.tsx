@@ -153,7 +153,9 @@ function DevScoreRing({ score, trend }: { score: number; trend: number }) {
             Career Health
           </p>
           <h2 className="text-2xl font-black text-slate-900 dark:text-white">Developer Score</h2>
-          <p className="text-slate-600 dark:text-slate-500 text-sm mt-1">Your comprehensive career readiness rating</p>
+          <p className="text-slate-600 dark:text-slate-500 text-sm mt-1">
+            Your comprehensive career readiness rating
+          </p>
         </div>
         <div className="flex items-center gap-2">
           <div
@@ -214,9 +216,7 @@ function MetricCard({
   const animated = useCountUp(value);
 
   return (
-    <div
-      className="relative rounded-2xl border border-slate-200 dark:border-white/[0.06] bg-white dark:bg-white/[0.02] p-5 overflow-hidden group hover:border-slate-300 dark:hover:border-white/[0.12] transition-all duration-500 shadow-sm dark:shadow-none"
-    >
+    <div className="relative rounded-2xl border border-slate-200 dark:border-white/[0.06] bg-white dark:bg-white/[0.02] p-5 overflow-hidden group hover:border-slate-300 dark:hover:border-white/[0.12] transition-all duration-500 shadow-sm dark:shadow-none">
       <div
         className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
         style={{
@@ -242,7 +242,9 @@ function MetricCard({
         </div>
 
         <div className="flex items-baseline gap-1 mb-3">
-          <span className="text-4xl font-black text-slate-900 dark:text-white">{loading ? "—" : animated}</span>
+          <span className="text-4xl font-black text-slate-900 dark:text-white">
+            {loading ? "—" : animated}
+          </span>
           <span className="text-slate-500 dark:text-slate-600 text-sm font-semibold">/100</span>
         </div>
 
@@ -268,7 +270,9 @@ function CustomTooltip({ active, payload }: TooltipProps<number, string>) {
   return (
     <div className="rounded-xl border border-slate-200 dark:border-white/[0.08] bg-white/95 dark:bg-[#0f0f1e]/95 backdrop-blur-xl px-3 py-2 text-sm shadow-xl dark:shadow-2xl">
       <p className="font-bold text-slate-900 dark:text-white">{payload[0]?.payload?.name}</p>
-      <p className="text-indigo-600 dark:text-indigo-400 font-semibold">{payload[0]?.value} / 100</p>
+      <p className="text-indigo-600 dark:text-indigo-400 font-semibold">
+        {payload[0]?.value} / 100
+      </p>
     </div>
   );
 }
@@ -361,9 +365,7 @@ function ActionCard({
           transition: "all 0.4s cubic-bezier(0.34,1.2,0.64,1)",
           borderColor: hovered ? `${color}30` : undefined,
           transform: hovered ? "translateY(-3px)" : "none",
-          boxShadow: hovered
-            ? `0 16px 40px ${glow}`
-            : undefined,
+          boxShadow: hovered ? `0 16px 40px ${glow}` : undefined,
         }}
       >
         {/* Hover glow */}
@@ -402,7 +404,9 @@ function ActionCard({
           <div className="flex items-start justify-between gap-2">
             <div>
               <h3 className="font-bold text-slate-900 dark:text-white text-sm">{title}</h3>
-              <p className="mt-1 text-xs text-slate-500 dark:text-slate-600 leading-relaxed">{desc}</p>
+              <p className="mt-1 text-xs text-slate-500 dark:text-slate-600 leading-relaxed">
+                {desc}
+              </p>
             </div>
             <ChevronRight
               className="h-4 w-4 flex-shrink-0 mt-0.5 transition-all duration-300"
@@ -422,7 +426,9 @@ function ActionCard({
 function DataRow({ label, value }: { label: string; value: string | number }) {
   return (
     <div className="flex items-center justify-between py-2.5 border-b border-slate-100 dark:border-white/[0.04] last:border-0">
-      <dt className="text-xs text-slate-500 dark:text-slate-600 font-semibold uppercase tracking-wider">{label}</dt>
+      <dt className="text-xs text-slate-500 dark:text-slate-600 font-semibold uppercase tracking-wider">
+        {label}
+      </dt>
       <dd className="text-sm font-bold text-slate-700 dark:text-slate-300">{value}</dd>
     </div>
   );
@@ -451,7 +457,9 @@ function InsightRow({
         <div className="text-[10px] uppercase tracking-widest text-slate-500 dark:text-slate-600 font-bold">
           {label}
         </div>
-        <div className="text-sm font-semibold text-slate-800 dark:text-slate-300 truncate mt-0.5">{value}</div>
+        <div className="text-sm font-semibold text-slate-800 dark:text-slate-300 truncate mt-0.5">
+          {value}
+        </div>
       </div>
     </div>
   );
@@ -524,7 +532,9 @@ function Dashboard() {
         {/* AI pulse badge */}
         <div className="hidden md:flex items-center gap-2 px-4 py-2 rounded-2xl border border-slate-200 dark:border-white/[0.06] bg-white dark:bg-white/[0.02] shadow-sm dark:shadow-none">
           <Cpu className="h-4 w-4 text-violet-500 dark:text-violet-400 animate-pulse" />
-          <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">AI powered</span>
+          <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">
+            AI powered
+          </span>
         </div>
       </div>
 
@@ -631,7 +641,9 @@ function Dashboard() {
                   </span>
                 ))
               ) : (
-                <span className="text-xs text-slate-500 dark:text-slate-700">Take a mock interview to earn badges</span>
+                <span className="text-xs text-slate-500 dark:text-slate-700">
+                  Take a mock interview to earn badges
+                </span>
               )}
             </div>
           </div>
@@ -674,7 +686,9 @@ function Dashboard() {
             className="flex items-center gap-1.5 mt-4 text-xs font-bold transition-colors"
             style={{ color: "#10b981" }}
           >
-            {((data?.githubResume as any)?.insights || []).length > 0 ? "Insights available" : "No insights yet"}
+            {((data?.githubResume as any)?.insights || []).length > 0
+              ? "Insights available"
+              : "No insights yet"}
             <ArrowRight className="h-3.5 w-3.5" />
           </Link>
         </GlassPanel>
@@ -684,7 +698,9 @@ function Dashboard() {
           <SectionHeader icon={MessageSquare} label="Latest Interview" accent="#8b5cf6" />
           {data?.mockInterview ? (
             <div className="space-y-2">
-              <div className="text-base font-bold text-slate-900 dark:text-white">{data.mockInterview.job_role}</div>
+              <div className="text-base font-bold text-slate-900 dark:text-white">
+                {data.mockInterview.job_role}
+              </div>
               <div className="text-4xl font-black" style={{ color: "#8b5cf6" }}>
                 {data.mockInterview.overall_score}
                 <span className="text-slate-400 dark:text-slate-600 text-lg font-bold">/100</span>
@@ -784,7 +800,11 @@ function Dashboard() {
                 <InsightRow
                   icon={Briefcase}
                   label="Best Project"
-                  value={((data.githubResume.resume_data as any)?.projects || []).length > 0 ? `${((data.githubResume.resume_data as any)?.projects || []).length} projects highlighted` : "N/A"}
+                  value={
+                    ((data.githubResume.resume_data as any)?.projects || []).length > 0
+                      ? `${((data.githubResume.resume_data as any)?.projects || []).length} projects highlighted`
+                      : "N/A"
+                  }
                   color="#10b981"
                 />
                 <InsightRow

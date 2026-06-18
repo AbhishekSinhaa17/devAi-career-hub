@@ -23,7 +23,10 @@ export function CircularProgress({
   const offset = circumference - (value / max) * circumference;
 
   return (
-    <div className={cn("relative flex items-center justify-center", className)} style={{ width: size, height: size }}>
+    <div
+      className={cn("relative flex items-center justify-center", className)}
+      style={{ width: size, height: size }}
+    >
       <svg
         width={size}
         height={size}

@@ -441,7 +441,10 @@ function LoginPage() {
   }
 
   return (
-    <div id="login-page" className="relative min-h-screen flex items-center justify-center overflow-hidden bg-slate-50 dark:bg-[#030712] text-slate-900 dark:text-foreground transition-colors duration-500">
+    <div
+      id="login-page"
+      className="relative min-h-screen flex items-center justify-center overflow-hidden bg-slate-50 dark:bg-[#030712] text-slate-900 dark:text-foreground transition-colors duration-500"
+    >
       {/* Back to Home Button */}
       <Link
         to="/"
@@ -589,7 +592,9 @@ function LoginPage() {
                 </span>
               </div>
               <h2 className="text-3xl font-black text-slate-900 dark:text-white">Welcome back</h2>
-              <p className="text-slate-600 dark:text-slate-500 text-sm">Your AI-powered developer journey continues</p>
+              <p className="text-slate-600 dark:text-slate-500 text-sm">
+                Your AI-powered developer journey continues
+              </p>
             </div>
 
             {/* Card */}
@@ -606,9 +611,13 @@ function LoginPage() {
               }}
             >
               {/* Dark mode background gradient (injected via a pseudo element trick or nested div) */}
-              <div className="absolute inset-0 bg-white hidden dark:block" style={{
-                background: "linear-gradient(135deg, rgba(15,15,30,0.95) 0%, rgba(10,10,25,0.98) 100%)"
-              }} />
+              <div
+                className="absolute inset-0 bg-white hidden dark:block"
+                style={{
+                  background:
+                    "linear-gradient(135deg, rgba(15,15,30,0.95) 0%, rgba(10,10,25,0.98) 100%)",
+                }}
+              />
 
               {/* Top glow bar */}
               <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-indigo-400/40 dark:via-indigo-500/60 to-transparent" />
@@ -630,7 +639,9 @@ function LoginPage() {
                       <Zap className="h-4 w-4 text-white" />
                       <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-white/20 to-transparent" />
                     </div>
-                    <span className="text-lg font-black text-slate-900 dark:text-white tracking-tight">DevAI</span>
+                    <span className="text-lg font-black text-slate-900 dark:text-white tracking-tight">
+                      DevAI
+                    </span>
                   </div>
                   <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20">
                     <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 dark:bg-emerald-400 animate-pulse" />
@@ -764,7 +775,8 @@ function LoginPage() {
                     className="group/btn relative w-full h-12 mt-2 rounded-xl font-bold text-sm text-white overflow-hidden disabled:opacity-60 disabled:cursor-not-allowed shadow-md"
                     style={{
                       background: "linear-gradient(135deg, #4f46e5 0%, #7c3aed 50%, #9333ea 100%)",
-                      boxShadow: "0 0 32px rgba(99,102,241,0.2), inset 0 1px 0 rgba(255,255,255,0.15)",
+                      boxShadow:
+                        "0 0 32px rgba(99,102,241,0.2), inset 0 1px 0 rgba(255,255,255,0.15)",
                     }}
                   >
                     {/* Shine sweep */}

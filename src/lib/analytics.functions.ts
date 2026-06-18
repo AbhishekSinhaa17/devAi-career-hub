@@ -74,7 +74,9 @@ export const getGlobalAnalytics = createServerFn({ method: "GET" })
     const countUsers = async () => {
       // Supabase auth.users can't be queried directly like this in some setups,
       // but we have a `profiles` table which mirrors users.
-      const { count } = await supabaseAdmin.from("profiles").select("id", { count: "exact", head: true });
+      const { count } = await supabaseAdmin
+        .from("profiles")
+        .select("id", { count: "exact", head: true });
       return count ?? 0;
     };
 
@@ -97,9 +99,9 @@ export const getGlobalAnalytics = createServerFn({ method: "GET" })
         .from("ai_usage_events")
         .select("created_at, endpoint")
         .gte("created_at", periodStart.toISOString());
-      
+
       const activityMap: Record<string, DailyActivity> = {};
-      
+
       // Initialize all dates in the range to ensure zero-days are shown
       for (let i = 0; i <= days; i++) {
         const d = new Date(periodStart);
@@ -115,12 +117,12 @@ export const getGlobalAnalytics = createServerFn({ method: "GET" })
             activityMap[dateStr] = { date: dateStr, total: 0 };
           }
           activityMap[dateStr].total += 1;
-          
+
           const endpoint = event.endpoint.replace("/api/ai/", "") || "other";
           if (typeof activityMap[dateStr][endpoint] === "number") {
-             (activityMap[dateStr][endpoint] as number) += 1;
+            (activityMap[dateStr][endpoint] as number) += 1;
           } else {
-             activityMap[dateStr][endpoint] = 1;
+            activityMap[dateStr][endpoint] = 1;
           }
         });
       }
@@ -141,16 +143,18 @@ export const getGlobalAnalytics = createServerFn({ method: "GET" })
     ];
 
     const fetchHealthMetrics = async () => {
-      const { data } = await supabaseAdmin.from("developer_health_scores").select("user_id, overall_score");
+      const { data } = await supabaseAdmin
+        .from("developer_health_scores")
+        .select("user_id, overall_score");
       if (!data || data.length === 0) {
-         return { avg: 0, dist: [], top: [] };
+        return { avg: 0, dist: [], top: [] };
       }
-      
+
       let sum = 0;
       const ranges = { "0-20": 0, "21-40": 0, "41-60": 0, "61-80": 0, "81-100": 0 };
       const userScores: Record<string, number> = {};
 
-      data.forEach(d => {
+      data.forEach((d) => {
         sum += d.overall_score;
         if (d.overall_score <= 20) ranges["0-20"]++;
         else if (d.overall_score <= 40) ranges["21-40"]++;
@@ -159,7 +163,7 @@ export const getGlobalAnalytics = createServerFn({ method: "GET" })
         else ranges["81-100"]++;
 
         if (!userScores[d.user_id] || userScores[d.user_id] < d.overall_score) {
-           userScores[d.user_id] = d.overall_score;
+          userScores[d.user_id] = d.overall_score;
         }
       });
 
@@ -199,7 +203,7 @@ export const getGlobalAnalytics = createServerFn({ method: "GET" })
 
     // Process feature metrics
     const totalFeatureUsage = featureResults.reduce((acc, f) => acc + f.total, 0);
-    
+
     let fastestGrowingFeature = "None";
     let highestGrowth = -Infinity;
     let mostUsedFeature = "None";

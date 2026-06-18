@@ -111,9 +111,7 @@ export function validateEnv(): string[] {
 
   // At least one AI provider must be configured
   if (!process.env.GEMINI_API_KEY && !process.env.GROQ_API_KEY) {
-    problems.push(
-      "No AI provider configured. Set at least one of: GEMINI_API_KEY, GROQ_API_KEY",
-    );
+    problems.push("No AI provider configured. Set at least one of: GEMINI_API_KEY, GROQ_API_KEY");
   }
 
   return problems;

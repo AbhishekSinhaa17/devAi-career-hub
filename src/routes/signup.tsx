@@ -338,7 +338,10 @@ function SignupPage() {
   }
 
   return (
-    <div id="signup-page" className="flex min-h-screen bg-white dark:bg-[#030712] text-slate-900 dark:text-foreground transition-colors duration-500">
+    <div
+      id="signup-page"
+      className="flex min-h-screen bg-white dark:bg-[#030712] text-slate-900 dark:text-foreground transition-colors duration-500"
+    >
       {/* Back to Home Button */}
       <Link
         to="/"
@@ -367,11 +370,15 @@ function SignupPage() {
               <Zap className="h-5 w-5 text-white" />
               <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-white/20 to-transparent" />
             </div>
-            <span className="text-xl font-black text-slate-900 dark:text-white tracking-tight">DevAI</span>
+            <span className="text-xl font-black text-slate-900 dark:text-white tracking-tight">
+              DevAI
+            </span>
           </div>
 
           <div className="mb-8">
-            <h2 className="text-3xl font-black text-slate-900 dark:text-white">Create an account</h2>
+            <h2 className="text-3xl font-black text-slate-900 dark:text-white">
+              Create an account
+            </h2>
             <p className="text-slate-500 dark:text-slate-400 text-sm mt-2">
               Start building your developer career for free.
             </p>
@@ -384,8 +391,9 @@ function SignupPage() {
               </div>
               <h3 className="text-xl font-bold text-slate-900 dark:text-white">Check your email</h3>
               <p className="text-slate-500 dark:text-slate-400 text-sm max-w-[300px] mx-auto">
-                We've sent a magic link to <span className="text-slate-900 dark:text-white font-semibold">{email}</span>.
-                Click it to activate your account.
+                We've sent a magic link to{" "}
+                <span className="text-slate-900 dark:text-white font-semibold">{email}</span>. Click
+                it to activate your account.
               </p>
             </div>
           ) : (
@@ -503,7 +511,8 @@ function SignupPage() {
                     className="group/btn relative w-full h-12 rounded-xl font-bold text-sm text-white overflow-hidden disabled:opacity-60 disabled:cursor-not-allowed shadow-md"
                     style={{
                       background: "linear-gradient(135deg, #059669 0%, #0d9488 100%)",
-                      boxShadow: "0 0 24px rgba(16,185,129,0.2), inset 0 1px 0 rgba(255,255,255,0.2)",
+                      boxShadow:
+                        "0 0 24px rgba(16,185,129,0.2), inset 0 1px 0 rgba(255,255,255,0.2)",
                     }}
                   >
                     <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/15 to-transparent -translate-x-full group-hover/btn:translate-x-full transition-transform duration-700 ease-in-out" />
@@ -525,7 +534,10 @@ function SignupPage() {
 
           <p className="mt-8 text-center text-sm text-slate-500">
             Already have an account?{" "}
-            <Link to="/login" className="font-bold text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 transition-colors">
+            <Link
+              to="/login"
+              className="font-bold text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 transition-colors"
+            >
               Sign in →
             </Link>
           </p>
@@ -537,7 +549,7 @@ function SignupPage() {
         {/* Abstract animated backgrounds */}
         <div className="absolute top-[-20%] right-[-10%] w-[800px] h-[800px] bg-emerald-500/10 dark:bg-emerald-500/10 blur-[120px] rounded-full pointer-events-none mix-blend-multiply dark:mix-blend-screen" />
         <div className="absolute bottom-[-10%] left-[-10%] w-[600px] h-[600px] bg-teal-500/10 dark:bg-teal-500/10 blur-[100px] rounded-full pointer-events-none mix-blend-multiply dark:mix-blend-screen" />
-        
+
         {/* Subtle grid */}
         <div
           className="absolute inset-0 opacity-[0.05] dark:opacity-[0.03]"

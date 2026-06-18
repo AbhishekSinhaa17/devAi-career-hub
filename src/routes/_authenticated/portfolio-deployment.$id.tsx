@@ -30,7 +30,7 @@ export const Route = createFileRoute("/_authenticated/portfolio-deployment/$id")
 
 function PortfolioDeploymentPage() {
   const { id } = Route.useParams();
-  
+
   // Actually, we need username for the URL simulation, we can get it from the user session or query param.
   // For simplicity, we just use a generic 'dev' if not found, but we can pass it via search params.
   const search: any = Route.useSearch();
@@ -64,7 +64,8 @@ function PortfolioDeploymentPage() {
 
   const deployMut = useMutation({
     mutationFn: (provider: string) => {
-      if (provider !== "Vercel") throw new Error("Only Vercel deployment is supported in this implementation");
+      if (provider !== "Vercel")
+        throw new Error("Only Vercel deployment is supported in this implementation");
       return startFn({ data: { portfolioId: id } });
     },
     onSuccess: (data) => {
@@ -82,7 +83,7 @@ function PortfolioDeploymentPage() {
         "Project created on Vercel.",
         "Uploading React+Vite portfolio files...",
         "Building static optimized assets via Vite...",
-        "Awaiting DNS propagation and health check..."
+        "Awaiting DNS propagation and health check...",
       ]);
     }
   }, [deploymentStatus?.status, activeDeploymentId]);
@@ -116,7 +117,12 @@ function PortfolioDeploymentPage() {
     <div className="max-w-5xl mx-auto space-y-8 pb-10">
       {showConfetti && (
         <div className="fixed inset-0 z-50 pointer-events-none">
-          <Confetti width={window.innerWidth} height={window.innerHeight} recycle={false} numberOfPieces={500} />
+          <Confetti
+            width={window.innerWidth}
+            height={window.innerHeight}
+            recycle={false}
+            numberOfPieces={500}
+          />
         </div>
       )}
 
@@ -129,7 +135,9 @@ function PortfolioDeploymentPage() {
         </Link>
         <div>
           <h1 className="text-3xl font-black text-foreground tracking-tight">Deploy Portfolio</h1>
-          <p className="text-muted-foreground mt-1">Publish your generated AI portfolio to the world.</p>
+          <p className="text-muted-foreground mt-1">
+            Publish your generated AI portfolio to the world.
+          </p>
         </div>
       </div>
 
@@ -146,8 +154,13 @@ function PortfolioDeploymentPage() {
               >
                 <div className="flex items-center gap-3">
                   <div className="h-10 w-10 bg-black dark:bg-white rounded-full flex items-center justify-center">
-                    <svg viewBox="0 0 76 65" fill="none" xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-white dark:text-black">
-                      <path d="M37.5274 0L75.0548 65H0L37.5274 0Z" fill="currentColor"/>
+                    <svg
+                      viewBox="0 0 76 65"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="h-4 w-4 text-white dark:text-black"
+                    >
+                      <path d="M37.5274 0L75.0548 65H0L37.5274 0Z" fill="currentColor" />
                     </svg>
                   </div>
                   <div>
@@ -180,10 +193,15 @@ function PortfolioDeploymentPage() {
           {/* Deployment History */}
           {history && history.length > 0 && (
             <div className="rounded-2xl border bg-card/40 backdrop-blur-sm p-6 space-y-4">
-              <h2 className="text-sm font-bold text-foreground uppercase tracking-widest">History</h2>
+              <h2 className="text-sm font-bold text-foreground uppercase tracking-widest">
+                History
+              </h2>
               <div className="space-y-3">
                 {history.map((h: any) => (
-                  <div key={h.id} className="flex items-center justify-between p-3 rounded-xl bg-muted/30 border">
+                  <div
+                    key={h.id}
+                    className="flex items-center justify-between p-3 rounded-xl bg-muted/30 border"
+                  >
                     <div className="flex items-center gap-3">
                       {h.status === "success" ? (
                         <CheckCircle2 className="h-4 w-4 text-emerald-500" />
@@ -194,11 +212,18 @@ function PortfolioDeploymentPage() {
                       )}
                       <div>
                         <p className="text-xs font-bold text-foreground">{h.provider}</p>
-                        <p className="text-[10px] text-muted-foreground">{new Date(h.created_at).toLocaleString()}</p>
+                        <p className="text-[10px] text-muted-foreground">
+                          {new Date(h.created_at).toLocaleString()}
+                        </p>
                       </div>
                     </div>
                     {h.status === "success" && (
-                      <a href={h.deployment_url} target="_blank" rel="noreferrer" className="text-xs text-primary hover:underline">
+                      <a
+                        href={h.deployment_url}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="text-xs text-primary hover:underline"
+                      >
                         View
                       </a>
                     )}
@@ -215,18 +240,26 @@ function PortfolioDeploymentPage() {
             <>
               {/* Success Card */}
               {latestDeployment.status === "success" && (
-                <div className="rounded-2xl border border-emerald-500/30 bg-emerald-500/5 p-8 text-center space-y-6" style={{ animation: "fadeSlideIn 0.5s ease-out" }}>
+                <div
+                  className="rounded-2xl border border-emerald-500/30 bg-emerald-500/5 p-8 text-center space-y-6"
+                  style={{ animation: "fadeSlideIn 0.5s ease-out" }}
+                >
                   <div className="h-20 w-20 mx-auto bg-emerald-500/10 rounded-full flex items-center justify-center">
                     <Rocket className="h-10 w-10 text-emerald-500" />
                   </div>
                   <div>
                     <h2 className="text-2xl font-black text-foreground">Your Portfolio is Live!</h2>
-                    <p className="text-muted-foreground mt-2">Deployed successfully to {latestDeployment.provider}.</p>
+                    <p className="text-muted-foreground mt-2">
+                      Deployed successfully to {latestDeployment.provider}.
+                    </p>
                   </div>
-                  
+
                   {latestDeployment.build_duration && (
                     <div className="inline-block bg-muted/50 border rounded-xl px-4 py-2 mt-4 text-sm font-semibold text-foreground/80">
-                      Deployment Time: <span className="text-primary">{Math.round(latestDeployment.build_duration / 1000)} seconds</span>
+                      Deployment Time:{" "}
+                      <span className="text-primary">
+                        {Math.round(latestDeployment.build_duration / 1000)} seconds
+                      </span>
                     </div>
                   )}
 
@@ -234,13 +267,17 @@ function PortfolioDeploymentPage() {
                     <div className="px-4 py-2 bg-background border rounded-lg text-sm font-mono text-muted-foreground break-all max-w-sm flex-1 text-left">
                       {latestDeployment.deployment_url}
                     </div>
-                    <button onClick={() => copyUrl(latestDeployment.deployment_url || "")} className="p-2 border bg-card hover:bg-muted rounded-lg transition-colors">
+                    <button
+                      onClick={() => copyUrl(latestDeployment.deployment_url || "")}
+                      className="p-2 border bg-card hover:bg-muted rounded-lg transition-colors"
+                    >
                       <Copy className="h-5 w-5" />
                     </button>
                   </div>
-                  
+
                   <p className="text-xs text-muted-foreground italic max-w-sm mx-auto">
-                    Deployment completed. It may take a few moments for DNS propagation to fully resolve the URL.
+                    Deployment completed. It may take a few moments for DNS propagation to fully
+                    resolve the URL.
                   </p>
 
                   <div className="flex justify-center gap-4 pt-4">
@@ -267,8 +304,12 @@ function PortfolioDeploymentPage() {
                       <Loader2 className="h-6 w-6 text-primary animate-spin" />
                     </div>
                     <div>
-                      <h2 className="text-lg font-bold text-foreground">Deploying to {latestDeployment.provider}...</h2>
-                      <p className="text-sm text-muted-foreground">Please do not close this page.</p>
+                      <h2 className="text-lg font-bold text-foreground">
+                        Deploying to {latestDeployment.provider}...
+                      </h2>
+                      <p className="text-sm text-muted-foreground">
+                        Please do not close this page.
+                      </p>
                     </div>
                   </div>
 
@@ -280,7 +321,11 @@ function PortfolioDeploymentPage() {
                     </div>
                     <div className="space-y-1.5 text-white/80 h-[240px] overflow-y-auto">
                       {logs.map((log, idx) => (
-                        <div key={idx} className="flex gap-3" style={{ animation: "fadeSlideIn 0.3s ease-out" }}>
+                        <div
+                          key={idx}
+                          className="flex gap-3"
+                          style={{ animation: "fadeSlideIn 0.3s ease-out" }}
+                        >
                           <span className="text-emerald-400 flex-shrink-0">›</span>
                           <span>{log}</span>
                         </div>
@@ -303,9 +348,14 @@ function PortfolioDeploymentPage() {
                   </div>
                   <div>
                     <h2 className="text-xl font-black text-foreground">Deployment Failed</h2>
-                    <p className="text-muted-foreground mt-2">An error occurred while building the project. Please try again.</p>
+                    <p className="text-muted-foreground mt-2">
+                      An error occurred while building the project. Please try again.
+                    </p>
                   </div>
-                  <button onClick={() => handleDeploy(latestDeployment.provider)} className="px-6 py-2.5 bg-background border font-bold rounded-xl inline-flex items-center gap-2 hover:bg-muted transition-colors mt-4">
+                  <button
+                    onClick={() => handleDeploy(latestDeployment.provider)}
+                    className="px-6 py-2.5 bg-background border font-bold rounded-xl inline-flex items-center gap-2 hover:bg-muted transition-colors mt-4"
+                  >
                     <Server className="h-4 w-4" /> Retry Deployment
                   </button>
                 </div>
@@ -318,7 +368,8 @@ function PortfolioDeploymentPage() {
               </div>
               <h2 className="text-xl font-bold text-foreground">Ready to Launch</h2>
               <p className="text-muted-foreground mt-2 max-w-sm mx-auto">
-                Select a provider from the left to instantly deploy your portfolio site and get a live URL.
+                Select a provider from the left to instantly deploy your portfolio site and get a
+                live URL.
               </p>
             </div>
           )}

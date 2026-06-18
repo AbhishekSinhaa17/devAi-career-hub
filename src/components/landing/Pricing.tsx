@@ -176,9 +176,9 @@ export function Pricing() {
                     {/* CTA */}
                     <Link to="/signup" className="mt-8 block">
                       <Button
-                         variant="outline"
-                         className="w-full h-12 rounded-xl text-sm font-semibold border-border/60 transition-all duration-300 group-hover:border-primary/30 group-hover:bg-primary/5 group-hover:text-primary"
-                         size="lg"
+                        variant="outline"
+                        className="w-full h-12 rounded-xl text-sm font-semibold border-border/60 transition-all duration-300 group-hover:border-primary/30 group-hover:bg-primary/5 group-hover:text-primary"
+                        size="lg"
                       >
                         {t.cta}
                       </Button>

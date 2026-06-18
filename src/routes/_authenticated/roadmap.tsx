@@ -938,8 +938,7 @@ function Page() {
                           "0 0 12px rgba(245,158,11,0.15)";
                       }}
                       onMouseLeave={(e) => {
-                        (e.currentTarget as HTMLSpanElement).style.background =
-                          "var(--card)";
+                        (e.currentTarget as HTMLSpanElement).style.background = "var(--card)";
                         (e.currentTarget as HTMLSpanElement).style.boxShadow = "none";
                       }}
                     >

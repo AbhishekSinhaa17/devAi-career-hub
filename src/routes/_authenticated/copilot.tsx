@@ -463,7 +463,9 @@ function CopilotPage() {
                 </div>
                 <div className="flex-1 overflow-y-auto p-3 space-y-1">
                   {!history?.length ? (
-                    <p className="text-xs text-center mt-10 text-slate-400">No conversations yet.</p>
+                    <p className="text-xs text-center mt-10 text-slate-400">
+                      No conversations yet.
+                    </p>
                   ) : (
                     history.map((conv) => (
                       <ConvItem
@@ -556,50 +558,50 @@ function CopilotPage() {
         {/* ── Input bar ── */}
         <div className="absolute bottom-0 left-0 right-0 z-20 shrink-0 bg-white/80 dark:bg-[#080810]/80 backdrop-blur-md border-t border-slate-200 dark:border-white/10 p-3">
           <div className="max-w-3xl mx-auto">
-              <div
-                className="relative flex items-end gap-3 p-2 rounded-2xl border shadow-lg transition-all duration-200
+            <div
+              className="relative flex items-end gap-3 p-2 rounded-2xl border shadow-lg transition-all duration-200
                 bg-white dark:bg-white/[0.04]
                 border-slate-200 dark:border-white/10
                 shadow-slate-200/50 dark:shadow-black/20
                 focus-within:border-indigo-300 dark:focus-within:border-indigo-500/40
                 focus-within:shadow-indigo-100 dark:focus-within:shadow-indigo-500/10
                 focus-within:shadow-xl"
-              >
-                <textarea
-                  ref={textareaRef}
-                  value={inputMsg}
-                  onChange={(e) => setInputMsg(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter" && !e.shiftKey) {
-                      e.preventDefault();
-                      handleSend();
-                    }
-                  }}
-                  placeholder="Ask anything about your career…"
-                  className="flex-1 bg-transparent resize-none text-sm text-slate-800 dark:text-slate-200 placeholder:text-slate-400 dark:placeholder:text-slate-600 focus:outline-none pl-3 py-2 min-h-[40px] max-h-[180px] overflow-y-auto leading-relaxed"
-                  rows={1}
-                />
-                <button
-                  onClick={handleSend}
-                  disabled={!inputMsg.trim() || isPending}
-                  className="flex-shrink-0 h-10 w-10 rounded-xl flex items-center justify-center transition-all duration-200
+            >
+              <textarea
+                ref={textareaRef}
+                value={inputMsg}
+                onChange={(e) => setInputMsg(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" && !e.shiftKey) {
+                    e.preventDefault();
+                    handleSend();
+                  }
+                }}
+                placeholder="Ask anything about your career…"
+                className="flex-1 bg-transparent resize-none text-sm text-slate-800 dark:text-slate-200 placeholder:text-slate-400 dark:placeholder:text-slate-600 focus:outline-none pl-3 py-2 min-h-[40px] max-h-[180px] overflow-y-auto leading-relaxed"
+                rows={1}
+              />
+              <button
+                onClick={handleSend}
+                disabled={!inputMsg.trim() || isPending}
+                className="flex-shrink-0 h-10 w-10 rounded-xl flex items-center justify-center transition-all duration-200
                     bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-600 dark:hover:bg-indigo-500
                     disabled:opacity-40 disabled:cursor-not-allowed
                     hover:shadow-lg hover:shadow-indigo-500/25
                     hover:scale-[1.05] active:scale-95"
-                >
-                  {isPending ? (
-                    <Loader2 className="h-4 w-4 animate-spin text-white" />
-                  ) : (
-                    <Send className="h-4 w-4 text-white translate-x-px" />
-                  )}
-                </button>
-              </div>
-
-              <p className="hidden md:block text-center text-[11px] text-slate-400 dark:text-slate-600 mt-2">
-                Copilot uses your personal DevAI context. AI responses may not always be accurate.
-              </p>
+              >
+                {isPending ? (
+                  <Loader2 className="h-4 w-4 animate-spin text-white" />
+                ) : (
+                  <Send className="h-4 w-4 text-white translate-x-px" />
+                )}
+              </button>
             </div>
+
+            <p className="hidden md:block text-center text-[11px] text-slate-400 dark:text-slate-600 mt-2">
+              Copilot uses your personal DevAI context. AI responses may not always be accurate.
+            </p>
+          </div>
         </div>
       </main>
     </div>

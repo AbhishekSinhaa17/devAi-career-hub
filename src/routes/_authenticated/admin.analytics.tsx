@@ -4,10 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { getGlobalAnalytics } from "@/lib/analytics.functions";
 import { useState, useRef } from "react";
-import {
-  PageLoadingState,
-  PageEmptyState,
-} from "@/components/LoadingStates";
+import { PageLoadingState, PageEmptyState } from "@/components/LoadingStates";
 import {
   BarChart,
   Bar,
@@ -54,26 +51,30 @@ function AdminAnalyticsPage() {
 
   const exportCSV = () => {
     if (!data) return;
-    const headers = ["Feature", "Total Usage", "Last 30 Days", "Prev 30 Days", "Growth %", "Percentage %"];
+    const headers = [
+      "Feature",
+      "Total Usage",
+      "Last 30 Days",
+      "Prev 30 Days",
+      "Growth %",
+      "Percentage %",
+    ];
     const rows = data.features.map((f: any) => [
       f.name,
       f.count,
       f.last30Days,
       f.prev30Days,
       f.growth.toFixed(1),
-      f.percentage.toFixed(1)
+      f.percentage.toFixed(1),
     ]);
-    
-    const csvContent = [
-      headers.join(","),
-      ...rows.map((e: any) => e.join(","))
-    ].join("\n");
+
+    const csvContent = [headers.join(","), ...rows.map((e: any) => e.join(","))].join("\n");
 
     const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
     link.href = url;
-    link.setAttribute("download", `devai-analytics-${new Date().toISOString().split('T')[0]}.csv`);
+    link.setAttribute("download", `devai-analytics-${new Date().toISOString().split("T")[0]}.csv`);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -103,14 +104,18 @@ function AdminAnalyticsPage() {
   }
 
   // Memoize data for pie chart
-  const pieData = data.features.map((f: any) => ({
-    name: f.name,
-    value: f.count,
-  })).filter((f: any) => f.value > 0);
+  const pieData = data.features
+    .map((f: any) => ({
+      name: f.name,
+      value: f.count,
+    }))
+    .filter((f: any) => f.value > 0);
 
   return (
-    <div className="space-y-8 min-h-screen text-slate-900 dark:text-foreground print:text-black" ref={dashboardRef}>
-      
+    <div
+      className="space-y-8 min-h-screen text-slate-900 dark:text-foreground print:text-black"
+      ref={dashboardRef}
+    >
       {/* ── Header & Controls ── */}
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
         <div>
@@ -154,7 +159,7 @@ function AdminAnalyticsPage() {
           >
             <Download className="h-4 w-4" /> CSV
           </button>
-          
+
           <button
             onClick={exportPDF}
             className="flex items-center gap-2 px-4 py-2 text-xs font-bold rounded-xl bg-indigo-600 text-white hover:bg-indigo-700 transition-colors shadow-lg shadow-indigo-500/20"
@@ -167,20 +172,60 @@ function AdminAnalyticsPage() {
       {/* ── KPIs ── */}
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
         {[
-          { label: "Total Users", value: data.kpis.totalUsers, icon: Users, color: "text-blue-500" },
-          { label: `Active (${days}d)`, value: data.kpis.activeUsers7d, icon: Activity, color: "text-green-500" },
-          { label: "Total AI Req", value: data.kpis.totalAiRequests, icon: Cpu, color: "text-indigo-500" },
-          { label: "Avg Req/User", value: data.kpis.avgAiRequestsPerUser.toFixed(1), icon: BarChart3, color: "text-purple-500" },
-          { label: "Most Used", value: data.kpis.mostUsedFeature, icon: Zap, color: "text-amber-500" },
-          { label: "Fastest Growth", value: data.kpis.fastestGrowingFeature, icon: TrendingUp, color: "text-pink-500" },
-          { label: "Avg Health Score", value: data.kpis.avgHealthScore?.toString() || "0", icon: Activity, color: "text-emerald-500" },
+          {
+            label: "Total Users",
+            value: data.kpis.totalUsers,
+            icon: Users,
+            color: "text-blue-500",
+          },
+          {
+            label: `Active (${days}d)`,
+            value: data.kpis.activeUsers7d,
+            icon: Activity,
+            color: "text-green-500",
+          },
+          {
+            label: "Total AI Req",
+            value: data.kpis.totalAiRequests,
+            icon: Cpu,
+            color: "text-indigo-500",
+          },
+          {
+            label: "Avg Req/User",
+            value: data.kpis.avgAiRequestsPerUser.toFixed(1),
+            icon: BarChart3,
+            color: "text-purple-500",
+          },
+          {
+            label: "Most Used",
+            value: data.kpis.mostUsedFeature,
+            icon: Zap,
+            color: "text-amber-500",
+          },
+          {
+            label: "Fastest Growth",
+            value: data.kpis.fastestGrowingFeature,
+            icon: TrendingUp,
+            color: "text-pink-500",
+          },
+          {
+            label: "Avg Health Score",
+            value: data.kpis.avgHealthScore?.toString() || "0",
+            icon: Activity,
+            color: "text-emerald-500",
+          },
         ].map((kpi, idx) => (
-          <div key={idx} className="p-5 rounded-2xl border border-border/40 bg-white/50 dark:bg-[#0d0d1a]/50 backdrop-blur-sm print:border-gray-300">
+          <div
+            key={idx}
+            className="p-5 rounded-2xl border border-border/40 bg-white/50 dark:bg-[#0d0d1a]/50 backdrop-blur-sm print:border-gray-300"
+          >
             <div className="flex items-center gap-3 mb-3">
               <div className={`p-2 rounded-lg bg-muted/50 ${kpi.color}`}>
                 <kpi.icon className="h-4 w-4" />
               </div>
-              <h3 className="text-xs font-bold text-muted-foreground uppercase tracking-wider">{kpi.label}</h3>
+              <h3 className="text-xs font-bold text-muted-foreground uppercase tracking-wider">
+                {kpi.label}
+              </h3>
             </div>
             <p className="text-2xl font-black truncate">{kpi.value}</p>
           </div>
@@ -213,9 +258,14 @@ function AdminAnalyticsPage() {
                     <td className="px-4 py-4">
                       <div className="flex items-center gap-2">
                         <div className="w-16 h-1.5 bg-muted rounded-full overflow-hidden">
-                          <div className="h-full bg-indigo-500" style={{ width: `${f.percentage}%` }} />
+                          <div
+                            className="h-full bg-indigo-500"
+                            style={{ width: `${f.percentage}%` }}
+                          />
                         </div>
-                        <span className="text-xs text-muted-foreground">{f.percentage.toFixed(1)}%</span>
+                        <span className="text-xs text-muted-foreground">
+                          {f.percentage.toFixed(1)}%
+                        </span>
                       </div>
                     </td>
                     <td className="px-4 py-4">
@@ -277,8 +327,15 @@ function AdminAnalyticsPage() {
         </h3>
         <div className="h-[350px]">
           <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={data.dailyActivity} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke="rgba(150,150,150,0.1)" vertical={false} />
+            <BarChart
+              data={data.dailyActivity}
+              margin={{ top: 10, right: 10, left: -20, bottom: 0 }}
+            >
+              <CartesianGrid
+                strokeDasharray="3 3"
+                stroke="rgba(150,150,150,0.1)"
+                vertical={false}
+              />
               <XAxis
                 dataKey="date"
                 tick={{ fontSize: 11, fill: "currentColor", opacity: 0.5 }}
@@ -317,13 +374,37 @@ function AdminAnalyticsPage() {
           </h3>
           <div className="flex-1 min-h-[300px]">
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={data.healthDistribution} margin={{ top: 10, right: 10, left: -20, bottom: 0 }} layout="vertical">
-                <CartesianGrid strokeDasharray="3 3" stroke="rgba(150,150,150,0.1)" horizontal={false} />
-                <XAxis type="number" axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: "currentColor", opacity: 0.5 }} />
-                <YAxis dataKey="range" type="category" axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: "currentColor", opacity: 0.5 }} />
+              <BarChart
+                data={data.healthDistribution}
+                margin={{ top: 10, right: 10, left: -20, bottom: 0 }}
+                layout="vertical"
+              >
+                <CartesianGrid
+                  strokeDasharray="3 3"
+                  stroke="rgba(150,150,150,0.1)"
+                  horizontal={false}
+                />
+                <XAxis
+                  type="number"
+                  axisLine={false}
+                  tickLine={false}
+                  tick={{ fontSize: 11, fill: "currentColor", opacity: 0.5 }}
+                />
+                <YAxis
+                  dataKey="range"
+                  type="category"
+                  axisLine={false}
+                  tickLine={false}
+                  tick={{ fontSize: 11, fill: "currentColor", opacity: 0.5 }}
+                />
                 <Tooltip
                   cursor={{ fill: "rgba(150,150,150,0.05)" }}
-                  contentStyle={{ backgroundColor: "rgba(13, 13, 26, 0.9)", borderRadius: "12px", border: "1px solid rgba(255,255,255,0.1)", color: "#fff" }}
+                  contentStyle={{
+                    backgroundColor: "rgba(13, 13, 26, 0.9)",
+                    borderRadius: "12px",
+                    border: "1px solid rgba(255,255,255,0.1)",
+                    color: "#fff",
+                  }}
                 />
                 <Bar dataKey="count" name="Users" fill="#10b981" radius={[0, 4, 4, 0]} />
               </BarChart>
@@ -337,7 +418,10 @@ function AdminAnalyticsPage() {
           </h3>
           <div className="space-y-4">
             {data.topPerformers?.map((u: any, idx: number) => (
-              <div key={u.userId} className="flex items-center justify-between p-4 rounded-xl border border-border/40 bg-muted/30">
+              <div
+                key={u.userId}
+                className="flex items-center justify-between p-4 rounded-xl border border-border/40 bg-muted/30"
+              >
                 <div className="flex items-center gap-3">
                   <div className="h-8 w-8 rounded-lg bg-indigo-500/10 text-indigo-500 font-black grid place-items-center text-xs">
                     #{idx + 1}
@@ -356,7 +440,6 @@ function AdminAnalyticsPage() {
           </div>
         </div>
       </div>
-
     </div>
   );
 }

@@ -60,16 +60,24 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
       <div className="max-w-md text-center">
-        <h1 className="text-xl font-semibold tracking-tight text-foreground">Something went wrong</h1>
+        <h1 className="text-xl font-semibold tracking-tight text-foreground">
+          Something went wrong
+        </h1>
         <p className="mt-2 text-sm text-muted-foreground">{error.message}</p>
         <div className="mt-6 flex flex-wrap justify-center gap-2">
           <button
-            onClick={() => { router.invalidate(); reset(); }}
+            onClick={() => {
+              router.invalidate();
+              reset();
+            }}
             className="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90"
           >
             Try again
           </button>
-          <a href="/" className="inline-flex items-center justify-center rounded-md border border-input bg-background px-4 py-2 text-sm font-medium text-foreground hover:bg-accent">
+          <a
+            href="/"
+            className="inline-flex items-center justify-center rounded-md border border-input bg-background px-4 py-2 text-sm font-medium text-foreground hover:bg-accent"
+          >
             Go home
           </a>
         </div>
@@ -84,9 +92,17 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
       { title: "DevAI — AI-Powered Developer Career Platform" },
-      { name: "description", content: "Analyze your GitHub, build ATS resumes, generate portfolios, get AI code reviews, and ace interviews with DevAI." },
+      {
+        name: "description",
+        content:
+          "Analyze your GitHub, build ATS resumes, generate portfolios, get AI code reviews, and ace interviews with DevAI.",
+      },
       { property: "og:title", content: "DevAI — AI-Powered Developer Career Platform" },
-      { property: "og:description", content: "Your AI career copilot — GitHub analysis, ATS resumes, code reviews, mock interviews, and personalized roadmaps." },
+      {
+        property: "og:description",
+        content:
+          "Your AI career copilot — GitHub analysis, ATS resumes, code reviews, mock interviews, and personalized roadmaps.",
+      },
       { property: "og:image", content: "https://YOUR_VERCEL_URL/og-image.png" },
       { property: "og:url", content: "https://YOUR_VERCEL_URL" },
       { name: "twitter:image", content: "https://YOUR_VERCEL_URL/og-image.png" },
@@ -97,7 +113,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { rel: "stylesheet", href: appCss },
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
-      { rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" },
+      {
+        rel: "stylesheet",
+        href: "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap",
+      },
     ],
   }),
   shellComponent: RootShell,
@@ -132,10 +151,12 @@ function RootComponent() {
   const router = useRouter();
 
   useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((event, session) => {
       if (event !== "SIGNED_IN" && event !== "SIGNED_OUT" && event !== "USER_UPDATED") return;
       router.invalidate();
-      
+
       if (event === "SIGNED_IN" && session?.user) {
         if (import.meta.env.VITE_POSTHOG_KEY) {
           posthog.identify(session.user.id, { email: session.user.email });

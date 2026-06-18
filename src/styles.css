@@ -161,20 +161,25 @@
 }
 
 @layer base {
-  html, body {
+  html,
+  body {
     background-color: var(--color-background);
     color: var(--color-foreground);
     font-family: var(--font-display);
     -webkit-font-smoothing: antialiased;
   }
-  * { border-color: var(--color-border); }
+  * {
+    border-color: var(--color-border);
+  }
 
-  ::selection { background: oklch(0.68 0.18 280 / 0.35); }
+  ::selection {
+    background: oklch(0.68 0.18 280 / 0.35);
+  }
 
   /* Fix browser autofill colors */
   input:-webkit-autofill,
-  input:-webkit-autofill:hover, 
-  input:-webkit-autofill:focus, 
+  input:-webkit-autofill:hover,
+  input:-webkit-autofill:focus,
   input:-webkit-autofill:active {
     -webkit-box-shadow: 0 0 0 30px var(--color-background) inset !important;
     -webkit-text-fill-color: var(--color-foreground) !important;
@@ -205,8 +210,12 @@
 }
 
 @keyframes marquee {
-  from { transform: translateX(0); }
-  to   { transform: translateX(-50%); }
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
 }
 
 .marquee {

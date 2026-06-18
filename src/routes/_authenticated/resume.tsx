@@ -764,7 +764,9 @@ function Page() {
       {/* ── Main grid ── */}
       <div className="grid gap-6 lg:grid-cols-2">
         {/* Editor */}
-        <div className={`space-y-3 print:hidden ${mobileTab === "preview" ? "hidden lg:block" : "block"}`}>
+        <div
+          className={`space-y-3 print:hidden ${mobileTab === "preview" ? "hidden lg:block" : "block"}`}
+        >
           {/* Basics */}
           <EditorSection title="Personal Info" icon={User} accent="#6366f1">
             <div className="grid gap-3 sm:grid-cols-2">
@@ -975,7 +977,9 @@ function Page() {
         </div>
 
         {/* Preview */}
-        <div className={`lg:sticky lg:top-6 lg:h-fit space-y-4 ${mobileTab === "editor" ? "hidden lg:block" : "block"}`}>
+        <div
+          className={`lg:sticky lg:top-6 lg:h-fit space-y-4 ${mobileTab === "editor" ? "hidden lg:block" : "block"}`}
+        >
           <ResumePreview r={r} />
 
           {/* Quick tips */}

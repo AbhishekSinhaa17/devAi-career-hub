@@ -26,7 +26,16 @@ import {
   BarChart3,
   ExternalLink,
 } from "lucide-react";
-import { Bar, BarChart, ResponsiveContainer, Tooltip, XAxis, YAxis, Cell, TooltipProps } from "recharts";
+import {
+  Bar,
+  BarChart,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+  Cell,
+  TooltipProps,
+} from "recharts";
 
 export const Route = createFileRoute("/_authenticated/github")({
   head: () => ({ meta: [{ title: "GitHub Analyzer — DevAI" }] }),
@@ -548,17 +557,19 @@ function Page() {
                 </div>
               </div>
               <div className="flex gap-1.5 flex-wrap justify-end max-w-xs">
-                {data.stats.languages.slice(0, 4).map((l: { name: string; count: number }, i: number) => (
-                  <div key={l.name} className="flex items-center gap-1">
-                    <div
-                      className="h-2 w-2 rounded-full"
-                      style={{ backgroundColor: LANG_COLORS[i] }}
-                    />
-                    <span className="text-[10px] text-muted-foreground font-semibold">
-                      {l.name}
-                    </span>
-                  </div>
-                ))}
+                {data.stats.languages
+                  .slice(0, 4)
+                  .map((l: { name: string; count: number }, i: number) => (
+                    <div key={l.name} className="flex items-center gap-1">
+                      <div
+                        className="h-2 w-2 rounded-full"
+                        style={{ backgroundColor: LANG_COLORS[i] }}
+                      />
+                      <span className="text-[10px] text-muted-foreground font-semibold">
+                        {l.name}
+                      </span>
+                    </div>
+                  ))}
               </div>
             </div>
 

@@ -424,7 +424,6 @@ function CodeEditor({
   );
 }
 
-
 // ─── Empty state ──────────────────────────────────────────────────────────────
 function EmptyState() {
   return (
@@ -555,8 +554,6 @@ function Page() {
         <div className="p-4">
           <CodeEditor value={code} onChange={setCode} language={language} />
         </div>
-
-
 
         {/* Footer */}
         <div className="flex items-center justify-between px-5 pb-5">
