@@ -25,12 +25,26 @@ export function Reveal({
   children,
   delay = 0,
   className = "",
+  animateOnLoad = false,
 }: {
   children: React.ReactNode;
   delay?: number;
   className?: string;
+  animateOnLoad?: boolean;
 }) {
   const { ref, shown } = useReveal<HTMLDivElement>();
+
+  if (animateOnLoad) {
+    return (
+      <div
+        className={`animate-[slide-up-fade_0.7s_ease-out_backwards] ${className}`}
+        style={{ animationDelay: `${delay}ms` }}
+      >
+        {children}
+      </div>
+    );
+  }
+
   return (
     <div
       ref={ref}

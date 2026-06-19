@@ -257,12 +257,12 @@ export function Hero({ session }: { session?: any }) {
 
       <div className="relative mx-auto max-w-6xl px-6 pb-24 pt-10 text-center md:pt-16">
         {/* badge */}
-        <Reveal>
+        <Reveal animateOnLoad>
           <BadgePill />
         </Reveal>
 
         {/* headline */}
-        <Reveal delay={80}>
+        <Reveal animateOnLoad delay={80}>
           <h1 className="mx-auto mt-8 max-w-5xl text-balance text-5xl font-extrabold leading-[1.05] tracking-tight md:text-7xl lg:text-[5.5rem]">
             Ship your{" "}
             <span className="relative inline-block">
@@ -294,7 +294,7 @@ export function Hero({ session }: { session?: any }) {
         </Reveal>
 
         {/* sub */}
-        <Reveal delay={160}>
+        <Reveal animateOnLoad delay={160}>
           <p className="mx-auto mt-8 max-w-2xl text-balance text-lg leading-relaxed text-muted-foreground md:text-xl">
             Analyze your GitHub, build ATS-optimized resumes, generate portfolios, crack interviews,
             and follow personalized roadmaps —{" "}
@@ -305,7 +305,7 @@ export function Hero({ session }: { session?: any }) {
         </Reveal>
 
         {/* CTAs */}
-        <Reveal delay={240}>
+        <Reveal animateOnLoad delay={240}>
           <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
             <Link to={session ? "/dashboard" : "/signup"}>
               <Button
@@ -337,7 +337,7 @@ export function Hero({ session }: { session?: any }) {
         </Reveal>
 
         {/* trust signals */}
-        <Reveal delay={300}>
+        <Reveal animateOnLoad delay={300}>
           <div className="mt-8 flex flex-col items-center justify-center gap-6 sm:flex-row sm:gap-10">
             <SocialProof />
 
@@ -378,12 +378,12 @@ export function Hero({ session }: { session?: any }) {
         </Reveal>
 
         {/* stats */}
-        <Reveal delay={360}>
+        <Reveal animateOnLoad delay={360}>
           <StatsStrip />
         </Reveal>
 
         {/* product preview */}
-        <Reveal delay={440}>
+        <Reveal animateOnLoad delay={440}>
           <HeroPreview mx={pointer.x} my={pointer.y} />
         </Reveal>
       </div>
