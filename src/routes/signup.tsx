@@ -320,22 +320,6 @@ function SignupPage() {
     navigate({ to: "/dashboard" });
   }
 
-  async function handleGithub() {
-    setLoading(true);
-    const { data, error } = await supabase.auth.signInWithOAuth({
-      provider: "github",
-      options: { redirectTo: `${window.location.origin}/dashboard` },
-    });
-    if (error) {
-      toast.error(error.message);
-      setLoading(false);
-      return;
-    }
-    if (data?.url) {
-      window.location.href = data.url;
-      return;
-    }
-  }
 
   return (
     <div
@@ -399,7 +383,7 @@ function SignupPage() {
           ) : (
             <>
               {/* OAuth */}
-              <div className="grid grid-cols-2 gap-3 mb-6">
+              <div className="grid grid-cols-1 gap-3 mb-6">
                 <button
                   onClick={handleGoogle}
                   disabled={loading}
@@ -426,14 +410,6 @@ function SignupPage() {
                   <span className="relative z-10">Google</span>
                 </button>
 
-                <button
-                  onClick={handleGithub}
-                  disabled={loading}
-                  className="group relative h-11 rounded-xl border border-slate-200 dark:border-white/[0.08] bg-slate-50 dark:bg-white/[0.02] hover:bg-white dark:hover:bg-white/[0.06] hover:border-slate-300 dark:hover:border-white/20 transition-all duration-300 flex items-center justify-center gap-2.5 font-semibold text-sm text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white overflow-hidden shadow-sm dark:shadow-none"
-                >
-                  <Github className="h-4 w-4 flex-shrink-0 relative z-10 text-slate-900 dark:text-white" />
-                  <span className="relative z-10">GitHub</span>
-                </button>
               </div>
 
               <div className="flex items-center gap-3 mb-6">

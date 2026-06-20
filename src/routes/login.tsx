@@ -423,22 +423,6 @@ function LoginPage() {
     navigate({ to: "/dashboard" });
   }
 
-  async function handleGithub() {
-    setLoading(true);
-    const { data, error } = await supabase.auth.signInWithOAuth({
-      provider: "github",
-      options: { redirectTo: `${window.location.origin}/dashboard` },
-    });
-    if (error) {
-      toast.error(error.message);
-      setLoading(false);
-      return;
-    }
-    if (data?.url) {
-      window.location.href = data.url;
-      return;
-    }
-  }
 
   return (
     <div
@@ -659,7 +643,7 @@ function LoginPage() {
               {/* Body */}
               <div className="relative px-8 py-6 space-y-5">
                 {/* OAuth */}
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 gap-3">
                   <button
                     onClick={handleGoogle}
                     disabled={loading}
@@ -687,15 +671,6 @@ function LoginPage() {
                     <span className="relative z-10">Google</span>
                   </button>
 
-                  <button
-                    onClick={handleGithub}
-                    disabled={loading}
-                    className="group relative h-11 rounded-xl border border-slate-200 dark:border-white/[0.08] bg-slate-50 dark:bg-white/[0.03] hover:bg-white dark:hover:bg-white/[0.07] hover:border-slate-300 dark:hover:border-white/20 transition-all duration-300 flex items-center justify-center gap-2.5 font-semibold text-sm text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white overflow-hidden shadow-sm dark:shadow-none"
-                  >
-                    <div className="absolute inset-0 bg-gradient-to-r from-slate-600/0 via-slate-600/5 dark:via-slate-600/10 to-slate-600/0 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                    <Github className="h-4 w-4 flex-shrink-0 relative z-10 text-slate-900 dark:text-white" />
-                    <span className="relative z-10">GitHub</span>
-                  </button>
                 </div>
 
                 {/* Divider */}
