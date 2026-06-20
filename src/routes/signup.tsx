@@ -320,7 +320,6 @@ function SignupPage() {
     navigate({ to: "/dashboard" });
   }
 
-
   return (
     <div
       id="signup-page"
@@ -409,7 +408,6 @@ function SignupPage() {
                   </svg>
                   <span className="relative z-10">Google</span>
                 </button>
-
               </div>
 
               <div className="flex items-center gap-3 mb-6">

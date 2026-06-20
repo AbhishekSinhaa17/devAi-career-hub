@@ -423,7 +423,6 @@ function LoginPage() {
     navigate({ to: "/dashboard" });
   }
 
-
   return (
     <div
       id="login-page"
@@ -670,7 +669,6 @@ function LoginPage() {
                     </svg>
                     <span className="relative z-10">Google</span>
                   </button>
-
                 </div>
 
                 {/* Divider */}
