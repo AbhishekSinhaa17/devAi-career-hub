@@ -2,8 +2,31 @@ import { Link } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
 import { Reveal } from "./shared";
 import { Check, Sparkles, Zap } from "lucide-react";
+import { useEffect, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
 
 export function Pricing() {
+  const [isPro, setIsPro] = useState(false);
+
+  useEffect(() => {
+    supabase.auth.getSession().then(async ({ data: { session } }) => {
+      if (session) {
+        const { data } = await supabase
+          .from("profiles")
+          .select("is_pro, pro_expires_at")
+          .eq("id", session.user.id)
+          .single();
+        if (data?.is_pro) {
+          if (!data.pro_expires_at) {
+            setIsPro(true);
+          } else if (new Date(data.pro_expires_at) > new Date()) {
+            setIsPro(true);
+          }
+        }
+      }
+    });
+  }, []);
+
   const tiers = [
     {
       name: "Free",
@@ -19,6 +42,7 @@ export function Pricing() {
         "Career Roadmap",
       ],
       cta: "Start for free",
+      href: "/signup",
       featured: false,
     },
     {
@@ -37,7 +61,8 @@ export function Pricing() {
         "Priority AI (Gemini 2.5 Flash)",
         "Admin Analytics",
       ],
-      cta: "Get Pro",
+      cta: isPro ? "You're a Pro member" : "Get Pro",
+      href: isPro ? "/dashboard" : "/checkout",
       featured: true,
     },
   ];
@@ -124,7 +149,7 @@ export function Pricing() {
                       </ul>
 
                       {/* CTA */}
-                      <Link to="/signup" className="mt-8 block">
+                      <Link to={t.href} className="mt-8 block">
                         <Button
                           className="w-full h-12 rounded-xl text-sm font-semibold shadow-lg shadow-primary/25 hover:shadow-primary/40 transition-all duration-300"
                           size="lg"
@@ -174,7 +199,7 @@ export function Pricing() {
                     </ul>
 
                     {/* CTA */}
-                    <Link to="/signup" className="mt-8 block">
+                    <Link to={t.href} className="mt-8 block">
                       <Button
                         variant="outline"
                         className="w-full h-12 rounded-xl text-sm font-semibold border-border/60 transition-all duration-300 group-hover:border-primary/30 group-hover:bg-primary/5 group-hover:text-primary"

@@ -391,7 +391,7 @@ function SidebarOrbs() {
 
 // ─── Logo ──────────────────────────────────────────────────────────────────────
 
-function Logo({ animate }: { animate: boolean }) {
+function Logo({ animate, isPro }: { animate: boolean; isPro?: boolean }) {
   return (
     <div
       className="flex items-center gap-3"
@@ -404,7 +404,14 @@ function Logo({ animate }: { animate: boolean }) {
         />
       </div>
       <div>
-        <div className="text-lg font-black tracking-tight leading-none t-heading">DevAI</div>
+        <div className="text-lg font-black tracking-tight leading-none t-heading flex items-center gap-2">
+          DevAI
+          {isPro && (
+            <span className="px-1.5 py-0.5 rounded-md bg-indigo-500/10 border border-indigo-500/20 text-[9px] font-black text-indigo-500">
+              PRO
+            </span>
+          )}
+        </div>
         <div className="text-[9px] font-black uppercase tracking-[0.15em] t-sub mt-0.5">
           Career Hub
         </div>
@@ -608,6 +615,31 @@ export function AppShell({ children }: { children: ReactNode }) {
     queryFn: () => checkAdmin(),
   });
 
+  const isProQ = useQuery({
+    queryKey: ["user-is-pro"],
+    queryFn: async () => {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+      if (!session) return { is_pro: false };
+      const { data } = await supabase
+        .from("profiles")
+        .select("is_pro, pro_expires_at")
+        .eq("id", session.user.id)
+        .single();
+
+      let isValidPro = false;
+      if (data?.is_pro) {
+        if (!data.pro_expires_at) {
+          isValidPro = true;
+        } else {
+          isValidPro = new Date(data.pro_expires_at) > new Date();
+        }
+      }
+      return { is_pro: isValidPro };
+    },
+  });
+
   const [mounted, setMounted] = useState(false);
   const [drawerOpen, setDrawerOpen] = useState(false);
 
@@ -655,7 +687,7 @@ export function AppShell({ children }: { children: ReactNode }) {
         {/* Logo */}
         <div className="flex h-[72px] items-center justify-between px-5 flex-shrink-0 relative z-10 w-full">
           <Link to="/dashboard" className="flex items-center">
-            <Logo animate={mounted} />
+            <Logo animate={mounted} isPro={isProQ.data?.is_pro} />
           </Link>
           <ThemeToggle />
         </div>
@@ -739,7 +771,7 @@ export function AppShell({ children }: { children: ReactNode }) {
 
             {/* Drawer header */}
             <div className="flex items-center justify-between px-5 h-14 flex-shrink-0 relative z-10">
-              <Logo animate={false} />
+              <Logo animate={false} isPro={isProQ.data?.is_pro} />
               <div className="flex items-center gap-3">
                 <ThemeToggle />
                 <button

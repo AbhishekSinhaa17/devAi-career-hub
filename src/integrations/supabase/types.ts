@@ -567,6 +567,8 @@ export type Database = {
           github_username: string | null;
           id: string;
           interview_streak: number;
+          is_pro: boolean | null;
+          pro_expires_at: string | null;
           name: string | null;
           skills: string[];
           total_interviews: number;
@@ -583,6 +585,8 @@ export type Database = {
           github_username?: string | null;
           id: string;
           interview_streak?: number;
+          is_pro?: boolean | null;
+          pro_expires_at?: string | null;
           name?: string | null;
           skills?: string[];
           total_interviews?: number;
@@ -599,6 +603,8 @@ export type Database = {
           github_username?: string | null;
           id?: string;
           interview_streak?: number;
+          is_pro?: boolean | null;
+          pro_expires_at?: string | null;
           name?: string | null;
           skills?: string[];
           total_interviews?: number;
