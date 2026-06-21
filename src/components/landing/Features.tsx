@@ -1,5 +1,6 @@
 import { useRef, useState } from "react";
 import { Reveal } from "./shared";
+import { Link } from "@tanstack/react-router";
 import {
   ArrowRight,
   Github,
@@ -24,6 +25,7 @@ export const featuresData = [
     glow: "group-hover:shadow-violet-500/10",
     border: "group-hover:border-violet-500/30",
     tag: "Most used",
+    href: "/github",
   },
   {
     icon: FileText,
@@ -37,6 +39,7 @@ export const featuresData = [
     glow: "group-hover:shadow-blue-500/10",
     border: "group-hover:border-blue-500/30",
     tag: null,
+    href: "/resume",
   },
   {
     icon: Code2,
@@ -50,6 +53,7 @@ export const featuresData = [
     glow: "group-hover:shadow-emerald-500/10",
     border: "group-hover:border-emerald-500/30",
     tag: null,
+    href: "/code-review",
   },
   {
     icon: MessageSquare,
@@ -63,6 +67,7 @@ export const featuresData = [
     glow: "group-hover:shadow-orange-500/10",
     border: "group-hover:border-orange-500/30",
     tag: "New",
+    href: "/interview",
   },
   {
     icon: MapIcon,
@@ -76,6 +81,7 @@ export const featuresData = [
     glow: "group-hover:shadow-pink-500/10",
     border: "group-hover:border-pink-500/30",
     tag: null,
+    href: "/roadmap",
   },
   {
     icon: Globe,
@@ -89,6 +95,7 @@ export const featuresData = [
     glow: "group-hover:shadow-indigo-500/10",
     border: "group-hover:border-indigo-500/30",
     tag: null,
+    href: "/profile",
   },
 ];
 
@@ -147,6 +154,7 @@ function FeatureCard({
   border,
   tag,
   index,
+  href,
 }: {
   icon: React.ComponentType<{ className?: string }>;
   title: string;
@@ -159,12 +167,13 @@ function FeatureCard({
   border: string;
   tag: string | null;
   index: number;
+  href: string;
 }) {
-  const cardRef = useRef<HTMLDivElement>(null);
+  const cardRef = useRef<HTMLAnchorElement>(null);
   const [rotate, setRotate] = useState({ x: 0, y: 0 });
   const [isHovered, setIsHovered] = useState(false);
 
-  const onMove = (e: React.MouseEvent<HTMLDivElement>) => {
+  const onMove = (e: React.MouseEvent<HTMLAnchorElement>) => {
     const el = cardRef.current;
     if (!el) return;
     const r = el.getBoundingClientRect();
@@ -187,7 +196,8 @@ function FeatureCard({
   };
 
   return (
-    <div
+    <Link
+      to={href as any}
       ref={cardRef}
       onMouseMove={onMove}
       onMouseEnter={() => setIsHovered(true)}
@@ -196,7 +206,7 @@ function FeatureCard({
         transform: `perspective(1000px) rotateX(${rotate.x}deg) rotateY(${rotate.y}deg)`,
         transition: isHovered ? "transform 0.1s ease-out" : "transform 0.5s ease-out",
       }}
-      className={`spotlight group relative h-full overflow-hidden rounded-2xl border border-border/40 bg-card/30 backdrop-blur-sm cursor-default shadow-xl ${glow} ${border} transition-[border-color,box-shadow] duration-500 hover:shadow-2xl`}
+      className={`spotlight group relative block h-full overflow-hidden rounded-2xl border border-border/40 bg-card/30 backdrop-blur-sm cursor-pointer shadow-xl ${glow} ${border} transition-[border-color,box-shadow] duration-500 hover:shadow-2xl`}
     >
       {/* Gradient accent blob */}
       <div
@@ -266,6 +276,6 @@ function FeatureCard({
           </div>
         </div>
       </div>
-    </div>
+    </Link>
   );
 }

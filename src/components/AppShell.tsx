@@ -622,6 +622,17 @@ export function AppShell({ children }: { children: ReactNode }) {
         data: { session },
       } = await supabase.auth.getSession();
       if (!session) return { is_pro: false };
+
+      // Admins automatically get all Pro features
+      try {
+        const adminRes = await checkAdmin();
+        if (adminRes?.isAdmin) {
+          return { is_pro: true };
+        }
+      } catch (e) {
+        // Ignore error and fall back to checking profile
+      }
+
       const { data } = await supabase
         .from("profiles")
         .select("is_pro, pro_expires_at")

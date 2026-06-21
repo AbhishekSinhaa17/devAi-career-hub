@@ -11,6 +11,16 @@ export function Pricing() {
   useEffect(() => {
     supabase.auth.getSession().then(async ({ data: { session } }) => {
       if (session) {
+        // Admin gets all pro features
+        const { data: roleData } = await supabase.rpc("has_role", {
+          _user_id: session.user.id,
+          _role: "admin",
+        });
+        if (roleData) {
+          setIsPro(true);
+          return;
+        }
+
         const { data } = await supabase
           .from("profiles")
           .select("is_pro, pro_expires_at")
