@@ -1,15 +1,11 @@
 # DevAI — AI-Powered Developer Career Platform
 
-> **AccioBuild 2026 Hackathon Submission**
 
 [![Live Demo](https://img.shields.io/badge/Live-Demo-blue)](YOUR_LIVE_URL_HERE)
 [![GitHub](https://img.shields.io/badge/GitHub-Repo-black)](YOUR_GITHUB_URL_HERE)
 
 DevAI is a full-stack AI-powered career platform built for developers. Analyze your GitHub profile, build ATS-optimized resumes, generate and deploy portfolio sites, practice mock interviews, and get personalized career roadmaps — all in one intelligent platform.
 
-## Demo Video
-
-[Watch Demo →](YOUR_DEMO_VIDEO_URL_HERE)
 
 ## Live Link
 
