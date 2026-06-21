@@ -607,7 +607,9 @@ export function AppShell({ children }: { children: ReactNode }) {
         if (adminRes?.isAdmin) {
           return { is_pro: true };
         }
-      } catch (e) {}
+      } catch (e) {
+        void 0;
+      }
 
       const { data } = await supabase
         .from("profiles")

@@ -487,7 +487,9 @@ function MockInterviewPage() {
         setIsRecording(true);
         if ("speechSynthesis" in window) window.speechSynthesis.cancel();
         setIsSpeaking(false);
-      } catch (e) {}
+      } catch (e) {
+        void 0;
+      }
     }
   };
 

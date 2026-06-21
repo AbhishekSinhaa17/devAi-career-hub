@@ -456,7 +456,9 @@ function Page() {
         setR({ ...empty, ...importedData });
         setCurrentId(undefined);
         toast.success("GitHub Resume loaded! Edit and save.");
-      } catch {}
+      } catch {
+        void 0;
+      }
       sessionStorage.removeItem("importedGithubResume");
     }
   }, []);
