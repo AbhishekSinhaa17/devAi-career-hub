@@ -6,8 +6,8 @@ import { generatePortfolioFiles } from "./vercel.templates";
 const VERCEL_API_URL = "https://api.vercel.com";
 
 function getVercelToken() {
-  const token = process.env.VERCEL_API_TOKEN;
-  if (!token) throw new Error("VERCEL_API_TOKEN is missing in environment variables.");
+  const token = process.env.DEPLOY_VERCEL_TOKEN;
+  if (!token) throw new Error("DEPLOY_VERCEL_TOKEN is missing in environment variables.");
   return token;
 }
 
