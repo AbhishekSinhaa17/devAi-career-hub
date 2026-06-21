@@ -34,6 +34,8 @@ CREATE TABLE public.profiles (
   avatar_url TEXT,
   skills TEXT[] NOT NULL DEFAULT '{}',
   experience_level TEXT NOT NULL DEFAULT 'junior',
+  is_pro BOOLEAN NOT NULL DEFAULT false,
+  pro_expires_at TIMESTAMPTZ,
   created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
@@ -345,6 +347,11 @@ CREATE TABLE public.portfolio_deployments (
   status TEXT NOT NULL DEFAULT 'pending',
   deployment_url TEXT,
   error_message TEXT,
+  deployment_id TEXT,
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  build_duration INT,
+  deployment_logs JSONB NOT NULL DEFAULT '[]'::jsonb,
+  deployed_at TIMESTAMPTZ,
   created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 GRANT SELECT, INSERT, UPDATE ON public.portfolio_deployments TO authenticated;
@@ -388,3 +395,17 @@ JOIN public.profiles p ON p.id = ds.user_id
 ORDER BY ds.overall_score DESC
 LIMIT 20;
 GRANT SELECT ON public.leaderboard TO authenticated;
+
+-- Admin Audit Logs
+CREATE TABLE public.admin_audit_logs (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  admin_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE SET NULL,
+  action TEXT NOT NULL,
+  target_id UUID,
+  metadata JSONB NOT NULL DEFAULT '{}'::jsonb,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+GRANT SELECT, INSERT ON public.admin_audit_logs TO authenticated;
+GRANT ALL ON public.admin_audit_logs TO service_role;
+ALTER TABLE public.admin_audit_logs ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Admins view audit logs" ON public.admin_audit_logs FOR SELECT TO authenticated USING (public.has_role(auth.uid(), 'admin'));
