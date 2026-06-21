@@ -32,7 +32,6 @@ export const Route = createFileRoute("/signup")({
   component: SignupPage,
 });
 
-// ─── Typewriter hook ──────────────────────────────────────────────────────────
 function useTypewriter(texts: string[], speed = 80, pause = 2200) {
   const [displayed, setDisplayed] = useState("");
   const [textIndex, setTextIndex] = useState(0);
@@ -96,7 +95,7 @@ function PasswordStrengthMeter({ password }: { password: string }) {
 
   return (
     <div className="space-y-2 mt-2">
-      {/* Bar */}
+      {}
       <div className="flex gap-1">
         {Array.from({ length: 4 }).map((_, i) => (
           <div
@@ -114,7 +113,7 @@ function PasswordStrengthMeter({ password }: { password: string }) {
           {label}
         </span>
       </div>
-      {/* Checks */}
+      {}
       <div className="grid grid-cols-2 gap-1">
         {checks.map((c) => (
           <div key={c.label} className="flex items-center gap-1.5">
@@ -135,7 +134,6 @@ function PasswordStrengthMeter({ password }: { password: string }) {
   );
 }
 
-// ─── Floating Code Lines ──────────────────────────────────────────────────────
 const CODE_SNIPPETS = [
   "const career = await ai.accelerate(you)",
   "git push origin feature/new-job",
@@ -160,7 +158,6 @@ function FloatingCodeLine({ text, delay, top }: { text: string; delay: number; t
   );
 }
 
-// ─── Feature Card ─────────────────────────────────────────────────────────────
 const FEATURES = [
   {
     icon: GitBranch,
@@ -246,7 +243,6 @@ function FeatureCard({ feature, index }: { feature: (typeof FEATURES)[0]; index:
   );
 }
 
-// ─── Main Page ────────────────────────────────────────────────────────────────
 function SignupPage() {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
@@ -325,7 +321,7 @@ function SignupPage() {
       id="signup-page"
       className="flex min-h-screen bg-white dark:bg-[#030712] text-slate-900 dark:text-foreground transition-colors duration-500"
     >
-      {/* Back to Home Button */}
+      {}
       <Link
         to="/"
         className="absolute top-6 left-6 md:top-8 md:left-8 z-50 flex items-center gap-2 text-slate-500 dark:text-slate-400 hover:text-emerald-600 dark:hover:text-white transition-colors group"
@@ -338,7 +334,7 @@ function SignupPage() {
         </span>
       </Link>
 
-      {/* ── Left side: Auth Form ── */}
+      {}
       <div className="w-full lg:w-[45%] flex flex-col justify-center px-8 sm:px-16 lg:px-24 py-12 relative z-10">
         <div
           className="w-full max-w-[400px] mx-auto"
@@ -381,7 +377,7 @@ function SignupPage() {
             </div>
           ) : (
             <>
-              {/* OAuth */}
+              {}
               <div className="grid grid-cols-1 gap-3 mb-6">
                 <button
                   onClick={handleGoogle}
@@ -518,13 +514,13 @@ function SignupPage() {
         </div>
       </div>
 
-      {/* ── Right side: Promotional Content ── */}
+      {}
       <div className="hidden lg:flex w-[55%] relative flex-col justify-center px-16 xl:px-24 border-l border-slate-200 dark:border-white/[0.05] overflow-hidden bg-slate-50 dark:bg-[#03080c] transition-colors duration-500">
-        {/* Abstract animated backgrounds */}
+        {}
         <div className="absolute top-[-20%] right-[-10%] w-[800px] h-[800px] bg-emerald-500/10 dark:bg-emerald-500/10 blur-[120px] rounded-full pointer-events-none mix-blend-multiply dark:mix-blend-screen" />
         <div className="absolute bottom-[-10%] left-[-10%] w-[600px] h-[600px] bg-teal-500/10 dark:bg-teal-500/10 blur-[100px] rounded-full pointer-events-none mix-blend-multiply dark:mix-blend-screen" />
 
-        {/* Subtle grid */}
+        {}
         <div
           className="absolute inset-0 opacity-[0.05] dark:opacity-[0.03]"
           style={{
@@ -533,7 +529,7 @@ function SignupPage() {
           }}
         />
 
-        {/* Floating Code */}
+        {}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
           {CODE_SNIPPETS.map((s, i) => (
             <FloatingCodeLine key={i} text={s} delay={i * 4} top={`${15 + i * 15}%`} />
@@ -548,7 +544,7 @@ function SignupPage() {
             transition: "all 1s cubic-bezier(0.34,1.2,0.64,1) 200ms",
           }}
         >
-          {/* Badge */}
+          {}
           <div className="inline-flex items-center gap-2.5 px-4 py-2 rounded-full border border-emerald-200 dark:border-emerald-500/30 bg-emerald-50 dark:bg-emerald-500/10 backdrop-blur-xl mb-6">
             <Sparkles className="h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400" />
             <span className="text-[11px] font-bold text-emerald-700 dark:text-emerald-300 uppercase tracking-[0.2em]">
@@ -572,7 +568,7 @@ function SignupPage() {
             </span>
           </h1>
 
-          {/* Typewriter */}
+          {}
           <div className="flex items-center gap-3 mb-10">
             <Terminal className="h-5 w-5 text-emerald-500 dark:text-emerald-400 flex-shrink-0 animate-pulse" />
             <p className="text-xl text-slate-600 dark:text-slate-300 font-mono">
@@ -584,14 +580,14 @@ function SignupPage() {
             </p>
           </div>
 
-          {/* Feature Grid */}
+          {}
           <div className="grid grid-cols-2 gap-4 mb-10">
             {FEATURES.map((f, i) => (
               <FeatureCard key={f.label} feature={f} index={i} />
             ))}
           </div>
 
-          {/* Trust indicators */}
+          {}
           <div className="flex items-center gap-6 pt-6 border-t border-slate-200 dark:border-white/[0.08]">
             {[
               { icon: "🔒", text: "256-bit SSL" },

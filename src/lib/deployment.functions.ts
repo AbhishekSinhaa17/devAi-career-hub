@@ -7,9 +7,6 @@ function generateDeploymentId() {
 }
 
 function generateDeploymentUrl(username: string, provider: string, portfolioId: string) {
-  // We'll use our internal public portfolio renderer to ensure the user's actual data is displayed,
-  // avoiding collisions with external sites that happen to have the same subdomains.
-  // In a full production app with Vercel API access, this would be the actual Vercel project URL.
   return `/p/${portfolioId}`;
 }
 
@@ -44,19 +41,10 @@ export const startDeployment = createServerFn({ method: "POST" })
       throw new Error("Failed to start deployment");
     }
 
-    // In a real application, we would call the Vercel/Netlify API here.
-    // For this implementation, we will simulate the deployment asynchronously.
-
-    // Simulate a build process taking some time.
-    // Note: In an edge/serverless env, background tasks like this might be killed.
-    // In a real app we'd use a queue or webhooks. This is just for demonstration.
     setTimeout(async () => {
       try {
         const liveUrl = generateDeploymentUrl(data.username, data.provider, data.portfolioId);
-        // We cannot use context.supabase here if the context is destroyed,
-        // but for a simple node simulation it might work.
-        // Actually, let's just do a sync delay for the simulation if we want it to be robust,
-        // or just let it update. We'll try the timeout.
+
         await context.supabase
           .from("portfolio_deployments")
           .update({
@@ -69,7 +57,7 @@ export const startDeployment = createServerFn({ method: "POST" })
         const { logger } = await import("./logger.server");
         logger.error({ err, userId: context.userId }, "Background deployment error");
       }
-    }, 12000); // Simulate a 12-second build process
+    }, 12000);
 
     return deploymentData;
   });
@@ -120,10 +108,9 @@ export const getPublicPortfolio = createServerFn({ method: "GET" })
 
     if (error) throw new Error("Portfolio not found or is not public");
 
-    // Sanitize PII
     const safeData = {
       ...portfolioData,
-      insights: undefined, // remove private AI insights
+      insights: undefined,
     };
 
     if (safeData.resume_data && typeof safeData.resume_data === "object") {

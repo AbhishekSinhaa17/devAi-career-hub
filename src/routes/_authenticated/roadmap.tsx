@@ -59,8 +59,6 @@ const PHASE_PALETTES = [
   { from: "#ef4444", to: "#f87171", glow: "#ef444440" },
 ];
 
-// ─── CSS injected once ─────────────────────────────────────────────────────────
-
 const STYLES = `
   @keyframes float-orb {
     0%, 100% { transform: translate(0, 0) scale(1); }
@@ -150,8 +148,6 @@ const STYLES = `
   }
 `;
 
-// ─── Floating background orbs ──────────────────────────────────────────────────
-
 function BackgroundOrbs() {
   return (
     <div className="pointer-events-none fixed inset-0 overflow-hidden -z-10" aria-hidden>
@@ -178,8 +174,6 @@ function BackgroundOrbs() {
   );
 }
 
-// ─── Animated grid background ─────────────────────────────────────────────────
-
 function GridBackground() {
   return (
     <div
@@ -195,12 +189,10 @@ function GridBackground() {
   );
 }
 
-// ─── Skeleton loader ──────────────────────────────────────────────────────────
-
 function RoadmapSkeleton() {
   return (
     <div className="space-y-4 mt-2">
-      {/* Scanning bar */}
+      {}
       <div className="relative h-0.5 rounded-full overflow-hidden bg-white/5">
         <div
           className="absolute inset-y-0 w-1/3 rounded-full"
@@ -246,8 +238,6 @@ function RoadmapSkeleton() {
     </div>
   );
 }
-
-// ─── Block (skills / projects / resources) ────────────────────────────────────
 
 function Block({
   icon: Icon,
@@ -299,8 +289,6 @@ function Block({
   );
 }
 
-// ─── Phase card ───────────────────────────────────────────────────────────────
-
 function PhaseCard({
   phase,
   index,
@@ -326,11 +314,11 @@ function PhaseCard({
       className="flex gap-5 phase-card"
       style={{ animation: `phase-slide 0.5s cubic-bezier(0.34,1.1,0.64,1) ${index * 100}ms both` }}
     >
-      {/* Timeline */}
+      {}
       <div className="flex flex-col items-center flex-shrink-0 pt-1">
-        {/* Number bubble */}
+        {}
         <div className="relative flex-shrink-0">
-          {/* Pulse ring */}
+          {}
           {index === 0 && (
             <div
               className="absolute inset-0 rounded-full"
@@ -352,7 +340,7 @@ function PhaseCard({
           </div>
         </div>
 
-        {/* Progress line */}
+        {}
         {!isLast && (
           <div
             className="w-px mt-2 flex-1 min-h-8 rounded-full overflow-hidden"
@@ -371,7 +359,7 @@ function PhaseCard({
         )}
       </div>
 
-      {/* Card */}
+      {}
       <div
         className="flex-1 min-w-0 mb-4 rounded-2xl overflow-hidden relative group/card cursor-pointer"
         style={{
@@ -389,7 +377,7 @@ function PhaseCard({
           (e.currentTarget as HTMLDivElement).style.boxShadow = "none";
         }}
       >
-        {/* Top accent line */}
+        {}
         <div
           className="absolute inset-x-0 top-0 h-px"
           style={{
@@ -397,7 +385,7 @@ function PhaseCard({
           }}
         />
 
-        {/* Glow overlay */}
+        {}
         <div
           className="phase-glow absolute inset-0 opacity-0 transition-opacity duration-500 pointer-events-none"
           style={{
@@ -405,7 +393,7 @@ function PhaseCard({
           }}
         />
 
-        {/* Header */}
+        {}
         <div className="phase-inner relative flex items-center justify-between gap-3 px-5 py-4">
           <div className="flex items-center gap-3 min-w-0">
             <div
@@ -439,7 +427,7 @@ function PhaseCard({
           </div>
         </div>
 
-        {/* Progress bar */}
+        {}
         <div className="relative px-5">
           <div className="h-px w-full" style={{ background: "var(--card)" }}>
             <div
@@ -453,7 +441,7 @@ function PhaseCard({
           </div>
         </div>
 
-        {/* Body */}
+        {}
         {expanded && (
           <div
             className="phase-inner relative grid gap-5 sm:grid-cols-3 px-5 py-5"
@@ -487,8 +475,6 @@ function PhaseCard({
   );
 }
 
-// ─── Meta stat card ───────────────────────────────────────────────────────────
-
 function MetaCard({
   label,
   value,
@@ -520,7 +506,7 @@ function MetaCard({
         (e.currentTarget as HTMLDivElement).style.boxShadow = "none";
       }}
     >
-      {/* bg glow */}
+      {}
       <div
         className="absolute -right-4 -top-4 h-16 w-16 rounded-full opacity-20 transition-opacity duration-500 group-hover/meta:opacity-40"
         style={{ background: `radial-gradient(circle, ${color}, transparent 70%)` }}
@@ -545,8 +531,6 @@ function MetaCard({
     </div>
   );
 }
-
-// ─── Main Page ────────────────────────────────────────────────────────────────
 
 function Page() {
   const [path, setPath] = useState("Full Stack Developer");
@@ -580,9 +564,9 @@ function Page() {
           transition: "all 0.6s cubic-bezier(0.34,1.1,0.64,1)",
         }}
       >
-        {/* ── Header ──────────────────────────────────────────────── */}
+        {}
         <header className="relative space-y-4 pt-2">
-          {/* Badge */}
+          {}
           <div
             className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full w-fit"
             style={{
@@ -597,7 +581,7 @@ function Page() {
             </span>
           </div>
 
-          {/* Title */}
+          {}
           <div style={{ animation: "fade-up 0.5s 0.15s ease both" }}>
             <h1 className="text-4xl sm:text-5xl font-black tracking-tight leading-none">
               <span className="text-foreground/90">Plan your</span>
@@ -622,7 +606,7 @@ function Page() {
           </p>
         </header>
 
-        {/* ── Config Panel ─────────────────────────────────────────── */}
+        {}
         <div
           className="relative rounded-2xl overflow-hidden"
           style={{
@@ -633,7 +617,7 @@ function Page() {
         >
           <GridBackground />
 
-          {/* Top border glow */}
+          {}
           <div
             className="absolute inset-x-0 top-0 h-px"
             style={{
@@ -641,14 +625,14 @@ function Page() {
             }}
           />
 
-          {/* Corner glow */}
+          {}
           <div
             className="absolute -top-20 -left-20 h-40 w-40 rounded-full opacity-30"
             style={{ background: "radial-gradient(circle, #6366f1, transparent 70%)" }}
           />
 
           <div className="relative p-6">
-            {/* Panel header */}
+            {}
             <div className="flex items-center gap-3 mb-6">
               <div
                 className="h-9 w-9 rounded-xl flex items-center justify-center flex-shrink-0"
@@ -667,9 +651,9 @@ function Page() {
               </div>
             </div>
 
-            {/* Selects */}
+            {}
             <div className="grid gap-4 sm:grid-cols-2 mb-6">
-              {/* Target path */}
+              {}
               <div>
                 <Label className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60 mb-2.5">
                   <Target className="h-3 w-3" />
@@ -695,7 +679,7 @@ function Page() {
                 </Select>
               </div>
 
-              {/* Level */}
+              {}
               <div>
                 <Label className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60 mb-2.5">
                   <TrendingUp className="h-3 w-3" />
@@ -722,9 +706,9 @@ function Page() {
               </div>
             </div>
 
-            {/* Footer row */}
+            {}
             <div className="flex items-center justify-between gap-4">
-              {/* Status pill */}
+              {}
               <div
                 className="flex items-center gap-2 px-3 py-2 rounded-full text-xs font-semibold"
                 style={{
@@ -756,7 +740,7 @@ function Page() {
                     : "Configure and generate"}
               </div>
 
-              {/* CTA button */}
+              {}
               <button
                 onClick={() => mutation.mutate()}
                 disabled={mutation.isPending}
@@ -784,7 +768,7 @@ function Page() {
                   (e.currentTarget as HTMLButtonElement).style.transform = "scale(1)";
                 }}
               >
-                {/* Shimmer */}
+                {}
                 <div
                   className="absolute inset-0 -skew-x-12 pointer-events-none"
                   style={{
@@ -809,13 +793,13 @@ function Page() {
           </div>
         </div>
 
-        {/* ── Loading ──────────────────────────────────────────────── */}
+        {}
         {mutation.isPending && <RoadmapSkeleton />}
 
-        {/* ── Results ──────────────────────────────────────────────── */}
+        {}
         {rm && !mutation.isPending && (
           <div className="space-y-8" style={{ animation: "fade-up 0.5s ease both" }}>
-            {/* Meta stats */}
+            {}
             <div className="grid grid-cols-3 gap-3">
               <MetaCard
                 label="Estimated timeline"
@@ -834,7 +818,7 @@ function Page() {
               />
             </div>
 
-            {/* Section header */}
+            {}
             <div
               className="flex items-center gap-4"
               style={{ animation: "fade-up 0.4s 0.1s ease both" }}
@@ -865,7 +849,7 @@ function Page() {
               </div>
             </div>
 
-            {/* Phase list */}
+            {}
             <div>
               {rm.phases.map((phase: any, i: number) => (
                 <PhaseCard
@@ -878,7 +862,7 @@ function Page() {
               ))}
             </div>
 
-            {/* Certifications */}
+            {}
             <div
               className="relative rounded-2xl p-6 overflow-hidden"
               style={{
@@ -887,7 +871,7 @@ function Page() {
                 animation: `fade-up 0.5s ${rm.phases.length * 80 + 100}ms ease both`,
               }}
             >
-              {/* Glow */}
+              {}
               <div
                 className="absolute -right-12 -top-12 h-32 w-32 rounded-full opacity-20"
                 style={{ background: "radial-gradient(circle, #f59e0b, transparent 70%)" }}

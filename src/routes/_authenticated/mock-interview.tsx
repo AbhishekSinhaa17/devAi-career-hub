@@ -75,7 +75,6 @@ const TIMERS = [
   { label: "10 Minutes", value: 600 },
 ];
 
-// ─── Shared Panel ─────────────────────────────────────────────────────────────
 function Panel({
   children,
   className = "",
@@ -109,7 +108,6 @@ function Panel({
   );
 }
 
-// ─── Select field ─────────────────────────────────────────────────────────────
 function ConfigSelect({
   label,
   icon: Icon,
@@ -154,7 +152,6 @@ function ConfigSelect({
   );
 }
 
-// ─── Score ring ───────────────────────────────────────────────────────────────
 function ScoreRing({
   score,
   size = 120,
@@ -215,7 +212,6 @@ function ScoreRing({
   );
 }
 
-// ─── Score metric bar ─────────────────────────────────────────────────────────
 function ScoreMetric({
   label,
   value,
@@ -254,7 +250,6 @@ function ScoreMetric({
   );
 }
 
-// ─── Camera Preview ────────────────────────────────────────────────────────────
 function CameraPreview() {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [hasCamera, setHasCamera] = useState(false);
@@ -305,7 +300,7 @@ function CameraPreview() {
         </div>
       )}
 
-      {/* Recording overlay indicator */}
+      {}
       <div className="absolute top-4 right-4 h-3 w-3 rounded-full bg-red-500 animate-pulse shadow-[0_0_10px_rgba(239,68,68,0.8)]" />
       <div className="absolute bottom-4 left-4 right-4 flex justify-between items-end">
         <div className="px-3 py-1.5 rounded-lg bg-black/50 backdrop-blur-md border border-white/10 text-[10px] font-bold text-white uppercase tracking-widest">
@@ -316,7 +311,6 @@ function CameraPreview() {
   );
 }
 
-// ─── Progress dots ────────────────────────────────────────────────────────────
 function ProgressDots({
   total,
   current,
@@ -350,7 +344,6 @@ function ProgressDots({
   );
 }
 
-// ─── Timer display ────────────────────────────────────────────────────────────
 function TimerDisplay({ seconds }: { seconds: number }) {
   const isUrgent = seconds < 60;
   const pct = Math.min(100, (seconds / 600) * 100);
@@ -378,7 +371,6 @@ function TimerDisplay({ seconds }: { seconds: number }) {
   );
 }
 
-// ─── Main Page ────────────────────────────────────────────────────────────────
 function MockInterviewPage() {
   const queryClient = useQueryClient();
   const [status, setStatus] = useState<
@@ -400,7 +392,6 @@ function MockInterviewPage() {
     null,
   );
 
-  // ─── Voice Feature State ───
   const [detailedFeedback, setDetailedFeedback] = useState<
     {
       ai_score?: number;
@@ -496,9 +487,7 @@ function MockInterviewPage() {
         setIsRecording(true);
         if ("speechSynthesis" in window) window.speechSynthesis.cancel();
         setIsSpeaking(false);
-      } catch (e) {
-        // Ignore errors if recognition is already started
-      }
+      } catch (e) {}
     }
   };
 
@@ -572,7 +561,6 @@ function MockInterviewPage() {
     return () => clearTimeout(iv);
   }, [timeRemaining, status]);
 
-  // Auto-focus textarea when question changes
   useEffect(() => {
     if (status === "interview") {
       setTimeout(() => textareaRef.current?.focus(), 100);
@@ -612,7 +600,7 @@ function MockInterviewPage() {
         transition: "all 0.6s cubic-bezier(0.34,1.2,0.64,1)",
       }}
     >
-      {/* ── Header ── */}
+      {}
       <header className="flex flex-wrap items-start justify-between gap-4">
         <div>
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-primary/20 bg-primary/5 mb-3">
@@ -650,7 +638,7 @@ function MockInterviewPage() {
         )}
       </header>
 
-      {/* ──────────────────────── SETUP ──────────────────────── */}
+      {}
       {status === "setup" && (
         <div
           className="max-w-3xl space-y-6"
@@ -695,7 +683,7 @@ function MockInterviewPage() {
               />
             </div>
 
-            {/* Info strip */}
+            {}
             <div
               className="mt-6 flex items-start gap-3 p-4 rounded-xl border"
               style={{
@@ -713,7 +701,7 @@ function MockInterviewPage() {
               </p>
             </div>
 
-            {/* Feature pills */}
+            {}
             <div className="mt-4 flex flex-wrap gap-2">
               {[
                 { icon: Brain, label: "AI Scoring", color: "#6366f1" },
@@ -756,7 +744,7 @@ function MockInterviewPage() {
         </div>
       )}
 
-      {/* ──────────────────────── GENERATING ──────────────────────── */}
+      {}
       {status === "generating" && (
         <PageLoadingState
           title="Analyzing Profile..."
@@ -764,7 +752,7 @@ function MockInterviewPage() {
         />
       )}
 
-      {/* ──────────────────────── COUNTDOWN ──────────────────────── */}
+      {}
       {status === "countdown" && countdown !== null && (
         <div
           className="flex flex-col items-center justify-center py-32 space-y-6"
@@ -789,13 +777,13 @@ function MockInterviewPage() {
         </div>
       )}
 
-      {/* ──────────────────────── INTERVIEW ──────────────────────── */}
+      {}
       {status === "interview" && questions.length > 0 && (
         <div
           className="flex flex-col lg:flex-row gap-6 max-w-6xl mx-auto"
           style={{ animation: "fadeSlideIn 0.4s ease-out both" }}
         >
-          {/* Camera Column (Top on mobile, left on desktop) */}
+          {}
           <div className="w-full lg:w-[400px] xl:w-[480px] shrink-0 space-y-4">
             <CameraPreview />
 
@@ -823,9 +811,9 @@ function MockInterviewPage() {
             </Panel>
           </div>
 
-          {/* Q&A Column (Bottom on mobile, right on desktop) */}
+          {}
           <div className="flex-1 space-y-5 min-w-0">
-            {/* Top bar */}
+            {}
             <Panel className="px-5 py-4">
               <div className="flex flex-wrap items-center justify-between gap-4">
                 <div className="flex items-center gap-4">
@@ -852,7 +840,7 @@ function MockInterviewPage() {
               </div>
             </Panel>
 
-            {/* Question card */}
+            {}
             <Panel accent="#6366f1" className="p-8" glow="rgba(99,102,241,0.04)">
               <div
                 className="absolute inset-0 opacity-30"
@@ -863,7 +851,7 @@ function MockInterviewPage() {
               />
 
               <div className="relative z-10 space-y-6">
-                {/* Q label */}
+                {}
                 <div className="flex items-center gap-3">
                   <div
                     className="h-8 w-8 rounded-xl grid place-items-center font-black text-sm text-white flex-shrink-0"
@@ -879,7 +867,7 @@ function MockInterviewPage() {
                   </span>
                 </div>
 
-                {/* Question text */}
+                {}
                 <div className="flex items-start justify-between gap-4">
                   <h2 className="text-xl font-black text-foreground leading-relaxed flex-1">
                     {questions[currentQ].question}
@@ -899,7 +887,7 @@ function MockInterviewPage() {
                   </button>
                 </div>
 
-                {/* Answer area */}
+                {}
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
                     <Label className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground">
@@ -972,7 +960,7 @@ function MockInterviewPage() {
               </div>
             </Panel>
 
-            {/* Navigation */}
+            {}
             <div className="flex items-center justify-between gap-4">
               <button
                 onClick={handlePrev}
@@ -1017,7 +1005,7 @@ function MockInterviewPage() {
         </div>
       )}
 
-      {/* ──────────────────────── EVALUATING ──────────────────────── */}
+      {}
       {status === "evaluating" && (
         <PageLoadingState
           title="Evaluating Answer..."
@@ -1025,10 +1013,10 @@ function MockInterviewPage() {
         />
       )}
 
-      {/* ──────────────────────── REPORT ──────────────────────── */}
+      {}
       {status === "report" && report && (
         <div className="space-y-8" style={{ animation: "fadeSlideIn 0.5s ease-out both" }}>
-          {/* Score hero */}
+          {}
           <Panel accent="#6366f1" glow="rgba(99,102,241,0.06)" className="p-8">
             <div
               className="absolute inset-0 opacity-40"
@@ -1038,7 +1026,7 @@ function MockInterviewPage() {
               }}
             />
             <div className="relative z-10 flex flex-wrap items-center gap-10">
-              {/* Ring */}
+              {}
               <div className="flex flex-col items-center gap-3">
                 <ScoreRing score={overallScore} size={140} strokeWidth={12} />
                 <div>
@@ -1063,7 +1051,7 @@ function MockInterviewPage() {
                 </div>
               </div>
 
-              {/* Metric bars */}
+              {}
               <div className="flex-1 grid gap-4 sm:grid-cols-2">
                 <ScoreMetric
                   label="Technical"
@@ -1099,9 +1087,9 @@ function MockInterviewPage() {
             </div>
           </Panel>
 
-          {/* Strengths / Weaknesses / Next steps */}
+          {}
           <div className="grid gap-4 md:grid-cols-3">
-            {/* Strengths */}
+            {}
             <Panel accent="#10b981" className="p-6">
               <div className="flex items-center gap-2.5 mb-5">
                 <div className="h-8 w-8 rounded-xl bg-emerald-500/10 border border-emerald-500/20 grid place-items-center">
@@ -1125,7 +1113,7 @@ function MockInterviewPage() {
               </ul>
             </Panel>
 
-            {/* Weaknesses */}
+            {}
             <Panel accent="#f59e0b" className="p-6">
               <div className="flex items-center gap-2.5 mb-5">
                 <div className="h-8 w-8 rounded-xl bg-amber-500/10 border border-amber-500/20 grid place-items-center">
@@ -1149,7 +1137,7 @@ function MockInterviewPage() {
               </ul>
             </Panel>
 
-            {/* Next steps */}
+            {}
             <Panel accent="#6366f1" className="p-6">
               <div className="flex items-center gap-2.5 mb-5">
                 <div className="h-8 w-8 rounded-xl bg-primary/10 border border-primary/20 grid place-items-center">
@@ -1174,7 +1162,7 @@ function MockInterviewPage() {
             </Panel>
           </div>
 
-          {/* Detailed Q&A review */}
+          {}
           <div>
             <div className="flex items-center gap-3 mb-5">
               <h2 className="text-lg font-black text-foreground">Detailed Question Review</h2>
@@ -1198,7 +1186,7 @@ function MockInterviewPage() {
                 return (
                   <div key={i} style={{ animation: `fadeSlideIn 0.4s ease-out ${i * 60}ms both` }}>
                     <Panel accent={scoreColor} className="overflow-hidden">
-                      {/* Q header */}
+                      {}
                       <div className="flex items-start justify-between gap-4 px-6 py-5 border-b border-border/40">
                         <div className="flex items-start gap-3 flex-1 min-w-0">
                           <div
@@ -1228,7 +1216,7 @@ function MockInterviewPage() {
                         </div>
                       </div>
 
-                      {/* Answer comparison */}
+                      {}
                       <div className="grid md:grid-cols-2 gap-0 divide-y md:divide-y-0 md:divide-x divide-border/40">
                         <div className="p-6">
                           <div className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground mb-3">
@@ -1266,7 +1254,7 @@ function MockInterviewPage() {
             </div>
           </div>
 
-          {/* CTA to retry */}
+          {}
           <Panel accent="#8b5cf6" className="p-6">
             <div className="flex flex-wrap items-center justify-between gap-4">
               <div className="flex items-center gap-3">

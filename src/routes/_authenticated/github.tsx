@@ -43,7 +43,6 @@ export const Route = createFileRoute("/_authenticated/github")({
   component: Page,
 });
 
-// ─── Animated counter ─────────────────────────────────────────────────────────
 function useCountUp(target: number, duration = 1000) {
   const [count, setCount] = useState(0);
   useEffect(() => {
@@ -64,7 +63,6 @@ function useCountUp(target: number, duration = 1000) {
   return count;
 }
 
-// ─── Score ring ───────────────────────────────────────────────────────────────
 function ScoreRing({ score }: { score: number }) {
   const animated = useCountUp(score);
   const radius = 44;
@@ -113,7 +111,6 @@ function ScoreRing({ score }: { score: number }) {
   );
 }
 
-// ─── Custom bar tooltip ───────────────────────────────────────────────────────
 function CustomBarTooltip({ active, payload }: TooltipProps<number, string>) {
   if (!active || !payload?.length) return null;
   return (
@@ -124,7 +121,6 @@ function CustomBarTooltip({ active, payload }: TooltipProps<number, string>) {
   );
 }
 
-// ─── Glass panel ──────────────────────────────────────────────────────────────
 function Panel({
   children,
   className = "",
@@ -156,7 +152,6 @@ function Panel({
   );
 }
 
-// ─── Stat card ────────────────────────────────────────────────────────────────
 const STAT_META = [
   { icon: BookOpen, color: "#6366f1", bg: "rgba(99,102,241,0.1)" },
   { icon: Star, color: "#f59e0b", bg: "rgba(245,158,11,0.1)" },
@@ -213,7 +208,6 @@ function StatCard({
   );
 }
 
-// ─── Insight card ─────────────────────────────────────────────────────────────
 const INSIGHT_META = {
   success: {
     color: "#10b981",
@@ -250,7 +244,7 @@ function InsightCard({
   return (
     <Panel className="p-6" accentColor={meta.color}>
       <div className="relative z-10">
-        {/* Header */}
+        {}
         <div className="flex items-center gap-2.5 mb-5">
           <div
             className="h-8 w-8 rounded-xl flex items-center justify-center"
@@ -261,7 +255,7 @@ function InsightCard({
           <span className="font-black text-sm tracking-tight text-foreground">{title}</span>
         </div>
 
-        {/* Items */}
+        {}
         <ul className="space-y-3">
           {items.map((s, i) => (
             <li
@@ -286,7 +280,6 @@ function InsightCard({
   );
 }
 
-// ─── Language bar colors ──────────────────────────────────────────────────────
 const LANG_COLORS = [
   "#6366f1",
   "#8b5cf6",
@@ -298,8 +291,6 @@ const LANG_COLORS = [
   "#a855f7",
 ];
 
-// ─── Empty / loading state ────────────────────────────────────────────────────
-// ─── Main Page ────────────────────────────────────────────────────────────────
 function Page() {
   const [username, setUsername] = useState("");
   const [mounted, setMounted] = useState(false);
@@ -331,7 +322,7 @@ function Page() {
         transition: "all 0.6s cubic-bezier(0.34,1.2,0.64,1)",
       }}
     >
-      {/* ── Header ── */}
+      {}
       <div className="flex items-start justify-between flex-wrap gap-4">
         <div>
           <div className="flex items-center gap-2 mb-3">
@@ -367,7 +358,7 @@ function Page() {
         )}
       </div>
 
-      {/* ── Search bar ── */}
+      {}
       <Panel className="p-1.5" accentColor="#6366f1">
         <form
           className="flex items-center gap-2"
@@ -412,7 +403,7 @@ function Page() {
         </form>
       </Panel>
 
-      {/* ── Results ── */}
+      {}
       {!data && mutation.isPending && (
         <PageLoadingState
           title="Analyzing profile…"
@@ -444,7 +435,7 @@ function Page() {
 
       {data && (
         <div className="space-y-6" style={{ animation: "fadeSlideIn 0.5s ease-out both" }}>
-          {/* ── Profile hero ── */}
+          {}
           <Panel className="p-6 md:p-8" accentColor="#6366f1">
             <div
               className="absolute inset-0 opacity-30"
@@ -454,7 +445,7 @@ function Page() {
               }}
             />
             <div className="relative z-10 flex flex-wrap items-center gap-6">
-              {/* Avatar */}
+              {}
               {data.stats.avatar_url && (
                 <div className="relative flex-shrink-0">
                   <img
@@ -478,7 +469,7 @@ function Page() {
                 </div>
               )}
 
-              {/* Info */}
+              {}
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 flex-wrap">
                   <h2 className="text-2xl font-black text-foreground">
@@ -492,7 +483,7 @@ function Page() {
                   {data.summary}
                 </p>
 
-                {/* Tag pills */}
+                {}
                 <div className="flex flex-wrap gap-2 mt-3">
                   {[
                     { icon: Code2, label: `${data.stats.public_repos} repos`, color: "#6366f1" },
@@ -515,7 +506,7 @@ function Page() {
                 </div>
               </div>
 
-              {/* Score ring */}
+              {}
               <div className="flex flex-col items-center gap-1 flex-shrink-0">
                 <ScoreRing score={data.score} />
                 <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
@@ -525,7 +516,7 @@ function Page() {
             </div>
           </Panel>
 
-          {/* ── Stats ── */}
+          {}
           <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-4">
             {[
               { label: "Public Repos", value: data.stats.public_repos },
@@ -544,7 +535,7 @@ function Page() {
             ))}
           </div>
 
-          {/* ── Languages chart ── */}
+          {}
           <Panel className="p-6" accentColor="#8b5cf6">
             <div className="flex items-center justify-between mb-6">
               <div className="flex items-center gap-2.5">
@@ -607,7 +598,7 @@ function Page() {
             </div>
           </Panel>
 
-          {/* ── Insights ── */}
+          {}
           <div>
             <div className="flex items-center gap-3 mb-5">
               <h2 className="text-lg font-black text-foreground">AI Insights</h2>
@@ -642,7 +633,7 @@ function Page() {
             </div>
           </div>
 
-          {/* ── CTA ── */}
+          {}
           <Panel className="p-6 md:p-8" accentColor="#10b981">
             <div
               className="absolute inset-0 opacity-40"

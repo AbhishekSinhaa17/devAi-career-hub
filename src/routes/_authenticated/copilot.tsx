@@ -34,7 +34,6 @@ export const Route = createFileRoute("/_authenticated/copilot")({
   component: CopilotPage,
 });
 
-// ── Typing indicator ────────────────────────────────────────────────────────
 function TypingDots() {
   return (
     <div className="flex items-center gap-1.5 py-1">
@@ -49,7 +48,6 @@ function TypingDots() {
   );
 }
 
-// ── Message bubble ──────────────────────────────────────────────────────────
 function MessageBubble({ msg, index }: { msg: any; index: number }) {
   const isUser = msg.role === "user";
   return (
@@ -57,7 +55,7 @@ function MessageBubble({ msg, index }: { msg: any; index: number }) {
       className={`flex gap-3 items-end animate-in fade-in slide-in-from-bottom-3 duration-300 ${isUser ? "flex-row-reverse" : "flex-row"}`}
       style={{ animationDelay: `${Math.min(index * 30, 150)}ms` }}
     >
-      {/* Avatar */}
+      {}
       <div
         className={`flex-shrink-0 h-8 w-8 rounded-2xl flex items-center justify-center shadow-sm ${
           isUser
@@ -72,7 +70,7 @@ function MessageBubble({ msg, index }: { msg: any; index: number }) {
         )}
       </div>
 
-      {/* Bubble */}
+      {}
       <div
         className={`relative max-w-[78%] group ${isUser ? "items-end" : "items-start"} flex flex-col`}
       >
@@ -96,7 +94,6 @@ function MessageBubble({ msg, index }: { msg: any; index: number }) {
   );
 }
 
-// ── Quick action card ───────────────────────────────────────────────────────
 function QuickActionCard({
   icon: Icon,
   title,
@@ -124,7 +121,7 @@ function QuickActionCard({
         shadow-sm dark:shadow-none"
       style={{ animationDelay: `${delay}ms` }}
     >
-      {/* Hover glow */}
+      {}
       <div
         className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-2xl"
         style={{ background: `radial-gradient(circle at top left, ${color}08, transparent 60%)` }}
@@ -152,7 +149,6 @@ function QuickActionCard({
   );
 }
 
-// ── Sidebar conversation item ───────────────────────────────────────────────
 function ConvItem({
   conv,
   isActive,
@@ -199,7 +195,6 @@ function ConvItem({
   );
 }
 
-// ── Main Page ───────────────────────────────────────────────────────────────
 function CopilotPage() {
   const [activeConvId, setActiveConvId] = useState<string | null>(null);
   const [inputMsg, setInputMsg] = useState("");
@@ -248,7 +243,6 @@ function CopilotPage() {
     },
   });
 
-  // Auto-grow textarea
   useEffect(() => {
     const el = textareaRef.current;
     if (!el) return;
@@ -256,7 +250,6 @@ function CopilotPage() {
     el.style.height = `${Math.min(el.scrollHeight, 180)}px`;
   }, [inputMsg]);
 
-  // Auto-scroll
   useEffect(() => {
     if (scrollRef.current) {
       scrollRef.current.scrollTo({
@@ -352,9 +345,9 @@ function CopilotPage() {
 
   return (
     <div className="flex h-[calc(100dvh-130px)] md:h-[calc(100dvh-64px)] overflow-hidden bg-slate-50 dark:bg-transparent">
-      {/* ── Sidebar ── */}
+      {}
       <aside className="hidden md:flex w-72 flex-col border-r border-slate-200 dark:border-white/8 bg-white dark:bg-white/[0.02] flex-shrink-0">
-        {/* Sidebar header */}
+        {}
         <div className="p-4 border-b border-slate-200 dark:border-white/8">
           <div className="flex items-center gap-2.5 mb-4 px-1">
             <div className="h-7 w-7 rounded-lg bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center shadow-lg shadow-indigo-500/25">
@@ -385,7 +378,7 @@ function CopilotPage() {
           </button>
         </div>
 
-        {/* History list */}
+        {}
         <div className="flex-1 overflow-y-auto p-3 space-y-1">
           {isHistoryLoading ? (
             <div className="flex justify-center py-10">
@@ -420,7 +413,7 @@ function CopilotPage() {
           )}
         </div>
 
-        {/* Sidebar footer */}
+        {}
         <div className="p-4 border-t border-slate-200 dark:border-white/8">
           <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-indigo-50 dark:bg-indigo-500/8 border border-indigo-100 dark:border-indigo-500/15">
             <Zap className="h-3.5 w-3.5 text-indigo-500 flex-shrink-0" />
@@ -431,9 +424,9 @@ function CopilotPage() {
         </div>
       </aside>
 
-      {/* ── Main chat ── */}
+      {}
       <main className="flex-1 flex flex-col min-w-0 relative h-full">
-        {/* Mobile Header Toggle */}
+        {}
         <div className="md:hidden flex items-center justify-between p-3 border-b border-slate-200 dark:border-white/8 bg-white/80 dark:bg-black/50 backdrop-blur-md z-10 shrink-0">
           <div className="flex items-center gap-2">
             <div className="h-6 w-6 rounded-md bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center">
@@ -485,17 +478,16 @@ function CopilotPage() {
           </Sheet>
         </div>
 
-        {/* Ambient backgrounds (dark only) */}
+        {}
         <div className="fixed inset-0 pointer-events-none -z-10 hidden dark:block">
           <div className="absolute top-0 left-1/3 w-[500px] h-[500px] rounded-full bg-indigo-600/5 blur-[120px]" />
           <div className="absolute bottom-0 right-1/4 w-[400px] h-[400px] rounded-full bg-violet-600/5 blur-[100px]" />
         </div>
 
         {!hasMessages ? (
-          /* ── Welcome screen ── */
           <div className="flex-1 overflow-y-auto flex flex-col items-center justify-center p-6 md:p-10">
             <div className="w-full max-w-2xl mx-auto">
-              {/* Hero */}
+              {}
               <div className="text-center mb-10 animate-in fade-in slide-in-from-bottom-4 duration-500">
                 <div className="relative inline-flex mb-6">
                   <div className="h-20 w-20 rounded-3xl bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center shadow-2xl shadow-indigo-500/30">
@@ -514,7 +506,7 @@ function CopilotPage() {
                 </p>
               </div>
 
-              {/* Quick action grid */}
+              {}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-8">
                 {quickActions.map((action, i) => (
                   <QuickActionCard
@@ -526,21 +518,20 @@ function CopilotPage() {
                 ))}
               </div>
 
-              {/* Hint */}
+              {}
               <p className="text-center text-xs text-slate-400 dark:text-slate-600 animate-in fade-in duration-700 delay-500">
                 Or type your own question below ↓
               </p>
             </div>
           </div>
         ) : (
-          /* ── Messages ── */
           <div ref={scrollRef} className="flex-1 overflow-y-auto">
             <div className="max-w-3xl mx-auto px-4 md:px-6 py-8 space-y-6 pb-32">
               {displayMsgs.map((msg, i) => (
                 <MessageBubble key={msg.id || i} msg={msg} index={i} />
               ))}
 
-              {/* Typing indicator */}
+              {}
               {isPending && (
                 <div className="flex gap-3 items-end animate-in fade-in duration-200">
                   <div className="flex-shrink-0 h-8 w-8 rounded-2xl bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center shadow-lg shadow-indigo-500/25">
@@ -555,7 +546,7 @@ function CopilotPage() {
           </div>
         )}
 
-        {/* ── Input bar ── */}
+        {}
         <div className="absolute bottom-0 left-0 right-0 z-20 shrink-0 bg-white/80 dark:bg-[#080810]/80 backdrop-blur-md border-t border-slate-200 dark:border-white/10 p-3">
           <div className="max-w-3xl mx-auto">
             <div

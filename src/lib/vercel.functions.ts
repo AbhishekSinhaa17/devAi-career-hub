@@ -21,7 +21,6 @@ export const triggerVercelDeployment = createServerFn({ method: "POST" })
       .parse(d),
   )
   .handler(async ({ data, context }) => {
-    // 1. Fetch the user's actual portfolio data
     const { data: portfolioData, error: portfolioError } = await context.supabase
       .from("github_resumes")
       .select("*")
@@ -32,7 +31,6 @@ export const triggerVercelDeployment = createServerFn({ method: "POST" })
       throw new Error("Failed to load portfolio data for deployment.");
     }
 
-    // Combine username for template
     const resumeData = {
       ...(typeof portfolioData.resume_data === "object" && portfolioData.resume_data !== null
         ? portfolioData.resume_data
@@ -40,11 +38,9 @@ export const triggerVercelDeployment = createServerFn({ method: "POST" })
       github_username: portfolioData.github_username,
     };
 
-    // 2. Generate actual React+Vite files dynamically
     const files = generatePortfolioFiles(resumeData);
     const projectName = `portfolio-${portfolioData.github_username.toLowerCase().replace(/[^a-z0-9]/g, "-")}`;
 
-    // 3. Trigger actual Vercel deployment
     const token = getVercelToken();
     const response = await fetch(`${VERCEL_API_URL}/v13/deployments`, {
       method: "POST",
@@ -69,7 +65,6 @@ export const triggerVercelDeployment = createServerFn({ method: "POST" })
 
     const vercelData = await response.json();
 
-    // 4. Record the real deployment in Supabase
     const { data: deploymentData, error: dbError } = await context.supabase
       .from("portfolio_deployments")
       .insert({
@@ -100,7 +95,6 @@ export const checkVercelStatus = createServerFn({ method: "GET" })
       .parse(d),
   )
   .handler(async ({ data, context }) => {
-    // 1. Get deployment record
     const { data: deploymentData, error: dbError } = await context.supabase
       .from("portfolio_deployments")
       .select("*")
@@ -112,7 +106,6 @@ export const checkVercelStatus = createServerFn({ method: "GET" })
       throw new Error("Deployment not found");
     }
 
-    // Only ping Vercel if it's still building
     if (deploymentData.status === "building" && deploymentData.deployment_id) {
       try {
         const token = getVercelToken();
@@ -135,7 +128,6 @@ export const checkVercelStatus = createServerFn({ method: "GET" })
             newStatus = "failed";
           }
 
-          // If status changed, update DB
           if (newStatus !== "building") {
             const updates: any = {
               status: newStatus,
@@ -144,7 +136,7 @@ export const checkVercelStatus = createServerFn({ method: "GET" })
             if (newStatus === "success") {
               updates.deployed_at = new Date().toISOString();
             }
-            // Capture building duration if available
+
             if (vData.buildingAt && vData.readyAt) {
               updates.build_duration = vData.readyAt - vData.buildingAt;
             }

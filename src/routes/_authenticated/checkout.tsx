@@ -15,7 +15,6 @@ function CheckoutPage() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
 
-  // Mock form state
   const [cardNumber, setCardNumber] = useState("");
   const [expiry, setExpiry] = useState("");
   const [cvc, setCvc] = useState("");
@@ -66,7 +65,6 @@ function CheckoutPage() {
     }
   };
 
-  // Simple formatter for card number
   const handleCardNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const val = e.target.value.replace(/\D/g, "");
     const formatted = val.replace(/(.{4})/g, "$1 ").trim();
@@ -90,7 +88,7 @@ function CheckoutPage() {
   return (
     <div className="min-h-[calc(100vh-4rem)] bg-slate-50 dark:bg-[#030712] py-12 px-4 sm:px-6 lg:px-8 flex items-center justify-center">
       <div className="w-full max-w-5xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16">
-        {/* Left Side - Order Summary */}
+        {}
         <div className="flex flex-col justify-center space-y-8">
           <div>
             <div className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-3 py-1 mb-4">
@@ -143,9 +141,9 @@ function CheckoutPage() {
           </div>
         </div>
 
-        {/* Right Side - Payment Form */}
+        {}
         <div className="bg-white dark:bg-[#0B1120] border border-slate-200 dark:border-white/[0.08] rounded-3xl p-8 shadow-xl relative overflow-hidden">
-          {/* Subtle glow */}
+          {}
           <div className="absolute top-0 right-0 -mr-20 -mt-20 w-64 h-64 bg-primary/10 blur-[80px] rounded-full pointer-events-none" />
 
           <div className="mb-8">

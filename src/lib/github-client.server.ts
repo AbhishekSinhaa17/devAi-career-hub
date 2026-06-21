@@ -1,19 +1,6 @@
-/**
- * Centralized GitHub API client (server-only).
- *
- * - Uses GITHUB_TOKEN when available (5,000 req/hr authenticated)
- * - Falls back gracefully to unauthenticated requests (60 req/hr)
- * - Provides consistent error handling and typing
- * - Never exposes the token to the client
- */
-
 const GITHUB_API_BASE = "https://api.github.com";
 const USER_AGENT = "DevAI";
 
-/**
- * Build headers for GitHub API requests.
- * Automatically includes Authorization if GITHUB_TOKEN is set.
- */
 function getHeaders(): Record<string, string> {
   const headers: Record<string, string> = {
     "User-Agent": USER_AGENT,
@@ -39,9 +26,6 @@ export class GitHubApiError extends Error {
   }
 }
 
-/**
- * Execute a GET request to the GitHub API with centralized auth & error handling.
- */
 async function githubGet<T>(path: string, retries = 2): Promise<T> {
   const url = path.startsWith("http") ? path : `${GITHUB_API_BASE}${path}`;
 
@@ -94,8 +78,6 @@ async function githubGet<T>(path: string, retries = 2): Promise<T> {
   throw new Error("Unreachable");
 }
 
-// ── Public API ──────────────────────────────────────────────────────────────
-
 export interface GitHubUser {
   public_repos: number;
   followers: number;
@@ -117,12 +99,10 @@ export interface GitHubRepo {
   watchers_count?: number;
 }
 
-/** Fetch a GitHub user profile. */
 export function fetchGitHubUser(username: string): Promise<GitHubUser> {
   return githubGet<GitHubUser>(`/users/${username}`);
 }
 
-/** Fetch user repositories (non-forked, sorted by update date). */
 export async function fetchGitHubRepos(
   username: string,
   opts: { perPage?: number; sort?: "updated" | "pushed" } = {},

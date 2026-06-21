@@ -32,7 +32,7 @@ function PublicPortfolio() {
 
   return (
     <div className="min-h-screen bg-[#0a0a0a] text-slate-200 selection:bg-primary/30 font-sans selection:text-white">
-      {/* Hero Section */}
+      {}
       <div className="relative overflow-hidden border-b border-white/5">
         <div className="absolute inset-0 bg-gradient-to-b from-primary/10 via-background to-background" />
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-lg h-[400px] bg-primary/20 blur-[120px] rounded-full pointer-events-none" />
@@ -76,7 +76,7 @@ function PublicPortfolio() {
       </div>
 
       <div className="max-w-5xl mx-auto px-6 py-24 space-y-32">
-        {/* Skills */}
+        {}
         <section>
           <div className="flex items-center gap-4 mb-10">
             <div className="h-12 w-12 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center">
@@ -96,7 +96,7 @@ function PublicPortfolio() {
           </div>
         </section>
 
-        {/* Projects */}
+        {}
         <section id="projects">
           <div className="flex items-center gap-4 mb-10">
             <div className="h-12 w-12 rounded-2xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center">

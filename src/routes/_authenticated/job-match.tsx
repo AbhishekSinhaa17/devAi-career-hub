@@ -32,8 +32,6 @@ export const Route = createFileRoute("/_authenticated/job-match")({
   component: Page,
 });
 
-// ─── Styles ────────────────────────────────────────────────────────────────────
-
 const STYLES = `
   @keyframes float-orb {
     0%,100% { transform: translate(0,0) scale(1); }
@@ -139,8 +137,6 @@ const STYLES = `
   :root:not(.dark) .divider { background: rgba(0,0,0,0.07); }
 `;
 
-// ─── Background orbs ───────────────────────────────────────────────────────────
-
 function BackgroundOrbs() {
   return (
     <div className="pointer-events-none fixed inset-0 overflow-hidden -z-10" aria-hidden>
@@ -168,8 +164,6 @@ function BackgroundOrbs() {
   );
 }
 
-// ─── Accent top-border line ────────────────────────────────────────────────────
-
 function AccentLine({ color }: { color: string }) {
   return (
     <div
@@ -178,8 +172,6 @@ function AccentLine({ color }: { color: string }) {
     />
   );
 }
-
-// ─── Score ring ────────────────────────────────────────────────────────────────
 
 function ScoreRing({
   score,
@@ -231,8 +223,6 @@ function ScoreRing({
   );
 }
 
-// ─── Score card ────────────────────────────────────────────────────────────────
-
 function ScoreCard({
   title,
   score,
@@ -268,7 +258,7 @@ function ScoreCard({
 
       <div className="text-[11px] text-sub font-medium">{subtitle}</div>
 
-      {/* mini bar */}
+      {}
       <div
         className="w-full h-1 rounded-full overflow-hidden"
         style={{ background: "rgba(255,255,255,0.06)" }}
@@ -285,8 +275,6 @@ function ScoreCard({
     </div>
   );
 }
-
-// ─── Skill tag ─────────────────────────────────────────────────────────────────
 
 function SkillTag({
   label,
@@ -323,8 +311,6 @@ function SkillTag({
     </span>
   );
 }
-
-// ─── List panel ────────────────────────────────────────────────────────────────
 
 function ListPanel({
   icon: Icon,
@@ -382,8 +368,6 @@ function ListPanel({
     </div>
   );
 }
-
-// ─── Main Page ─────────────────────────────────────────────────────────────────
 
 function Page() {
   const [resumeFile, setResumeFile] = useState<File | null>(null);
@@ -514,7 +498,7 @@ function Page() {
           transition: "all 0.55s cubic-bezier(0.34,1.1,0.64,1)",
         }}
       >
-        {/* ── Header ── */}
+        {}
         <header className="space-y-4 pt-1">
           <div
             className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full w-fit"
@@ -554,9 +538,9 @@ function Page() {
           </p>
         </header>
 
-        {/* ── Input panels ── */}
+        {}
         <div className="grid gap-5 lg:grid-cols-2">
-          {/* Resume upload */}
+          {}
           <div
             className="glass-panel relative rounded-2xl p-6 space-y-5 overflow-hidden"
             style={{ animation: "card-enter 0.5s 0.2s cubic-bezier(0.34,1.1,0.64,1) both" }}
@@ -583,7 +567,7 @@ function Page() {
               </div>
             </div>
 
-            {/* Drop zone */}
+            {}
             <div
               className={`relative rounded-2xl transition-all duration-300 cursor-pointer ${dragOver ? "upload-dashed-active" : "upload-dashed-dark"} ${resumeFile ? "upload-dashed-active" : ""}`}
               style={{ minHeight: 180 }}
@@ -613,7 +597,7 @@ function Page() {
                         border: "1px solid rgba(99,102,241,0.3)",
                       }}
                     >
-                      {/* pulse */}
+                      {}
                       <div
                         className="absolute inset-0 rounded-2xl"
                         style={{
@@ -678,7 +662,7 @@ function Page() {
             </div>
           </div>
 
-          {/* Job details */}
+          {}
           <div
             className="glass-panel relative rounded-2xl p-6 space-y-5 overflow-hidden"
             style={{ animation: "card-enter 0.5s 0.28s cubic-bezier(0.34,1.1,0.64,1) both" }}
@@ -744,12 +728,12 @@ function Page() {
           </div>
         </div>
 
-        {/* ── CTA row ── */}
+        {}
         <div
           className="flex items-center justify-between gap-4 flex-wrap"
           style={{ animation: "fade-up 0.5s 0.35s ease both" }}
         >
-          {/* Status pill */}
+          {}
           <div
             className="flex items-center gap-2 px-3.5 py-2 rounded-full text-xs font-semibold transition-all duration-400"
             style={{
@@ -832,10 +816,10 @@ function Page() {
           </div>
         </div>
 
-        {/* ── Results ── */}
+        {}
         {result && !mutation.isPending && (
           <div className="space-y-6" style={{ animation: "fade-up 0.5s ease both" }}>
-            {/* Summary banner */}
+            {}
             <div
               className="glass-panel relative rounded-2xl p-6 overflow-hidden"
               style={{ animation: "card-enter 0.5s ease both" }}
@@ -862,7 +846,7 @@ function Page() {
               </div>
             </div>
 
-            {/* Score cards */}
+            {}
             <div className="grid gap-4 grid-cols-2 lg:grid-cols-4">
               <ScoreCard
                 title="ATS Score"
@@ -898,7 +882,7 @@ function Page() {
               />
             </div>
 
-            {/* Strengths / Weaknesses */}
+            {}
             <div className="grid gap-5 md:grid-cols-2">
               <ListPanel
                 icon={CheckCircle2}
@@ -920,9 +904,9 @@ function Page() {
               />
             </div>
 
-            {/* Skills */}
+            {}
             <div className="grid gap-5 md:grid-cols-2">
-              {/* Matched */}
+              {}
               <div
                 className="glass-panel relative rounded-2xl p-5 space-y-4 overflow-hidden"
                 style={{ animation: "card-enter 0.5s 0.24s ease both" }}
@@ -968,7 +952,7 @@ function Page() {
                 </div>
               </div>
 
-              {/* Missing */}
+              {}
               <div
                 className="glass-panel relative rounded-2xl p-5 space-y-4 overflow-hidden"
                 style={{ animation: "card-enter 0.5s 0.32s ease both" }}
@@ -1015,7 +999,7 @@ function Page() {
               </div>
             </div>
 
-            {/* Suggestions */}
+            {}
             <div
               className="glass-panel relative rounded-2xl p-6 space-y-5 overflow-hidden"
               style={{ animation: "card-enter 0.5s 0.4s ease both" }}
@@ -1079,7 +1063,7 @@ function Page() {
           </div>
         )}
 
-        {/* ── History ── */}
+        {}
         <div className="space-y-4" style={{ animation: "fade-up 0.5s 0.4s ease both" }}>
           <div className="flex items-center gap-3">
             <div
@@ -1108,7 +1092,7 @@ function Page() {
           </div>
 
           <div className="glass-panel rounded-2xl overflow-hidden">
-            {/* Table header */}
+            {}
             <div
               className="grid grid-cols-4 px-5 py-3 text-[10px] font-bold uppercase tracking-widest text-sub"
               style={{

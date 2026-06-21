@@ -31,8 +31,6 @@ export const Route = createFileRoute("/_authenticated/portfolio-deployment/$id")
 function PortfolioDeploymentPage() {
   const { id } = Route.useParams();
 
-  // Actually, we need username for the URL simulation, we can get it from the user session or query param.
-  // For simplicity, we just use a generic 'dev' if not found, but we can pass it via search params.
   const search: any = Route.useSearch();
   const username = search.username || "dev";
 
@@ -76,7 +74,6 @@ function PortfolioDeploymentPage() {
     onError: (e) => toast.error("Failed to start deployment: " + e.message),
   });
 
-  // Show accurate build stages
   useEffect(() => {
     if (deploymentStatus?.status === "building" && activeDeploymentId) {
       setLogs([
@@ -142,7 +139,7 @@ function PortfolioDeploymentPage() {
       </div>
 
       <div className="grid lg:grid-cols-3 gap-6">
-        {/* Left Column: Providers & History */}
+        {}
         <div className="space-y-6">
           <div className="rounded-2xl border bg-card/40 backdrop-blur-sm p-6 space-y-4">
             <h2 className="text-lg font-bold text-foreground">Select Provider</h2>
@@ -190,7 +187,7 @@ function PortfolioDeploymentPage() {
             </div>
           </div>
 
-          {/* Deployment History */}
+          {}
           {history && history.length > 0 && (
             <div className="rounded-2xl border bg-card/40 backdrop-blur-sm p-6 space-y-4">
               <h2 className="text-sm font-bold text-foreground uppercase tracking-widest">
@@ -234,11 +231,11 @@ function PortfolioDeploymentPage() {
           )}
         </div>
 
-        {/* Right Column: Status & Logs */}
+        {}
         <div className="lg:col-span-2 space-y-6">
           {latestDeployment ? (
             <>
-              {/* Success Card */}
+              {}
               {latestDeployment.status === "success" && (
                 <div
                   className="rounded-2xl border border-emerald-500/30 bg-emerald-500/5 p-8 text-center space-y-6"
@@ -296,7 +293,7 @@ function PortfolioDeploymentPage() {
                 </div>
               )}
 
-              {/* Building state with logs */}
+              {}
               {latestDeployment.status === "building" && (
                 <div className="rounded-2xl border bg-card/40 backdrop-blur-sm p-6">
                   <div className="flex items-center gap-4 mb-6">
@@ -313,7 +310,7 @@ function PortfolioDeploymentPage() {
                     </div>
                   </div>
 
-                  {/* Terminal emulator */}
+                  {}
                   <div className="rounded-xl bg-[#0d0d1a] border border-white/10 p-4 font-mono text-xs overflow-hidden relative">
                     <div className="flex items-center gap-2 border-b border-white/10 pb-3 mb-3">
                       <Terminal className="h-4 w-4 text-white/50" />
@@ -330,7 +327,7 @@ function PortfolioDeploymentPage() {
                           <span>{log}</span>
                         </div>
                       ))}
-                      {/* Blinking cursor */}
+                      {}
                       <div className="flex gap-3 mt-2">
                         <span className="text-emerald-400 flex-shrink-0">›</span>
                         <span className="w-2 h-3 bg-white/60 animate-pulse mt-0.5" />
@@ -340,7 +337,7 @@ function PortfolioDeploymentPage() {
                 </div>
               )}
 
-              {/* Failed State */}
+              {}
               {latestDeployment.status === "failed" && (
                 <div className="rounded-2xl border border-red-500/30 bg-red-500/5 p-8 text-center space-y-4">
                   <div className="h-16 w-16 mx-auto bg-red-500/10 rounded-full flex items-center justify-center">

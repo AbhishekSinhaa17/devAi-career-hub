@@ -30,14 +30,13 @@ export const fetchLeaderboard = createServerFn({ method: "GET" })
     if (scoresError) throw new Error(scoresError.message);
     if (!scores || scores.length === 0) return [];
 
-    // Deduplicate by user_id, taking only the highest score for each user
     const uniqueScores = [];
     const seenUsers = new Set();
     for (const score of scores) {
       if (!seenUsers.has(score.user_id)) {
         seenUsers.add(score.user_id);
         uniqueScores.push(score);
-        if (uniqueScores.length === 20) break; // Limit to top 20 unique users
+        if (uniqueScores.length === 20) break;
       }
     }
 
@@ -68,7 +67,6 @@ export const Route = createFileRoute("/_authenticated/leaderboard")({
   component: LeaderboardPage,
 });
 
-// ── Helpers ─────────────────────────────────────────────────────────────────
 const RANK_CONFIG = {
   1: {
     label: "Gold",
@@ -119,7 +117,6 @@ function getScoreBarColor(score: number) {
   return "bg-red-500";
 }
 
-// ── Avatar ───────────────────────────────────────────────────────────────────
 function Avatar({
   url,
   name,
@@ -160,7 +157,6 @@ function Avatar({
   );
 }
 
-// ── Animated score bar ────────────────────────────────────────────────────────
 function ScoreBar({ value, color, delay = 0 }: { value: number; color: string; delay?: number }) {
   const [width, setWidth] = useState(0);
   useEffect(() => {
@@ -178,7 +174,6 @@ function ScoreBar({ value, color, delay = 0 }: { value: number; color: string; d
   );
 }
 
-// ── Animated number ───────────────────────────────────────────────────────────
 function AnimatedNumber({ value, delay = 0 }: { value: number; delay?: number }) {
   const [display, setDisplay] = useState(0);
   useEffect(() => {
@@ -202,7 +197,6 @@ function AnimatedNumber({ value, delay = 0 }: { value: number; delay?: number })
   return <>{display}</>;
 }
 
-// ── Podium card ───────────────────────────────────────────────────────────────
 function PodiumCard({ data, rank, delay = 0 }: { data: any; rank: 1 | 2 | 3; delay?: number }) {
   const cfg = RANK_CONFIG[rank];
   const RankIcon = cfg.icon;
@@ -217,7 +211,7 @@ function PodiumCard({ data, rank, delay = 0 }: { data: any; rank: 1 | 2 | 3; del
     <div
       className={`group relative flex flex-col items-center transition-all duration-700 ${visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}
     >
-      {/* Rank badge */}
+      {}
       <div
         className={`absolute -top-4 left-1/2 -translate-x-1/2 h-8 w-8 rounded-full ${cfg.badge} flex items-center justify-center shadow-lg z-20 transition-all duration-300 group-hover:-translate-y-1.5`}
         style={{ boxShadow: `0 0 16px ${cfg.glow}60` }}
@@ -225,7 +219,7 @@ function PodiumCard({ data, rank, delay = 0 }: { data: any; rank: 1 | 2 | 3; del
         <RankIcon className="h-4 w-4 text-white" />
       </div>
 
-      {/* Card */}
+      {}
       <div
         className={`relative w-full rounded-3xl border ${cfg.border} overflow-hidden
           bg-gradient-to-b ${cfg.bg}
@@ -237,7 +231,7 @@ function PodiumCard({ data, rank, delay = 0 }: { data: any; rank: 1 | 2 | 3; del
           boxShadow: `0 8px 40px ${cfg.glow}15, 0 2px 8px rgba(0,0,0,0.06)`,
         }}
       >
-        {/* Glow top strip */}
+        {}
         <div
           className="absolute top-0 left-0 right-0 h-px"
           style={{
@@ -245,7 +239,7 @@ function PodiumCard({ data, rank, delay = 0 }: { data: any; rank: 1 | 2 | 3; del
           }}
         />
 
-        {/* Avatar */}
+        {}
         <div className="mt-4 mb-4">
           <Avatar
             url={data.avatar_url}
@@ -255,7 +249,7 @@ function PodiumCard({ data, rank, delay = 0 }: { data: any; rank: 1 | 2 | 3; del
           />
         </div>
 
-        {/* Name */}
+        {}
         <h3 className="font-black text-slate-900 dark:text-white text-sm leading-tight mb-0.5 line-clamp-1 w-full">
           {data.name || data.github_username || "Anonymous"}
         </h3>
@@ -265,7 +259,7 @@ function PodiumCard({ data, rank, delay = 0 }: { data: any; rank: 1 | 2 | 3; del
           </p>
         )}
 
-        {/* Score */}
+        {}
         <div className="text-4xl font-black mb-1" style={{ color: cfg.color }}>
           <AnimatedNumber value={data.overall_score || 0} delay={delay + 200} />
         </div>
@@ -273,7 +267,7 @@ function PodiumCard({ data, rank, delay = 0 }: { data: any; rank: 1 | 2 | 3; del
           Overall Score
         </p>
 
-        {/* Sub scores */}
+        {}
         <div className="w-full space-y-2.5 pt-4 border-t border-slate-200/60 dark:border-white/6">
           <div className="flex items-center justify-between text-xs">
             <span className="flex items-center gap-1.5 text-slate-500 dark:text-slate-500 font-medium">
@@ -304,7 +298,7 @@ function PodiumCard({ data, rank, delay = 0 }: { data: any; rank: 1 | 2 | 3; del
         </div>
       </div>
 
-      {/* Podium base */}
+      {}
       <div
         className={`w-full ${cfg.podiumH} rounded-b-2xl mt-0 flex items-center justify-center`}
         style={{
@@ -322,7 +316,6 @@ function PodiumCard({ data, rank, delay = 0 }: { data: any; rank: 1 | 2 | 3; del
   );
 }
 
-// ── Row (rank 4+) ─────────────────────────────────────────────────────────────
 function LeaderboardRow({ user, rank, delay = 0 }: { user: any; rank: number; delay?: number }) {
   const [visible, setVisible] = useState(false);
   useEffect(() => {
@@ -345,20 +338,20 @@ function LeaderboardRow({ user, rank, delay = 0 }: { user: any; rank: number; de
         shadow-sm dark:shadow-none`}
       style={{ transitionDelay: `${delay}ms` }}
     >
-      {/* Hover glow */}
+      {}
       <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-indigo-500/0 to-indigo-500/0 group-hover:from-indigo-500/[0.02] dark:group-hover:from-indigo-500/[0.04] transition-all duration-300 pointer-events-none" />
 
-      {/* Rank */}
+      {}
       <div className="w-10 flex-shrink-0 text-center">
         <span className="text-lg font-black text-slate-300 dark:text-white/15 group-hover:text-indigo-400 dark:group-hover:text-indigo-500 transition-colors duration-300">
           {rank}
         </span>
       </div>
 
-      {/* Avatar */}
+      {}
       <Avatar url={user.avatar_url} name={user.name} size="sm" />
 
-      {/* Info */}
+      {}
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2 mb-0.5">
           <h3 className="text-sm font-bold text-slate-800 dark:text-slate-100 truncate">
@@ -380,13 +373,13 @@ function LeaderboardRow({ user, rank, delay = 0 }: { user: any; rank: number; de
             {user.github_score || 0}
           </span>
         </div>
-        {/* Score bar */}
+        {}
         <div className="mt-2 hidden sm:block">
           <ScoreBar value={user.overall_score || 0} color={barColor} delay={delay} />
         </div>
       </div>
 
-      {/* Score */}
+      {}
       <div className="flex-shrink-0 text-right">
         <div className={`text-2xl font-black ${scoreColor}`}>
           <AnimatedNumber value={user.overall_score || 0} delay={delay} />
@@ -399,7 +392,6 @@ function LeaderboardRow({ user, rank, delay = 0 }: { user: any; rank: number; de
   );
 }
 
-// ── Main Page ─────────────────────────────────────────────────────────────────
 function LeaderboardPage() {
   const getLeaderboard = useServerFn(fetchLeaderboard);
 
@@ -420,7 +412,6 @@ function LeaderboardPage() {
   const top3 = leaderboard?.slice(0, 3) || [];
   const rest = leaderboard?.slice(3) || [];
 
-  // Podium order: 2nd, 1st, 3rd
   const podiumOrder = [
     top3[1] ? { data: top3[1], rank: 2 as const, delay: 100 } : null,
     top3[0] ? { data: top3[0], rank: 1 as const, delay: 0 } : null,
@@ -429,14 +420,14 @@ function LeaderboardPage() {
 
   return (
     <div className="pb-12">
-      {/* ── Ambient backgrounds ── */}
+      {}
       <div className="fixed inset-0 pointer-events-none -z-10 overflow-hidden">
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] rounded-full bg-indigo-500/4 dark:bg-indigo-500/6 blur-[120px]" />
         <div className="absolute top-32 left-1/4 w-[300px] h-[300px] rounded-full bg-amber-500/3 dark:bg-amber-500/5 blur-[80px]" />
       </div>
 
       <div className="space-y-10 animate-in fade-in duration-500">
-        {/* ── Header ── */}
+        {}
         <div className="text-center space-y-4 max-w-xl mx-auto pt-2">
           <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-amber-300/50 dark:border-amber-500/20 bg-amber-50 dark:bg-amber-500/8">
             <Trophy className="h-3.5 w-3.5 text-amber-600 dark:text-amber-400" />
@@ -458,7 +449,7 @@ function LeaderboardPage() {
             Top developers ranked by overall health score across GitHub, resumes, and interviews.
           </p>
 
-          {/* Live badge */}
+          {}
           <div className="inline-flex items-center gap-2">
             <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
             <span className="text-xs font-semibold text-emerald-600 dark:text-emerald-400">
@@ -467,7 +458,7 @@ function LeaderboardPage() {
           </div>
         </div>
 
-        {/* ── Podium ── */}
+        {}
         {top3.length > 0 && (
           <div className="max-w-3xl mx-auto">
             <div className="grid grid-cols-3 gap-4 items-end">
@@ -476,12 +467,12 @@ function LeaderboardPage() {
               ))}
             </div>
 
-            {/* Podium ground line */}
+            {}
             <div className="h-px mt-0 bg-gradient-to-r from-transparent via-slate-200 dark:via-white/8 to-transparent" />
           </div>
         )}
 
-        {/* ── Stats strip ── */}
+        {}
         {leaderboard && leaderboard.length > 0 && (
           <div className="max-w-3xl mx-auto grid grid-cols-3 gap-4">
             {[
@@ -526,7 +517,7 @@ function LeaderboardPage() {
           </div>
         )}
 
-        {/* ── Rest of ranks ── */}
+        {}
         {rest.length > 0 && (
           <div className="max-w-3xl mx-auto space-y-2.5">
             <div className="flex items-center gap-3 mb-4">
@@ -541,7 +532,7 @@ function LeaderboardPage() {
           </div>
         )}
 
-        {/* ── Footer note ── */}
+        {}
         <p className="text-center text-xs text-slate-400 dark:text-slate-700 animate-in fade-in duration-700">
           Rankings update in real-time as developers improve their scores.
         </p>

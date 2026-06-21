@@ -161,7 +161,6 @@ export const setUserAdmin = createServerFn({ method: "POST" })
       if (error) throw new Error(error.message);
     }
 
-    // Insert audit log
     await supabaseAdmin.from("admin_audit_logs").insert({
       admin_id: context.userId,
       action: action,
@@ -215,7 +214,6 @@ export const getApiUsageAnalytics = createServerFn({ method: "GET" })
 
     const rows = events ?? [];
 
-    // Requests per day
     const perDayMap = new Map<
       string,
       { date: string; requests: number; tokens: number; cost: number; errors: number }
@@ -236,7 +234,6 @@ export const getApiUsageAnalytics = createServerFn({ method: "GET" })
       if (r.status !== "success") bucket.errors += 1;
     }
 
-    // By endpoint
     const endpointMap = new Map<
       string,
       {
@@ -271,7 +268,6 @@ export const getApiUsageAnalytics = createServerFn({ method: "GET" })
       .map((e) => ({ ...e, avgMs: e.requests ? Math.round(e._ms / e.requests) : 0 }))
       .sort((a, b) => b.requests - a.requests);
 
-    // By model
     const modelMap = new Map<
       string,
       { model: string; requests: number; tokens: number; cost: number }
@@ -286,7 +282,6 @@ export const getApiUsageAnalytics = createServerFn({ method: "GET" })
     }
     const byModel = [...modelMap.values()].sort((a, b) => b.cost - a.cost);
 
-    // Top users
     const userMap = new Map<
       string,
       { user_id: string; requests: number; tokens: number; cost: number }

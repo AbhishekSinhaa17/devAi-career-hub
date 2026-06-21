@@ -51,7 +51,6 @@ const LANGS = [
   { value: "php", label: "PHP", color: "#4f5d95" },
 ];
 
-// ─── Tone config ──────────────────────────────────────────────────────────────
 const TONE_MAP = {
   destructive: {
     color: "#ef4444",
@@ -83,7 +82,6 @@ const TONE_MAP = {
   },
 };
 
-// ─── Shared panel ─────────────────────────────────────────────────────────────
 function Panel({
   children,
   className = "",
@@ -111,7 +109,6 @@ function Panel({
   );
 }
 
-// ─── Copy button ──────────────────────────────────────────────────────────────
 function CopyButton({ text }: { text: string }) {
   const [copied, setCopied] = useState(false);
   const copy = () => {
@@ -134,7 +131,6 @@ function CopyButton({ text }: { text: string }) {
   );
 }
 
-// ─── Score ring ───────────────────────────────────────────────────────────────
 function ScoreRing({
   score,
   label,
@@ -190,7 +186,6 @@ function ScoreRing({
   );
 }
 
-// ─── Overall score bar ────────────────────────────────────────────────────────
 function OverallBar({ value, label }: { value: number; label: string }) {
   const color =
     value >= 80 ? "#10b981" : value >= 60 ? "#6366f1" : value >= 40 ? "#f59e0b" : "#ef4444";
@@ -218,7 +213,6 @@ function OverallBar({ value, label }: { value: number; label: string }) {
   );
 }
 
-// ─── Review section card ──────────────────────────────────────────────────────
 function ReviewSection({
   icon: Icon,
   title,
@@ -256,7 +250,7 @@ function ReviewSection({
         }}
       />
 
-      {/* Header */}
+      {}
       <button
         onClick={() => setOpen((o) => !o)}
         className="w-full flex items-center justify-between px-5 py-4"
@@ -304,7 +298,7 @@ function ReviewSection({
         </div>
       </button>
 
-      {/* Body */}
+      {}
       {open && (
         <div className="px-5 pb-5 border-t" style={{ borderColor: meta.border }}>
           {allClear ? (
@@ -355,7 +349,6 @@ function ReviewSection({
   );
 }
 
-// ─── Line number gutter ───────────────────────────────────────────────────────
 function CodeEditor({
   value,
   onChange,
@@ -369,7 +362,6 @@ function CodeEditor({
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const gutterRef = useRef<HTMLDivElement>(null);
 
-  // Sync scroll between gutter and textarea
   const syncScroll = () => {
     if (textareaRef.current && gutterRef.current) {
       gutterRef.current.scrollTop = textareaRef.current.scrollTop;
@@ -378,7 +370,7 @@ function CodeEditor({
 
   return (
     <div className="relative flex overflow-hidden rounded-xl border border-border/60 bg-[#0d0d1a] font-mono text-sm">
-      {/* Gutter */}
+      {}
       <div
         ref={gutterRef}
         className="select-none overflow-hidden flex-shrink-0 py-4 pr-3 pl-4 text-right pointer-events-none"
@@ -397,7 +389,7 @@ function CodeEditor({
         ))}
       </div>
 
-      {/* Textarea */}
+      {}
       <textarea
         ref={textareaRef}
         value={value}
@@ -409,7 +401,7 @@ function CodeEditor({
         style={{ minHeight: "280px", maxHeight: "480px" }}
       />
 
-      {/* Lang badge */}
+      {}
       <div
         className="absolute top-3 right-3 px-2.5 py-1 rounded-lg text-[10px] font-black uppercase tracking-widest pointer-events-none"
         style={{
@@ -424,7 +416,6 @@ function CodeEditor({
   );
 }
 
-// ─── Empty state ──────────────────────────────────────────────────────────────
 function EmptyState() {
   return (
     <PageEmptyState
@@ -446,7 +437,6 @@ function EmptyState() {
   );
 }
 
-// ─── Main Page ────────────────────────────────────────────────────────────────
 function Page() {
   const [code, setCode] = useState("");
   const [language, setLanguage] = useState("typescript");
@@ -466,7 +456,6 @@ function Page() {
   const fb = mutation.data;
   const currentLang = LANGS.find((l) => l.value === language);
 
-  // Compute summary scores from item counts (0 = 100, 10 = 0, linear)
   const toScore = (arr: string[]) => Math.max(0, Math.round(100 - arr.length * 12));
 
   return (
@@ -478,7 +467,7 @@ function Page() {
         transition: "all 0.6s cubic-bezier(0.34,1.2,0.64,1)",
       }}
     >
-      {/* ── Header ── */}
+      {}
       <header className="flex flex-col gap-2">
         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-primary/20 bg-primary/5 w-fit">
           <Code2 className="h-3.5 w-3.5 text-primary" />
@@ -498,9 +487,9 @@ function Page() {
         </p>
       </header>
 
-      {/* ── Editor panel ── */}
+      {}
       <Panel accent="#6366f1">
-        {/* Toolbar */}
+        {}
         <div className="flex flex-wrap items-center justify-between gap-3 px-5 py-4 border-b border-border/40">
           <div className="flex items-center gap-3">
             <div className="flex items-center gap-1.5">
@@ -550,12 +539,12 @@ function Page() {
           </div>
         </div>
 
-        {/* Code editor with line numbers */}
+        {}
         <div className="p-4">
           <CodeEditor value={code} onChange={setCode} language={language} />
         </div>
 
-        {/* Footer */}
+        {}
         <div className="flex items-center justify-between px-5 pb-5">
           <p className="text-[11px] text-muted-foreground">
             Supports {LANGS.map((l) => l.label).join(", ")}
@@ -588,7 +577,7 @@ function Page() {
         </div>
       </Panel>
 
-      {/* ── States ── */}
+      {}
       {mutation.isPending && (
         <PageLoadingState
           title="Analyzing code…"
@@ -598,10 +587,10 @@ function Page() {
 
       {!fb && !mutation.isPending && <EmptyState />}
 
-      {/* ── Results ── */}
+      {}
       {fb && !mutation.isPending && (
         <div className="space-y-6" style={{ animation: "fadeSlideIn 0.5s ease-out both" }}>
-          {/* Overview */}
+          {}
           <Panel accent="#6366f1" className="p-6">
             <div
               className="absolute inset-0 opacity-40"
@@ -633,7 +622,7 @@ function Page() {
                   </div>
                 </div>
 
-                {/* Mini score rings */}
+                {}
                 <div className="flex flex-wrap gap-4 flex-shrink-0">
                   <ScoreRing score={toScore(fb.bugs)} label="Bugs" color="#ef4444" />
                   <ScoreRing score={toScore(fb.security)} label="Security" color="#f59e0b" />
@@ -644,7 +633,7 @@ function Page() {
             </div>
           </Panel>
 
-          {/* Review sections */}
+          {}
           <div className="grid gap-4 md:grid-cols-2">
             <ReviewSection
               icon={Bug}
@@ -683,7 +672,7 @@ function Page() {
             tone="primary"
           />
 
-          {/* Re-review CTA */}
+          {}
           <Panel accent="#8b5cf6" className="p-5">
             <div className="flex flex-wrap items-center justify-between gap-4">
               <div className="flex items-center gap-3">

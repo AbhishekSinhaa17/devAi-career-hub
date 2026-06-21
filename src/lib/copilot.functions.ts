@@ -3,7 +3,6 @@ import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { callAi } from "./ai-gateway.server";
 
-// Plain async helper — NOT a server function, just a regular function
 async function fetchContextSnapshotFromDb(userId: string, supabase: any) {
   const [ghRes, resumeRes, jobMatchRes, scoresRes, mockIntRes, portfolioRes] = await Promise.all([
     supabase
@@ -60,7 +59,6 @@ async function fetchContextSnapshotFromDb(userId: string, supabase: any) {
   };
 }
 
-// The server function now calls the helper with context
 export const getContextSnapshot = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
@@ -71,7 +69,6 @@ export const startCopilotConversation = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .validator((d: unknown) => z.object({ title: z.string().optional() }).parse(d))
   .handler(async ({ data, context }) => {
-    // Call the plain helper, NOT the server function
     const snapshot = await fetchContextSnapshotFromDb(context.userId, context.supabase);
 
     const { data: convData, error } = await context.supabase
@@ -130,7 +127,6 @@ export const sendCopilotMessage = createServerFn({ method: "POST" })
     const db = context.supabase;
     const userId = context.userId;
 
-    // 1. Verify and fetch conversation
     const { data: conv, error: convErr } = await db
       .from("copilot_conversations")
       .select("context_snapshot")
@@ -140,7 +136,6 @@ export const sendCopilotMessage = createServerFn({ method: "POST" })
 
     if (convErr || !conv) throw new Error("Conversation not found");
 
-    // 2. Save User Message
     await db.from("copilot_messages").insert({
       conversation_id: data.conversationId,
       user_id: userId,
@@ -148,7 +143,6 @@ export const sendCopilotMessage = createServerFn({ method: "POST" })
       content: data.message,
     });
 
-    // 3. Fetch past messages (limit to last 10 to save tokens)
     const { data: pastMsgs } = await db
       .from("copilot_messages")
       .select("role, content")
@@ -162,7 +156,6 @@ export const sendCopilotMessage = createServerFn({ method: "POST" })
       content: m.content,
     }));
 
-    // 4. Construct AI Context
     const systemPrompt = `You are the DevAI Career Copilot, an expert software engineering mentor and career coach.
 You have access to the user's latest platform data. Use it to provide highly personalized, specific, and actionable advice.
 DO NOT give generic advice if the data provides specific context. Always reference their actual skills, scores, and projects when relevant.
@@ -173,13 +166,11 @@ ${JSON.stringify(conv.context_snapshot, null, 2)}
 
     const aiMessages = [{ role: "system", content: systemPrompt }, ...history];
 
-    // 5. Call AI
     const responseText = await callAi({
       messages: aiMessages as any,
       log: { endpoint: "copilotChat", userId },
     });
 
-    // 6. Save Assistant Message
     const { data: savedMsg } = await db
       .from("copilot_messages")
       .insert({
@@ -190,8 +181,6 @@ ${JSON.stringify(conv.context_snapshot, null, 2)}
       })
       .select()
       .single();
-
-    // Log the usage to analytics happens inside callAi automatically if log is provided.
 
     return savedMsg;
   });

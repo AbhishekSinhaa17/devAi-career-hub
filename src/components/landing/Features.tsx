@@ -102,14 +102,14 @@ export const featuresData = [
 export function Features() {
   return (
     <section id="features" className="relative py-16 overflow-hidden">
-      {/* Ambient background */}
+      {}
       <div className="pointer-events-none absolute inset-0 -z-10">
         <div className="absolute left-1/4 top-1/4 h-[500px] w-[500px] rounded-full bg-primary/5 blur-[130px]" />
         <div className="absolute right-1/4 bottom-1/4 h-[400px] w-[400px] rounded-full bg-violet-500/5 blur-[100px]" />
       </div>
 
       <div className="mx-auto max-w-7xl px-6">
-        {/* Header */}
+        {}
         <Reveal>
           <div className="mx-auto max-w-2xl text-center">
             <div className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-4 py-1.5 backdrop-blur">
@@ -129,7 +129,7 @@ export function Features() {
           </div>
         </Reveal>
 
-        {/* Grid */}
+        {}
         <div className="mt-16 grid gap-3 md:grid-cols-2 lg:grid-cols-3">
           {featuresData.map((f, i) => (
             <Reveal key={f.title} delay={i * 70} className={f.span}>
@@ -178,11 +178,9 @@ function FeatureCard({
     if (!el) return;
     const r = el.getBoundingClientRect();
 
-    // Spotlight CSS vars
     el.style.setProperty("--mx", `${e.clientX - r.left}px`);
     el.style.setProperty("--my", `${e.clientY - r.top}px`);
 
-    // Subtle 3-D tilt
     const cx = r.left + r.width / 2;
     const cy = r.top + r.height / 2;
     const dx = (e.clientX - cx) / (r.width / 2);
@@ -208,36 +206,36 @@ function FeatureCard({
       }}
       className={`spotlight group relative block h-full overflow-hidden rounded-2xl border border-border/40 bg-card/30 backdrop-blur-sm cursor-pointer shadow-xl ${glow} ${border} transition-[border-color,box-shadow] duration-500 hover:shadow-2xl`}
     >
-      {/* Gradient accent blob */}
+      {}
       <div
         className={`pointer-events-none absolute -right-10 -top-10 h-48 w-48 rounded-full bg-gradient-to-br ${accent} blur-2xl transition-opacity duration-500 opacity-0 group-hover:opacity-100`}
       />
 
-      {/* Top line accent */}
+      {}
       <div
         className={`absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent ${iconColor.replace("text-", "via-")} to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100`}
       />
 
-      {/* Number watermark */}
+      {}
       <span className="pointer-events-none absolute right-5 bottom-4 text-7xl font-black text-muted/5 select-none tabular-nums">
         0{index + 1}
       </span>
 
       <div className="relative z-10 flex h-full flex-col p-7">
-        {/* Top row */}
+        {}
         <div className="flex items-start justify-between">
-          {/* Icon */}
+          {}
           <div
             className={`relative grid h-12 w-12 place-items-center rounded-2xl bg-gradient-to-br ${iconGradient} ${ring} ring-1 transition-all duration-500 group-hover:scale-110 group-hover:shadow-lg`}
           >
             <Icon className={`h-5 w-5 ${iconColor}`} />
-            {/* Icon inner glow */}
+            {}
             <div
               className={`absolute inset-0 rounded-2xl bg-gradient-to-br ${iconGradient} opacity-0 blur-sm group-hover:opacity-60 transition-opacity duration-500`}
             />
           </div>
 
-          {/* Tag badge */}
+          {}
           {tag && (
             <span
               className={`inline-flex items-center gap-1 rounded-full border ${ring} bg-card/80 px-2.5 py-1 text-xs font-semibold ${iconColor} backdrop-blur`}
@@ -250,13 +248,13 @@ function FeatureCard({
           )}
         </div>
 
-        {/* Content */}
+        {}
         <div className="mt-6 flex-1">
           <h3 className="text-lg font-semibold tracking-tight">{title}</h3>
           <p className="mt-2.5 text-sm leading-relaxed text-muted-foreground">{desc}</p>
         </div>
 
-        {/* Footer CTA */}
+        {}
         <div className="mt-6 flex items-center justify-between border-t border-border/30 pt-5">
           <div
             className={`flex items-center gap-1.5 text-sm font-medium ${iconColor} translate-x-0 opacity-0 transition-all duration-300 group-hover:opacity-100`}
@@ -264,7 +262,7 @@ function FeatureCard({
             Explore feature
             <ArrowRight className="h-3.5 w-3.5 transition-transform duration-300 group-hover:translate-x-1" />
           </div>
-          {/* Decorative dots */}
+          {}
           <div className="flex gap-1 opacity-20 group-hover:opacity-60 transition-opacity duration-300">
             {[...Array(3)].map((_, j) => (
               <span

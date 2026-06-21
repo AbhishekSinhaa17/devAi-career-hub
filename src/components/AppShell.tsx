@@ -28,8 +28,6 @@ import { toast } from "sonner";
 import { isAdmin as isAdminFn } from "@/lib/admin.functions";
 import { ThemeToggle } from "./ThemeToggle";
 
-// ─── Styles ────────────────────────────────────────────────────────────────────
-
 const STYLES = `
   @keyframes float-orb {
     0%,100% { transform:translate(0,0) scale(1); }
@@ -319,8 +317,6 @@ const STYLES = `
   }
 `;
 
-// ─── Nav structure ──────────────────────────────────────────────────────────────
-
 const NAV_SECTIONS = [
   {
     label: "Overview",
@@ -357,11 +353,8 @@ const NAV_SECTIONS = [
   },
 ] as const;
 
-// Flat list for mobile + admin appending
 type NavItem = { to: string; icon: React.ElementType; label: string };
 const NAV_FLAT: NavItem[] = NAV_SECTIONS.flatMap((s) => s.items as unknown as NavItem[]);
-
-// ─── Sidebar ambient orbs ───────────────────────────────────────────────────────
 
 function SidebarOrbs() {
   return (
@@ -388,8 +381,6 @@ function SidebarOrbs() {
     </div>
   );
 }
-
-// ─── Logo ──────────────────────────────────────────────────────────────────────
 
 function Logo({ animate, isPro }: { animate: boolean; isPro?: boolean }) {
   return (
@@ -420,8 +411,6 @@ function Logo({ animate, isPro }: { animate: boolean; isPro?: boolean }) {
   );
 }
 
-// ─── Nav item ──────────────────────────────────────────────────────────────────
-
 function NavLink({
   item,
   active,
@@ -451,7 +440,7 @@ function NavLink({
       }`}
     >
       <div className="flex items-center gap-3">
-        {/* Icon badge */}
+        {}
         <div
           className={`nav-icon-badge h-6 w-6 rounded-lg flex items-center justify-center flex-shrink-0 transition-all duration-300 ${active ? "active" : ""}`}
         >
@@ -477,8 +466,6 @@ function NavLink({
   );
 }
 
-// ─── Sidebar nav content (shared between desktop + drawer) ─────────────────────
-
 function SidebarNav({
   items,
   pathname,
@@ -490,7 +477,6 @@ function SidebarNav({
   animate: boolean;
   onItemClick?: () => void;
 }) {
-  // Build sections, appending admin item to Account if present
   const adminItem = items.find((i) => i.to === "/admin");
 
   const sections = NAV_SECTIONS.map((section) => ({
@@ -498,7 +484,6 @@ function SidebarNav({
     items: section.items as unknown as NavItem[],
   }));
 
-  // Add admin under Account if present
   const withAdmin = sections.map((s) => {
     if (s.label === "Account" && adminItem) {
       return { ...s, items: [...s.items, adminItem] };
@@ -533,8 +518,6 @@ function SidebarNav({
   );
 }
 
-// ─── Sign-out button ────────────────────────────────────────────────────────────
-
 function SignOutButton({ onSignOut, animate }: { onSignOut: () => void; animate: boolean }) {
   return (
     <button
@@ -558,8 +541,6 @@ function SignOutButton({ onSignOut, animate }: { onSignOut: () => void; animate:
   );
 }
 
-// ─── Score pill in sidebar footer ──────────────────────────────────────────────
-
 function SidebarFooterBadge({ animate }: { animate: boolean }) {
   return (
     <div
@@ -568,7 +549,7 @@ function SidebarFooterBadge({ animate }: { animate: boolean }) {
         animation: animate ? "footer-enter 0.5s 0.3s ease both" : "none",
       }}
     >
-      {/* shimmer */}
+      {}
       <div
         className="absolute inset-0 pointer-events-none"
         style={{
@@ -603,8 +584,6 @@ function SidebarFooterBadge({ animate }: { animate: boolean }) {
   );
 }
 
-// ─── App Shell ─────────────────────────────────────────────────────────────────
-
 export function AppShell({ children }: { children: ReactNode }) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const navigate = useNavigate();
@@ -623,15 +602,12 @@ export function AppShell({ children }: { children: ReactNode }) {
       } = await supabase.auth.getSession();
       if (!session) return { is_pro: false };
 
-      // Admins automatically get all Pro features
       try {
         const adminRes = await checkAdmin();
         if (adminRes?.isAdmin) {
           return { is_pro: true };
         }
-      } catch (e) {
-        // Ignore error and fall back to checking profile
-      }
+      } catch (e) {}
 
       const { data } = await supabase
         .from("profiles")
@@ -659,7 +635,6 @@ export function AppShell({ children }: { children: ReactNode }) {
     return () => clearTimeout(t);
   }, []);
 
-  // Close drawer on route change
   useEffect(() => {
     setDrawerOpen(false);
   }, [pathname]);
@@ -678,7 +653,6 @@ export function AppShell({ children }: { children: ReactNode }) {
     navigate({ to: "/login", replace: true });
   }
 
-  // Mobile bottom bar items (first 5 most important)
   const mobileBottomItems: NavItem[] = [
     { to: "/dashboard", icon: LayoutDashboard, label: "Dashboard" },
     { to: "/github", icon: Briefcase, label: "Tools" },
@@ -691,11 +665,11 @@ export function AppShell({ children }: { children: ReactNode }) {
     <div className="flex min-h-screen bg-background text-foreground selection:bg-primary/20">
       <style>{STYLES}</style>
 
-      {/* ── Desktop Sidebar ── */}
+      {}
       <aside className="sidebar-shell sticky top-0 hidden h-screen w-64 flex-col md:flex z-40 flex-shrink-0 relative overflow-hidden">
         <SidebarOrbs />
 
-        {/* Logo */}
+        {}
         <div className="flex h-[72px] items-center justify-between px-5 flex-shrink-0 relative z-10 w-full">
           <Link to="/dashboard" className="flex items-center">
             <Logo animate={mounted} isPro={isProQ.data?.is_pro} />
@@ -703,7 +677,7 @@ export function AppShell({ children }: { children: ReactNode }) {
           <ThemeToggle />
         </div>
 
-        {/* Top accent line */}
+        {}
         <div
           className="absolute inset-x-0 top-[72px] h-px"
           style={{
@@ -711,12 +685,12 @@ export function AppShell({ children }: { children: ReactNode }) {
           }}
         />
 
-        {/* Nav */}
+        {}
         <div className="flex-1 overflow-y-auto sidebar-scroll px-3 py-3 relative z-10">
           <SidebarNav items={allItems} pathname={pathname} animate={mounted} />
         </div>
 
-        {/* Bottom accent line */}
+        {}
         <div
           className="h-px mx-3"
           style={{
@@ -724,7 +698,7 @@ export function AppShell({ children }: { children: ReactNode }) {
           }}
         />
 
-        {/* Footer */}
+        {}
         <div className="flex-shrink-0 py-3 relative z-10">
           <SidebarFooterBadge animate={mounted} />
           <div className="px-2">
@@ -733,9 +707,9 @@ export function AppShell({ children }: { children: ReactNode }) {
         </div>
       </aside>
 
-      {/* ── Mobile header ── */}
+      {}
       <header className="mobile-header fixed inset-x-0 top-0 z-40 flex h-14 items-center justify-between px-4 md:hidden">
-        {/* Hamburger */}
+        {}
         <button
           onClick={() => setDrawerOpen(true)}
           className="menu-btn h-9 w-9 flex items-center justify-center"
@@ -744,7 +718,7 @@ export function AppShell({ children }: { children: ReactNode }) {
           <Menu className="h-4 w-4 t-heading" />
         </button>
 
-        {/* Logo center */}
+        {}
         <Link to="/dashboard" className="flex items-center gap-2">
           <div className="logo-box h-8 w-8 rounded-xl flex items-center justify-center">
             <Sparkles className="h-3.5 w-3.5 text-indigo-400 relative z-10" />
@@ -752,7 +726,7 @@ export function AppShell({ children }: { children: ReactNode }) {
           <span className="font-black text-base tracking-tight t-heading">DevAI</span>
         </Link>
 
-        {/* Right slot — live dot */}
+        {}
         <div className="flex items-center gap-3">
           <ThemeToggle />
           <div className="flex items-center gap-1.5">
@@ -767,20 +741,20 @@ export function AppShell({ children }: { children: ReactNode }) {
         </div>
       </header>
 
-      {/* ── Mobile drawer ── */}
+      {}
       {drawerOpen && (
         <>
-          {/* Backdrop */}
+          {}
           <div
             className="drawer-overlay fixed inset-0 z-50 md:hidden"
             onClick={() => setDrawerOpen(false)}
           />
 
-          {/* Drawer panel */}
+          {}
           <div className="drawer-panel fixed inset-y-0 left-0 z-50 flex flex-col md:hidden overflow-hidden">
             <SidebarOrbs />
 
-            {/* Drawer header */}
+            {}
             <div className="flex items-center justify-between px-5 h-14 flex-shrink-0 relative z-10">
               <Logo animate={false} isPro={isProQ.data?.is_pro} />
               <div className="flex items-center gap-3">
@@ -795,7 +769,7 @@ export function AppShell({ children }: { children: ReactNode }) {
               </div>
             </div>
 
-            {/* Divider */}
+            {}
             <div
               className="h-px mx-4"
               style={{
@@ -803,7 +777,7 @@ export function AppShell({ children }: { children: ReactNode }) {
               }}
             />
 
-            {/* Nav */}
+            {}
             <div className="flex-1 overflow-y-auto sidebar-scroll px-3 py-3 relative z-10">
               <SidebarNav
                 items={allItems}
@@ -813,10 +787,10 @@ export function AppShell({ children }: { children: ReactNode }) {
               />
             </div>
 
-            {/* Divider */}
+            {}
             <div className="h-px mx-4" style={{ background: "rgba(255,255,255,0.05)" }} />
 
-            {/* Footer */}
+            {}
             <div className="flex-shrink-0 py-3 relative z-10">
               <SidebarFooterBadge animate={false} />
               <div className="px-2">
@@ -827,12 +801,12 @@ export function AppShell({ children }: { children: ReactNode }) {
         </>
       )}
 
-      {/* ── Main content ── */}
+      {}
       <main className="flex-1 w-full min-w-0 pt-14 pb-20 md:pt-0 md:pb-0">
         <div className="mx-auto max-w-7xl px-4 py-8 md:px-10 md:py-12">{children}</div>
       </main>
 
-      {/* ── Mobile bottom nav ── */}
+      {}
       <nav className="mobile-bottom fixed inset-x-0 bottom-0 z-40 flex justify-around px-2 py-2 md:hidden">
         {mobileBottomItems.map((item, i) => {
           const active = pathname === item.to || pathname.startsWith(item.to + "/");
@@ -848,7 +822,7 @@ export function AppShell({ children }: { children: ReactNode }) {
                 background: active ? "rgba(99,102,241,0.1)" : "transparent",
               }}
             >
-              {/* Icon */}
+              {}
               <div
                 className={`mobile-icon-badge h-7 w-7 rounded-xl flex items-center justify-center transition-all duration-300 ${active ? "active" : ""}`}
               >
@@ -857,14 +831,14 @@ export function AppShell({ children }: { children: ReactNode }) {
                 />
               </div>
 
-              {/* Label */}
+              {}
               <span
                 className={`mobile-label text-[9px] font-black uppercase tracking-wide transition-colors duration-300 ${active ? "active" : ""}`}
               >
                 {item.label.split(" ")[0]}
               </span>
 
-              {/* Active dot */}
+              {}
               {active && <span className="mobile-nav-dot" />}
             </Link>
           );

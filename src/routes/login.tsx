@@ -30,7 +30,6 @@ export const Route = createFileRoute("/login")({
   component: LoginPage,
 });
 
-// ─── Particle Canvas ─────────────────────────────────────────────────────────
 interface Particle {
   x: number;
   y: number;
@@ -160,7 +159,6 @@ function ParticleCanvas() {
   );
 }
 
-// ─── Typing animation hook ────────────────────────────────────────────────────
 function useTypewriter(texts: string[], speed = 80, pause = 2000) {
   const [displayed, setDisplayed] = useState("");
   const [textIndex, setTextIndex] = useState(0);
@@ -230,7 +228,6 @@ function FloatingCodeLine({
   );
 }
 
-// ─── Feature Pill ─────────────────────────────────────────────────────────────
 const FEATURES = [
   { icon: GitBranch, label: "GitHub Analysis", color: "#10b981", glow: "rgba(16,185,129,0.3)" },
   { icon: FileText, label: "AI Resumes", color: "#6366f1", glow: "rgba(99,102,241,0.3)" },
@@ -300,7 +297,6 @@ function FeatureCard({ feature, index }: { feature: (typeof FEATURES)[0]; index:
   );
 }
 
-// ─── Stat Counter ─────────────────────────────────────────────────────────────
 function StatCounter({ value, label, delay }: { value: string; label: string; delay: number }) {
   const [visible, setVisible] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
@@ -336,7 +332,6 @@ function StatCounter({ value, label, delay }: { value: string; label: string; de
   );
 }
 
-// ─── Main Page ────────────────────────────────────────────────────────────────
 function LoginPage() {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
@@ -428,7 +423,7 @@ function LoginPage() {
       id="login-page"
       className="relative min-h-screen flex items-center justify-center overflow-hidden bg-slate-50 dark:bg-[#030712] text-slate-900 dark:text-foreground transition-colors duration-500"
     >
-      {/* Back to Home Button */}
+      {}
       <Link
         to="/"
         className="absolute top-6 left-6 md:top-8 md:left-8 z-50 flex items-center gap-2 text-slate-500 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-white transition-colors group"
@@ -441,16 +436,16 @@ function LoginPage() {
         </span>
       </Link>
 
-      {/* ── Particle field ── */}
+      {}
       <ParticleCanvas />
 
-      {/* ── Deep background gradients ── */}
+      {}
       <div className="pointer-events-none absolute inset-0">
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[900px] h-[500px] bg-gradient-to-b from-violet-300/30 dark:from-violet-600/10 via-indigo-300/20 dark:via-indigo-600/5 to-transparent rounded-full blur-3xl" />
         <div className="absolute bottom-0 left-0 w-[600px] h-[400px] bg-gradient-to-tr from-cyan-300/20 dark:from-cyan-600/8 to-transparent rounded-full blur-3xl" />
         <div className="absolute bottom-0 right-0 w-[500px] h-[400px] bg-gradient-to-tl from-purple-300/20 dark:from-purple-600/8 to-transparent rounded-full blur-3xl" />
 
-        {/* Subtle grid */}
+        {}
         <div
           className="absolute inset-0 opacity-[0.06] dark:opacity-[0.035]"
           style={{
@@ -462,7 +457,7 @@ function LoginPage() {
           }}
         />
 
-        {/* Floating code lines */}
+        {}
         <div className="absolute inset-0 overflow-hidden">
           {CODE_SNIPPETS.map((s, i) => (
             <FloatingCodeLine
@@ -475,14 +470,14 @@ function LoginPage() {
           ))}
         </div>
 
-        {/* Radial vignette */}
+        {}
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_0%,#f8fafc_80%)] dark:bg-[radial-gradient(ellipse_at_center,transparent_0%,#030712_80%)]" />
       </div>
 
-      {/* ── Content ── */}
+      {}
       <div className="relative z-10 w-full max-w-7xl mx-auto px-4 py-12">
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_480px] gap-16 items-center">
-          {/* ── Left: Hero ── */}
+          {}
           <div
             className="hidden lg:flex flex-col gap-10"
             style={{
@@ -491,7 +486,7 @@ function LoginPage() {
               transition: "all 0.9s cubic-bezier(0.34,1.2,0.64,1)",
             }}
           >
-            {/* Badge */}
+            {}
             <div className="flex items-center gap-3">
               <div className="relative flex items-center gap-2 px-4 py-2 rounded-full border border-indigo-200 dark:border-indigo-500/30 bg-indigo-50 dark:bg-indigo-500/5 backdrop-blur-xl">
                 <span className="relative flex h-2 w-2">
@@ -505,7 +500,7 @@ function LoginPage() {
               </div>
             </div>
 
-            {/* Heading */}
+            {}
             <div className="space-y-3">
               <h1 className="text-6xl xl:text-7xl font-black tracking-tight leading-[1.05]">
                 <span className="text-slate-900 dark:text-white">AI that</span>
@@ -523,7 +518,7 @@ function LoginPage() {
                 </span>
               </h1>
 
-              {/* Typewriter */}
+              {}
               <div className="flex items-center gap-3 mt-6">
                 <Cpu className="h-4 w-4 text-indigo-500 dark:text-indigo-400 flex-shrink-0 animate-pulse" />
                 <p className="text-lg text-slate-600 dark:text-slate-400 font-mono">
@@ -541,14 +536,14 @@ function LoginPage() {
               </p>
             </div>
 
-            {/* Feature grid */}
+            {}
             <div className="grid grid-cols-2 gap-3 max-w-lg">
               {FEATURES.map((f, i) => (
                 <FeatureCard key={f.label} feature={f} index={i} />
               ))}
             </div>
 
-            {/* Stats */}
+            {}
             <div className="flex items-center gap-10 pt-6 border-t border-slate-200 dark:border-white/[0.05]">
               <StatCounter value="50K+" label="Repos Analyzed" delay={0} />
               <div className="w-px h-10 bg-slate-200 dark:bg-white/[0.06]" />
@@ -558,7 +553,7 @@ function LoginPage() {
             </div>
           </div>
 
-          {/* ── Right: Auth Card ── */}
+          {}
           <div
             style={{
               opacity: mounted ? 1 : 0,
@@ -566,7 +561,7 @@ function LoginPage() {
               transition: "all 1s cubic-bezier(0.34,1.2,0.64,1) 150ms",
             }}
           >
-            {/* Mobile header */}
+            {}
             <div className="lg:hidden mb-8 text-center space-y-3">
               <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-indigo-200 dark:border-indigo-500/30 bg-indigo-50 dark:bg-indigo-500/10">
                 <Zap className="h-3 w-3 text-indigo-600 dark:text-indigo-400" />
@@ -580,7 +575,7 @@ function LoginPage() {
               </p>
             </div>
 
-            {/* Card */}
+            {}
             <div
               ref={cardRef}
               onMouseMove={handleCardMouseMove}
@@ -593,7 +588,7 @@ function LoginPage() {
                 `,
               }}
             >
-              {/* Dark mode background gradient (injected via a pseudo element trick or nested div) */}
+              {}
               <div
                 className="absolute inset-0 bg-white hidden dark:block"
                 style={{
@@ -602,19 +597,19 @@ function LoginPage() {
                 }}
               />
 
-              {/* Top glow bar */}
+              {}
               <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-indigo-400/40 dark:via-indigo-500/60 to-transparent" />
 
-              {/* Corner accents */}
+              {}
               <div className="absolute top-0 left-0 w-16 h-16 border-t border-l border-indigo-200 dark:border-indigo-500/30 rounded-tl-3xl" />
               <div className="absolute top-0 right-0 w-16 h-16 border-t border-r border-violet-200 dark:border-violet-500/30 rounded-tr-3xl" />
               <div className="absolute bottom-0 left-0 w-16 h-16 border-b border-l border-violet-200 dark:border-violet-500/20 rounded-bl-3xl" />
               <div className="absolute bottom-0 right-0 w-16 h-16 border-b border-r border-indigo-200 dark:border-indigo-500/20 rounded-br-3xl" />
 
-              {/* Inner glow */}
+              {}
               <div className="absolute inset-0 bg-gradient-to-br from-indigo-100/30 dark:from-indigo-600/[0.04] via-transparent to-violet-100/30 dark:to-violet-600/[0.04] pointer-events-none" />
 
-              {/* Header */}
+              {}
               <div className="relative px-8 pt-8 pb-6 border-b border-slate-100 dark:border-white/[0.04]">
                 <div className="flex items-center justify-between mb-1">
                   <div className="flex items-center gap-2.5">
@@ -639,9 +634,9 @@ function LoginPage() {
                 </p>
               </div>
 
-              {/* Body */}
+              {}
               <div className="relative px-8 py-6 space-y-5">
-                {/* OAuth */}
+                {}
                 <div className="grid grid-cols-1 gap-3">
                   <button
                     onClick={handleGoogle}
@@ -671,7 +666,7 @@ function LoginPage() {
                   </button>
                 </div>
 
-                {/* Divider */}
+                {}
                 <div className="flex items-center gap-3">
                   <div className="flex-1 h-px bg-gradient-to-r from-transparent via-slate-200 dark:via-white/10 to-transparent" />
                   <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-500 dark:text-slate-600">
@@ -680,9 +675,9 @@ function LoginPage() {
                   <div className="flex-1 h-px bg-gradient-to-r from-transparent via-slate-200 dark:via-white/10 to-transparent" />
                 </div>
 
-                {/* Form */}
+                {}
                 <form onSubmit={handleSubmit} className="space-y-4">
-                  {/* Email */}
+                  {}
                   <div className="space-y-2 group/f">
                     <Label className="text-[11px] font-bold uppercase tracking-[0.15em] text-slate-500 dark:text-slate-500 group-focus-within/f:text-indigo-600 dark:group-focus-within/f:text-indigo-400 transition-colors">
                       Email
@@ -697,12 +692,12 @@ function LoginPage() {
                         required
                         className="h-11 pl-10 rounded-xl bg-slate-50 dark:bg-white/[0.03] border-slate-200 dark:border-white/[0.08] text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-700 focus:border-indigo-500/50 focus:bg-white dark:focus:bg-white/[0.05] focus:ring-0 focus:shadow-lg focus:shadow-indigo-500/10 transition-all duration-300 hover:border-slate-300 dark:hover:border-white/15 hover:bg-white dark:hover:bg-white/[0.04]"
                       />
-                      {/* Animated focus line */}
+                      {}
                       <div className="absolute bottom-0 inset-x-0 h-px scale-x-0 group-focus-within/f:scale-x-100 transition-transform duration-300 rounded-full bg-gradient-to-r from-transparent via-indigo-500 to-transparent" />
                     </div>
                   </div>
 
-                  {/* Password */}
+                  {}
                   <div className="space-y-2 group/f">
                     <div className="flex items-center justify-between">
                       <Label className="text-[11px] font-bold uppercase tracking-[0.15em] text-slate-500 group-focus-within/f:text-indigo-600 dark:group-focus-within/f:text-indigo-400 transition-colors">
@@ -741,7 +736,7 @@ function LoginPage() {
                     </div>
                   </div>
 
-                  {/* Submit */}
+                  {}
                   <button
                     type="submit"
                     disabled={loading}
@@ -752,9 +747,9 @@ function LoginPage() {
                         "0 0 32px rgba(99,102,241,0.2), inset 0 1px 0 rgba(255,255,255,0.15)",
                     }}
                   >
-                    {/* Shine sweep */}
+                    {}
                     <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/15 to-transparent -translate-x-full group-hover/btn:translate-x-full transition-transform duration-700 ease-in-out" />
-                    {/* Top highlight */}
+                    {}
                     <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/40 to-transparent" />
 
                     <span className="relative flex items-center justify-center gap-2">
@@ -773,7 +768,7 @@ function LoginPage() {
                   </button>
                 </form>
 
-                {/* Sign up */}
+                {}
                 <p className="text-center text-sm text-slate-600">
                   New to DevAI?{" "}
                   <Link
@@ -785,7 +780,7 @@ function LoginPage() {
                 </p>
               </div>
 
-              {/* Footer */}
+              {}
               <div className="px-8 pb-6 flex items-center justify-center gap-4">
                 {[
                   { icon: "🔒", text: "256-bit SSL" },
@@ -801,11 +796,11 @@ function LoginPage() {
                 ))}
               </div>
 
-              {/* Bottom glow */}
+              {}
               <div className="absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-indigo-300 dark:via-violet-500/40 to-transparent" />
             </div>
 
-            {/* Below card */}
+            {}
             <p className="mt-5 text-center text-xs text-slate-500 dark:text-slate-700">
               By signing in, you agree to our{" "}
               <Link

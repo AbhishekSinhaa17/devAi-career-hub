@@ -39,9 +39,6 @@ export const Route = createFileRoute("/_authenticated/github-resume")({
   component: GithubResumePage,
 });
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Shared premium panel (theme-aware)
-// ─────────────────────────────────────────────────────────────────────────────
 function Panel({
   children,
   className = "",
@@ -149,7 +146,7 @@ function ActionButton({
         background: tone === "neutral" ? "transparent" : styles.bg,
       }}
     >
-      {/* shine */}
+      {}
       {tone !== "neutral" && (
         <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500">
           <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/12 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
@@ -329,7 +326,7 @@ function GithubResumePage() {
         transition: "all 0.6s cubic-bezier(0.34,1.2,0.64,1)",
       }}
     >
-      {/* ── Header ── */}
+      {}
       <header className="flex flex-col gap-3">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div>
@@ -356,7 +353,7 @@ function GithubResumePage() {
         </div>
       </header>
 
-      {/* ── Input panel ── */}
+      {}
       <Panel className="p-2 max-w-2xl" accent="#6366f1">
         <form
           onSubmit={(e) => {
@@ -403,7 +400,7 @@ function GithubResumePage() {
         </form>
       </Panel>
 
-      {/* ── Loading state ── */}
+      {}
       {mutation.isPending && (
         <Panel className="p-10" accent="#8b5cf6">
           <div className="flex flex-col items-center justify-center text-center gap-4">
@@ -431,10 +428,10 @@ function GithubResumePage() {
         </Panel>
       )}
 
-      {/* ── Result state ── */}
+      {}
       {data && (
         <div className="space-y-8" style={{ animation: "fadeSlideIn 0.5s ease-out both" }}>
-          {/* Top overview */}
+          {}
           <div className="grid gap-4 lg:grid-cols-12">
             <Panel className="p-7 lg:col-span-8" accent="#6366f1">
               <div
@@ -485,7 +482,7 @@ function GithubResumePage() {
                   </div>
                 </div>
 
-                {/* Badges */}
+                {}
                 {data.badges?.length > 0 && (
                   <div className="mt-6 pt-5 border-t border-border/60">
                     <div className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground mb-2">
@@ -589,9 +586,9 @@ function GithubResumePage() {
             </Panel>
           </div>
 
-          {/* Main grid */}
+          {}
           <div className="grid gap-4 lg:grid-cols-12">
-            {/* Actions sidebar */}
+            {}
             <div className="lg:col-span-4 space-y-4">
               <Panel className="p-6" accent="#6366f1">
                 <div className="flex items-center justify-between mb-4">
@@ -697,7 +694,7 @@ function GithubResumePage() {
               </Panel>
             </div>
 
-            {/* Preview */}
+            {}
             <div className="lg:col-span-8">
               <Panel className="overflow-hidden" accent="#8b5cf6">
                 <div className="flex items-center justify-between px-5 py-3 border-b border-border/60 bg-muted/20">
@@ -710,7 +707,7 @@ function GithubResumePage() {
                   </div>
                 </div>
 
-                {/* Preview "paper" */}
+                {}
                 <div className="p-4 sm:p-6 md:p-8 bg-background">
                   <div
                     className="rounded-2xl border border-border/60 overflow-hidden"
@@ -793,7 +790,7 @@ function GithubResumePage() {
         </div>
       )}
 
-      {/* Cover Letter Modal */}
+      {}
       <Dialog open={isCoverLetterOpen} onOpenChange={setIsCoverLetterOpen}>
         <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
           <DialogHeader>

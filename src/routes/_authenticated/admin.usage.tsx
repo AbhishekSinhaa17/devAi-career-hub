@@ -44,8 +44,6 @@ export const Route = createFileRoute("/_authenticated/admin/usage")({
   component: UsagePage,
 });
 
-// ─── Styles ────────────────────────────────────────────────────────────────────
-
 const STYLES = `
   @keyframes float-orb {
     0%,100% { transform:translate(0,0) scale(1); }
@@ -173,8 +171,6 @@ const STYLES = `
   }
 `;
 
-// ─── Constants ─────────────────────────────────────────────────────────────────
-
 const PRESETS = [
   { label: "7d", value: 7 },
   { label: "14d", value: 14 },
@@ -188,8 +184,6 @@ function fmtUSD(n: number) {
 function fmtInt(n: number) {
   return n.toLocaleString();
 }
-
-// ─── Orbs ──────────────────────────────────────────────────────────────────────
 
 function BackgroundOrbs() {
   return (
@@ -226,8 +220,6 @@ function AccentLine({ color }: { color: string }) {
     />
   );
 }
-
-// ─── Stat card ─────────────────────────────────────────────────────────────────
 
 function StatCard({
   label,
@@ -280,7 +272,7 @@ function StatCard({
         {value}
       </div>
 
-      {/* decorative bar */}
+      {}
       <div
         className="mt-3 h-0.5 rounded-full overflow-hidden"
         style={{ background: "rgba(255,255,255,0.05)" }}
@@ -297,8 +289,6 @@ function StatCard({
     </div>
   );
 }
-
-// ─── Chart section wrapper ─────────────────────────────────────────────────────
 
 function ChartPanel({
   title,
@@ -340,8 +330,6 @@ function ChartPanel({
   );
 }
 
-// ─── Table section wrapper ─────────────────────────────────────────────────────
-
 function TablePanel({
   title,
   subtitle,
@@ -376,8 +364,6 @@ function TablePanel({
   );
 }
 
-// ─── Shared chart tooltip style ────────────────────────────────────────────────
-
 const tooltipStyle = {
   background: "rgba(10,10,18,0.95)",
   border: "1px solid rgba(99,102,241,0.25)",
@@ -385,8 +371,6 @@ const tooltipStyle = {
   fontSize: 12,
   fontWeight: 700,
 };
-
-// ─── Main page ─────────────────────────────────────────────────────────────────
 
 function UsagePage() {
   const [mode, setMode] = useState<"preset" | "custom">("preset");
@@ -426,8 +410,6 @@ function UsagePage() {
     enabled: access.data?.isAdmin === true,
   });
 
-  // ── Guard ────────────────────────────────────────────────────────────────────
-
   if (access.isLoading) {
     return (
       <div className="flex h-64 items-center justify-center">
@@ -455,8 +437,6 @@ function UsagePage() {
 
   const d = q.data;
   const isCustomActive = mode === "custom";
-
-  // ── Export helpers ───────────────────────────────────────────────────────────
 
   const exportCsv = () => {
     if (!d) return;
@@ -577,8 +557,6 @@ function UsagePage() {
     }
   };
 
-  // ── Render ───────────────────────────────────────────────────────────────────
-
   return (
     <>
       <style>{STYLES}</style>
@@ -592,9 +570,9 @@ function UsagePage() {
           transition: "all 0.55s cubic-bezier(0.34,1.1,0.64,1)",
         }}
       >
-        {/* ── Header ── */}
+        {}
         <header className="space-y-4 pt-1">
-          {/* Back link */}
+          {}
           <Link
             to="/admin"
             className="inline-flex items-center gap-1.5 text-[11px] font-bold t-sub hover:text-indigo-400 transition-colors"
@@ -605,7 +583,7 @@ function UsagePage() {
           </Link>
 
           <div style={{ animation: "fade-up 0.5s 0.05s ease both" }}>
-            {/* Badge */}
+            {}
             <div
               className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full w-fit mb-3"
               style={{
@@ -637,12 +615,12 @@ function UsagePage() {
           </div>
         </header>
 
-        {/* ── Controls row ── */}
+        {}
         <div
           className="flex flex-wrap items-center gap-3"
           style={{ animation: "fade-up 0.5s 0.15s ease both" }}
         >
-          {/* Preset strip */}
+          {}
           <div
             className="flex gap-1 p-1 rounded-xl"
             style={{
@@ -670,7 +648,7 @@ function UsagePage() {
             </button>
           </div>
 
-          {/* Custom date pickers */}
+          {}
           {isCustomActive && (
             <div
               className="flex items-center gap-2"
@@ -739,10 +717,10 @@ function UsagePage() {
             </div>
           )}
 
-          {/* Divider */}
+          {}
           <div className="h-6 w-px divider-line" />
 
-          {/* Export buttons */}
+          {}
           <button className="export-btn" disabled={!d || q.isLoading} onClick={exportCsv}>
             <Download className="h-3 w-3" /> CSV
           </button>
@@ -759,7 +737,7 @@ function UsagePage() {
           </button>
         </div>
 
-        {/* Period label */}
+        {}
         {isCustomActive && d?.startDate && d?.endDate && (
           <div
             className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-[11px] font-bold t-sub"
@@ -774,7 +752,7 @@ function UsagePage() {
           </div>
         )}
 
-        {/* ── Stat cards ── */}
+        {}
         <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
           <StatCard
             label="Requests"
@@ -811,9 +789,9 @@ function UsagePage() {
           />
         </div>
 
-        {/* ── Charts (PNG export target) ── */}
+        {}
         <div ref={chartsRef} className="space-y-5">
-          {/* Requests per day */}
+          {}
           <ChartPanel title="Requests per day" accentColor="#6366f1" delay={240}>
             <div className="h-64">
               <ResponsiveContainer width="100%" height="100%">
@@ -860,7 +838,7 @@ function UsagePage() {
             </div>
           </ChartPanel>
 
-          {/* Tokens + Cost side by side */}
+          {}
           <div className="grid gap-5 lg:grid-cols-2">
             <ChartPanel title="Tokens per day" accentColor="#8b5cf6" delay={300}>
               <div className="h-52">
@@ -929,7 +907,7 @@ function UsagePage() {
           </div>
         </div>
 
-        {/* ── Endpoint table ── */}
+        {}
         <TablePanel
           title="By endpoint"
           subtitle="Tokens, cost, and latency per AI endpoint"
@@ -992,9 +970,9 @@ function UsagePage() {
           </div>
         </TablePanel>
 
-        {/* ── Model + Top users ── */}
+        {}
         <div className="grid gap-5 lg:grid-cols-2">
-          {/* By model */}
+          {}
           <TablePanel title="By model" accentColor="#8b5cf6" delay={460}>
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
@@ -1042,7 +1020,7 @@ function UsagePage() {
             </div>
           </TablePanel>
 
-          {/* Top users */}
+          {}
           <TablePanel
             title="Top users"
             subtitle="By AI request volume"
@@ -1057,7 +1035,7 @@ function UsagePage() {
                   style={{ animation: `row-enter 0.35s ${i * 40}ms ease both` }}
                 >
                   <div className="flex items-center gap-3 min-w-0">
-                    {/* Avatar */}
+                    {}
                     {u.profile?.avatar_url ? (
                       <img
                         src={u.profile.avatar_url}

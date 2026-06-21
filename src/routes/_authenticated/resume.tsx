@@ -123,7 +123,6 @@ function Panel({
   );
 }
 
-// ─── Section Accordion ────────────────────────────────────────────────────────
 function EditorSection({
   title,
   icon: Icon,
@@ -168,7 +167,6 @@ function EditorSection({
   );
 }
 
-// ─── Field ────────────────────────────────────────────────────────────────────
 function Field({
   label,
   v,
@@ -198,7 +196,6 @@ function Field({
   );
 }
 
-// ─── Score Bar ────────────────────────────────────────────────────────────────
 function ScoreBar({ score }: { score: number }) {
   const color =
     score >= 80 ? "#10b981" : score >= 60 ? "#6366f1" : score >= 40 ? "#f59e0b" : "#ef4444";
@@ -224,7 +221,6 @@ function ScoreBar({ score }: { score: number }) {
   );
 }
 
-// ─── List Section ─────────────────────────────────────────────────────────────
 function ListSection<T extends object>({
   title,
   icon: Icon,
@@ -289,7 +285,6 @@ function SkillTag({ label, onRemove }: { label: string; onRemove: () => void }) 
   );
 }
 
-// ─── Resume Preview ───────────────────────────────────────────────────────────
 function ResumePreview({ r }: { r: Resume }) {
   const hasContent = r.fullName || r.title || r.summary;
   return (
@@ -300,7 +295,7 @@ function ResumePreview({ r }: { r: Resume }) {
         boxShadow: "0 20px 60px rgba(0,0,0,0.15), 0 0 0 1px rgba(0,0,0,0.05)",
       }}
     >
-      {/* Preview chrome bar */}
+      {}
       <div className="flex items-center gap-2 px-4 py-3 bg-zinc-100 border-b border-zinc-200 print:hidden">
         <div className="flex gap-1.5">
           <div className="h-3 w-3 rounded-full bg-red-400" />
@@ -316,7 +311,7 @@ function ResumePreview({ r }: { r: Resume }) {
         />
       </div>
 
-      {/* Paper */}
+      {}
       <div
         className="p-8 bg-white text-zinc-900 print:p-6"
         style={{ fontFamily: "Georgia, 'Times New Roman', serif", minHeight: "700px" }}
@@ -330,7 +325,7 @@ function ResumePreview({ r }: { r: Resume }) {
           </div>
         ) : (
           <>
-            {/* Header */}
+            {}
             <div className="border-b-2 border-zinc-800 pb-4 mb-4">
               <h1 className="text-3xl font-bold text-zinc-900 tracking-tight">
                 {r.fullName || "Your Name"}
@@ -429,7 +424,6 @@ function PreviewSection({ title, children }: { title: string; children: React.Re
   );
 }
 
-// ─── Main Page ────────────────────────────────────────────────────────────────
 function Page() {
   const [r, setR] = useState<Resume>(empty);
   const [currentId, setCurrentId] = useState<string | undefined>();
@@ -462,9 +456,7 @@ function Page() {
         setR({ ...empty, ...importedData });
         setCurrentId(undefined);
         toast.success("GitHub Resume loaded! Edit and save.");
-      } catch {
-        // Ignore JSON parse errors for imported data
-      }
+      } catch {}
       sessionStorage.removeItem("importedGithubResume");
     }
   }, []);
@@ -536,7 +528,7 @@ function Page() {
         transition: "all 0.6s cubic-bezier(0.34,1.2,0.64,1)",
       }}
     >
-      {/* ── Header ── */}
+      {}
       <header className="flex flex-col gap-3">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div>
@@ -557,9 +549,9 @@ function Page() {
             </p>
           </div>
 
-          {/* Action buttons */}
+          {}
           <div className="flex flex-wrap gap-2 print:hidden">
-            {/* History sheet */}
+            {}
             <Sheet>
               <SheetTrigger asChild>
                 <button className="inline-flex items-center gap-2 h-10 px-4 rounded-xl border border-border/60 bg-card/40 text-sm font-bold text-foreground hover:bg-card/80 hover:border-border transition-all duration-300">
@@ -656,7 +648,7 @@ function Page() {
         </div>
       </header>
 
-      {/* ── AI Score panel ── */}
+      {}
       {mutation.data && (
         <Panel
           accent={aiScore >= 80 ? "#10b981" : aiScore >= 60 ? "#6366f1" : "#f59e0b"}
@@ -739,7 +731,7 @@ function Page() {
         </Panel>
       )}
 
-      {/* ── Mobile Tabs Toggle ── */}
+      {}
       <div className="flex lg:hidden bg-muted/50 p-1 rounded-xl mb-6">
         <button
           onClick={() => setMobileTab("editor")}
@@ -763,13 +755,13 @@ function Page() {
         </button>
       </div>
 
-      {/* ── Main grid ── */}
+      {}
       <div className="grid gap-6 lg:grid-cols-2">
-        {/* Editor */}
+        {}
         <div
           className={`space-y-3 print:hidden ${mobileTab === "preview" ? "hidden lg:block" : "block"}`}
         >
-          {/* Basics */}
+          {}
           <EditorSection title="Personal Info" icon={User} accent="#6366f1">
             <div className="grid gap-3 sm:grid-cols-2">
               <Field
@@ -817,7 +809,7 @@ function Page() {
             </div>
           </EditorSection>
 
-          {/* Skills */}
+          {}
           <EditorSection title="Skills" icon={Award} accent="#10b981" defaultOpen={false}>
             <div className="flex gap-2">
               <div className="relative flex-1 group/f">
@@ -859,7 +851,7 @@ function Page() {
             )}
           </EditorSection>
 
-          {/* Experience */}
+          {}
           <ListSection
             title="Experience"
             icon={Briefcase}
@@ -905,7 +897,7 @@ function Page() {
             )}
           />
 
-          {/* Education */}
+          {}
           <ListSection
             title="Education"
             icon={GraduationCap}
@@ -937,7 +929,7 @@ function Page() {
             )}
           />
 
-          {/* Projects */}
+          {}
           <ListSection
             title="Projects"
             icon={Code2}
@@ -978,13 +970,13 @@ function Page() {
           />
         </div>
 
-        {/* Preview */}
+        {}
         <div
           className={`lg:sticky lg:top-6 lg:h-fit space-y-4 ${mobileTab === "editor" ? "hidden lg:block" : "block"}`}
         >
           <ResumePreview r={r} />
 
-          {/* Quick tips */}
+          {}
           <Panel accent="#6366f1" className="print:hidden">
             <div className="p-5">
               <div className="flex items-center gap-2 mb-4">

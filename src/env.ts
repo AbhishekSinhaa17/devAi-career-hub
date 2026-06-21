@@ -11,10 +11,6 @@ const envSchema = z.object({
   VITE_POSTHOG_HOST: z.string().optional(),
 });
 
-/**
- * Validate process.env on startup.
- * Throws a detailed error if any required environment variable is missing or invalid.
- */
 export const env = envSchema.parse({
   VITE_SUPABASE_URL: process.env.VITE_SUPABASE_URL || import.meta.env?.VITE_SUPABASE_URL,
   VITE_SUPABASE_PUBLISHABLE_KEY:

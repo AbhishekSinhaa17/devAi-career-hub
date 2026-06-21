@@ -32,7 +32,7 @@ export function FAQ() {
   return (
     <section id="faq" className="relative py-16">
       <div className="mx-auto grid max-w-6xl gap-12 px-6 lg:grid-cols-[0.8fr_1.2fr] lg:gap-16">
-        {/* sticky heading / sidebar */}
+        {}
         <div className="lg:sticky lg:top-28 lg:self-start">
           <Reveal>
             <span className="inline-flex items-center gap-2 rounded-full border border-border bg-card/60 px-3 py-1 text-xs font-medium text-primary backdrop-blur">
@@ -56,7 +56,7 @@ export function FAQ() {
           </Reveal>
         </div>
 
-        {/* questions */}
+        {}
         <div className="space-y-3">
           {items.map((it, i) => (
             <Reveal key={it.q} delay={i * 60}>

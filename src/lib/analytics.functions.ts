@@ -23,7 +23,7 @@ export interface FeatureMetric {
 export interface DailyActivity {
   date: string;
   total: number;
-  [feature: string]: number | string; // dynamic for stacked bar charts
+  [feature: string]: number | string;
 }
 
 export interface AnalyticsResponse {
@@ -62,7 +62,6 @@ export const getGlobalAnalytics = createServerFn({ method: "GET" })
     const sevenDaysAgo = new Date(now);
     sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
 
-    // Helper for parallel count queries
     const countTable = async (table: string, from?: Date, to?: Date) => {
       let q = supabaseAdmin.from(table as any).select("id", { count: "exact", head: true });
       if (from) q = q.gte("created_at", from.toISOString());
@@ -72,8 +71,6 @@ export const getGlobalAnalytics = createServerFn({ method: "GET" })
     };
 
     const countUsers = async () => {
-      // Supabase auth.users can't be queried directly like this in some setups,
-      // but we have a `profiles` table which mirrors users.
       const { count } = await supabaseAdmin
         .from("profiles")
         .select("id", { count: "exact", head: true });
@@ -81,8 +78,6 @@ export const getGlobalAnalytics = createServerFn({ method: "GET" })
     };
 
     const countActiveUsers = async () => {
-      // Users who generated an AI event in the last 7 days
-      // We must fetch distinct user_ids since we can't easily do COUNT(DISTINCT user_id) in JS
       const { data } = await supabaseAdmin
         .from("ai_usage_events")
         .select("user_id")
@@ -94,7 +89,6 @@ export const getGlobalAnalytics = createServerFn({ method: "GET" })
     };
 
     const fetchDailyActivity = async () => {
-      // Fetch events for the chart
       const { data } = await supabaseAdmin
         .from("ai_usage_events")
         .select("created_at, endpoint")
@@ -102,7 +96,6 @@ export const getGlobalAnalytics = createServerFn({ method: "GET" })
 
       const activityMap: Record<string, DailyActivity> = {};
 
-      // Initialize all dates in the range to ensure zero-days are shown
       for (let i = 0; i <= days; i++) {
         const d = new Date(periodStart);
         d.setDate(d.getDate() + i);
@@ -177,7 +170,6 @@ export const getGlobalAnalytics = createServerFn({ method: "GET" })
       return { avg: Math.round(sum / data.length), dist, top };
     };
 
-    // Execute massive parallel fetch for performance
     const [
       totalUsers,
       activeUsers7d,
@@ -201,7 +193,6 @@ export const getGlobalAnalytics = createServerFn({ method: "GET" })
       }),
     ]);
 
-    // Process feature metrics
     const totalFeatureUsage = featureResults.reduce((acc, f) => acc + f.total, 0);
 
     let fastestGrowingFeature = "None";
@@ -213,7 +204,7 @@ export const getGlobalAnalytics = createServerFn({ method: "GET" })
       const percentage = totalFeatureUsage > 0 ? (f.total / totalFeatureUsage) * 100 : 0;
       let growth = 0;
       if (f.prev30 === 0 && f.last30 > 0) {
-        growth = 100; // Infinity formally, but 100% is cleaner
+        growth = 100;
       } else if (f.prev30 > 0) {
         growth = ((f.last30 - f.prev30) / f.prev30) * 100;
       }

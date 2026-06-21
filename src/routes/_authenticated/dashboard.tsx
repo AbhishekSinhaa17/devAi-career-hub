@@ -49,7 +49,6 @@ export const Route = createFileRoute("/_authenticated/dashboard")({
   component: Dashboard,
 });
 
-// ─── Animated counter ─────────────────────────────────────────────────────────
 function useCountUp(target: number, duration = 1200) {
   const [count, setCount] = useState(0);
   useEffect(() => {
@@ -70,7 +69,6 @@ function useCountUp(target: number, duration = 1200) {
   return count;
 }
 
-// ─── Glowing orb background ───────────────────────────────────────────────────
 function BackgroundOrbs() {
   return (
     <div className="pointer-events-none fixed inset-0 -z-10 overflow-hidden">
@@ -83,7 +81,7 @@ function BackgroundOrbs() {
         className="absolute -bottom-40 left-1/3 w-[350px] h-[350px] rounded-full bg-purple-600/10 dark:bg-purple-600/6 blur-3xl"
         style={{ animation: "pulse 5s ease-in-out 2s infinite" }}
       />
-      {/* Subtle grid */}
+      {}
       <div
         className="absolute inset-0 opacity-[0.05] dark:opacity-[0.025]"
         style={{
@@ -95,7 +93,6 @@ function BackgroundOrbs() {
   );
 }
 
-// ─── Dev Score Ring ───────────────────────────────────────────────────────────
 function DevScoreRing({ score, trend }: { score: number; trend: number }) {
   const animScore = useCountUp(score);
   const radius = 52;
@@ -107,10 +104,10 @@ function DevScoreRing({ score, trend }: { score: number; trend: number }) {
 
   return (
     <div className="flex items-center gap-8">
-      {/* Ring */}
+      {}
       <div className="relative flex items-center justify-center">
         <svg width="140" height="140" className="-rotate-90">
-          {/* Track */}
+          {}
           <circle
             cx="70"
             cy="70"
@@ -119,7 +116,7 @@ function DevScoreRing({ score, trend }: { score: number; trend: number }) {
             className="stroke-slate-200 dark:stroke-white/5"
             strokeWidth="10"
           />
-          {/* Progress */}
+          {}
           <circle
             cx="70"
             cy="70"
@@ -146,7 +143,7 @@ function DevScoreRing({ score, trend }: { score: number; trend: number }) {
         </div>
       </div>
 
-      {/* Meta */}
+      {}
       <div className="space-y-3">
         <div>
           <p className="text-xs text-slate-500 uppercase tracking-widest font-bold mb-1">
@@ -166,7 +163,7 @@ function DevScoreRing({ score, trend }: { score: number; trend: number }) {
                   ? "rgba(16,185,129,0.1)"
                   : trend < 0
                     ? "rgba(239,68,68,0.1)"
-                    : "rgba(100,116,139,0.1)", // Light mode friendly neutral
+                    : "rgba(100,116,139,0.1)",
               color: trend > 0 ? "#10b981" : trend < 0 ? "#ef4444" : "#64748b",
               border: `1px solid ${trend > 0 ? "rgba(16,185,129,0.2)" : trend < 0 ? "rgba(239,68,68,0.2)" : "rgba(100,116,139,0.2)"}`,
             }}
@@ -199,7 +196,6 @@ function DevScoreRing({ score, trend }: { score: number; trend: number }) {
   );
 }
 
-// ─── Metric Bar Card ──────────────────────────────────────────────────────────
 function MetricCard({
   label,
   value,
@@ -248,7 +244,7 @@ function MetricCard({
           <span className="text-slate-500 dark:text-slate-600 text-sm font-semibold">/100</span>
         </div>
 
-        {/* Progress track */}
+        {}
         <div className="h-1.5 rounded-full bg-slate-100 dark:bg-white/[0.06] overflow-hidden">
           <div
             className="h-full rounded-full transition-all duration-1000 ease-out"
@@ -264,7 +260,6 @@ function MetricCard({
   );
 }
 
-// ─── Radar chart custom tooltip ───────────────────────────────────────────────
 function CustomTooltip({ active, payload }: TooltipProps<number, string>) {
   if (!active || !payload?.length) return null;
   return (
@@ -277,7 +272,6 @@ function CustomTooltip({ active, payload }: TooltipProps<number, string>) {
   );
 }
 
-// ─── Glass Panel ──────────────────────────────────────────────────────────────
 function GlassPanel({
   children,
   className = "",
@@ -324,7 +318,6 @@ function SectionHeader({
   );
 }
 
-// ─── Action Card ──────────────────────────────────────────────────────────────
 const ACTION_COLORS: Record<string, { color: string; glow: string }> = {
   "/mock-interview": { color: "#8b5cf6", glow: "rgba(139,92,246,0.2)" },
   "/github-resume": { color: "#10b981", glow: "rgba(16,185,129,0.2)" },
@@ -368,7 +361,7 @@ function ActionCard({
           boxShadow: hovered ? `0 16px 40px ${glow}` : undefined,
         }}
       >
-        {/* Hover glow */}
+        {}
         <div
           className="absolute inset-0 transition-opacity duration-500"
           style={{
@@ -422,7 +415,6 @@ function ActionCard({
   );
 }
 
-// ─── Row components ───────────────────────────────────────────────────────────
 function DataRow({ label, value }: { label: string; value: string | number }) {
   return (
     <div className="flex items-center justify-between py-2.5 border-b border-slate-100 dark:border-white/[0.04] last:border-0">
@@ -465,7 +457,6 @@ function InsightRow({
   );
 }
 
-// ─── Main Dashboard ───────────────────────────────────────────────────────────
 function Dashboard() {
   const fetcher = useServerFn(getDashboard);
   const { data, isLoading } = useQuery({
@@ -500,7 +491,7 @@ function Dashboard() {
     >
       <BackgroundOrbs />
 
-      {/* ── Header ── */}
+      {}
       <div className="flex items-start justify-between">
         <div>
           <div className="flex items-center gap-2 mb-2">
@@ -529,7 +520,7 @@ function Dashboard() {
           </p>
         </div>
 
-        {/* AI pulse badge */}
+        {}
         <div className="hidden md:flex items-center gap-2 px-4 py-2 rounded-2xl border border-slate-200 dark:border-white/[0.06] bg-white dark:bg-white/[0.02] shadow-sm dark:shadow-none">
           <Cpu className="h-4 w-4 text-violet-500 dark:text-violet-400 animate-pulse" />
           <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">
@@ -538,15 +529,15 @@ function Dashboard() {
         </div>
       </div>
 
-      {/* ── Hero: Dev Score ── */}
+      {}
       <GlassPanel className="p-8" glow="rgba(99,102,241,0.06)">
-        {/* Top accent */}
+        {}
         <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-indigo-500/40 to-transparent" />
 
         <div className="flex flex-col md:flex-row items-center justify-between gap-8">
           <DevScoreRing score={data?.devScore ?? 0} trend={data?.devScoreTrend ?? 0} />
 
-          {/* Metric pills */}
+          {}
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 flex-1 max-w-xl">
             {scores.map((s, i) => {
               const colors = ["#6366f1", "#10b981", "#f59e0b", "#38bdf8", "#8b5cf6"];
@@ -586,9 +577,9 @@ function Dashboard() {
         </div>
       </GlassPanel>
 
-      {/* ── Stats Row ── */}
+      {}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        {/* Profile Completion */}
+        {}
         <MetricCard
           label="Profile"
           value={data?.profileCompletion ?? 0}
@@ -597,7 +588,7 @@ function Dashboard() {
           color="#6366f1"
         />
 
-        {/* Mock Interview Gamification */}
+        {}
         <GlassPanel className="p-5">
           <SectionHeader icon={Trophy} label="Interview Stats" accent="#f59e0b" />
           <div className="grid grid-cols-2 gap-4 mb-4">
@@ -649,7 +640,7 @@ function Dashboard() {
           </div>
         </GlassPanel>
 
-        {/* GitHub Resume */}
+        {}
         <GlassPanel className="p-5">
           <SectionHeader icon={FileBadge} label="GitHub Resume" accent="#10b981" />
           {data?.githubResume ? (
@@ -693,7 +684,7 @@ function Dashboard() {
           </Link>
         </GlassPanel>
 
-        {/* Latest Mock Interview */}
+        {}
         <GlassPanel className="p-5">
           <SectionHeader icon={MessageSquare} label="Latest Interview" accent="#8b5cf6" />
           {data?.mockInterview ? (
@@ -734,9 +725,9 @@ function Dashboard() {
         </GlassPanel>
       </div>
 
-      {/* ── Radar + Insights ── */}
+      {}
       <div className="grid gap-4 lg:grid-cols-3">
-        {/* Radar */}
+        {}
         <GlassPanel className="p-6 lg:col-span-2">
           <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-indigo-500/30 to-transparent" />
           <SectionHeader icon={BarChart3} label="Career Radar" accent="#6366f1" />
@@ -767,7 +758,7 @@ function Dashboard() {
           </div>
         </GlassPanel>
 
-        {/* Activity + Insights */}
+        {}
         <GlassPanel className="p-6">
           <SectionHeader icon={Activity} label="Activity" accent="#38bdf8" />
 
@@ -831,7 +822,7 @@ function Dashboard() {
         </GlassPanel>
       </div>
 
-      {/* ── Quick Actions ── */}
+      {}
       <div>
         <div className="flex items-center gap-3 mb-5">
           <h2 className="text-lg font-black text-slate-900 dark:text-white">Quick Actions</h2>

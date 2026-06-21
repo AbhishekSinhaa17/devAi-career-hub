@@ -1,8 +1,6 @@
 import { useRouter, Link } from "@tanstack/react-router";
 import { AlertTriangle, RefreshCw, Home, WifiOff, Shield, Bot, ServerCrash } from "lucide-react";
 
-// ─── Error categorization ─────────────────────────────────────────────────────
-
 interface ErrorInfo {
   title: string;
   message: string;
@@ -10,10 +8,6 @@ interface ErrorInfo {
   accentColor: string;
 }
 
-/**
- * Classify an error into a user-friendly category based on the message.
- * Full error details are logged internally — only friendly text is shown.
- */
 function categorizeError(error: Error): ErrorInfo {
   const msg = error.message?.toLowerCase() ?? "";
 
@@ -29,7 +23,6 @@ function categorizeError(error: Error): ErrorInfo {
     };
   }
 
-  // AI provider errors
   if (
     msg.includes("ai request failed") ||
     msg.includes("ai credits") ||
@@ -44,7 +37,6 @@ function categorizeError(error: Error): ErrorInfo {
     };
   }
 
-  // GitHub errors
   if (msg.includes("github")) {
     if (msg.includes("rate limit")) {
       return {
@@ -70,7 +62,6 @@ function categorizeError(error: Error): ErrorInfo {
     };
   }
 
-  // Supabase / auth errors
   if (msg.includes("unauthorized") || msg.includes("invalid token")) {
     return {
       title: "Session Expired",
@@ -89,7 +80,6 @@ function categorizeError(error: Error): ErrorInfo {
     };
   }
 
-  // Network errors
   if (
     msg.includes("fetch") ||
     msg.includes("network") ||
@@ -104,7 +94,6 @@ function categorizeError(error: Error): ErrorInfo {
     };
   }
 
-  // Generic fallback
   return {
     title: "Something Went Wrong",
     message: "An unexpected error occurred. Please try again.",
@@ -113,20 +102,7 @@ function categorizeError(error: Error): ErrorInfo {
   };
 }
 
-// ─── Route-level error component ──────────────────────────────────────────────
-
-/**
- * Reusable error boundary component for TanStack Router `errorComponent`.
- *
- * Usage in route definitions:
- *   import { RouteErrorBoundary } from "@/components/ErrorBoundary";
- *   export const Route = createFileRoute("/_authenticated/my-page")({
- *     errorComponent: RouteErrorBoundary,
- *     component: Page,
- *   });
- */
 export function RouteErrorBoundary({ error, reset }: { error: Error; reset: () => void }) {
-  // Log full error internally (never exposed to user in production)
   console.error("[RouteErrorBoundary]", error);
 
   const router = useRouter();
@@ -139,7 +115,7 @@ export function RouteErrorBoundary({ error, reset }: { error: Error; reset: () =
         className="max-w-md w-full text-center"
         style={{ animation: "fadeSlideIn 0.5s ease-out both" }}
       >
-        {/* Icon */}
+        {}
         <div
           className="mx-auto mb-6 h-20 w-20 rounded-3xl grid place-items-center"
           style={{
@@ -151,13 +127,13 @@ export function RouteErrorBoundary({ error, reset }: { error: Error; reset: () =
           <Icon className="h-10 w-10" style={{ color: info.accentColor }} />
         </div>
 
-        {/* Text */}
+        {}
         <h2 className="text-xl font-black tracking-tight text-foreground mb-2">{info.title}</h2>
         <p className="text-sm text-muted-foreground leading-relaxed mb-8 max-w-sm mx-auto">
           {info.message}
         </p>
 
-        {/* Actions */}
+        {}
         <div className="flex flex-wrap justify-center gap-3">
           <button
             onClick={() => {
@@ -184,7 +160,7 @@ export function RouteErrorBoundary({ error, reset }: { error: Error; reset: () =
           </Link>
         </div>
 
-        {/* Dev-only error details */}
+        {}
         {process.env.NODE_ENV === "development" && (
           <details className="mt-8 text-left">
             <summary className="text-xs font-semibold text-muted-foreground cursor-pointer hover:text-foreground transition-colors">

@@ -3,8 +3,6 @@ import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { fetchGitHubUser, fetchGitHubRepos } from "./github-client.server";
 
-// ---------- GitHub Analyzer ----------
-
 export const GithubAnalysisSchema = z.object({
   score: z.number(),
   summary: z.string(),
@@ -33,7 +31,6 @@ export const analyzeGithub = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const username = data.username.toLowerCase();
 
-    // ── Cache Check ────────────────────────────────────────────────────────
     const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
     const { data: cached } = await context.supabase
       .from("github_analyses")
@@ -142,8 +139,6 @@ export const analyzeGithub = createServerFn({ method: "POST" })
     return { stats: stats as unknown as GithubStats, ...ai };
   });
 
-// ---------- Resume scoring & suggestions ----------
-
 export const ResumeScoreSchema = z.object({
   score: z.number(),
   suggestions: z.array(z.string()),
@@ -191,7 +186,6 @@ export const scoreResume = createServerFn({ method: "POST" })
     const crypto = await import("crypto");
     const resumeHash = crypto.createHash("md5").update(JSON.stringify(data.resume)).digest("hex");
 
-    // ── Cache Check ────────────────────────────────────────────────────────
     const { data: cached } = await context.supabase
       .from("resumes")
       .select("score, ai_suggestions")
@@ -205,7 +199,7 @@ export const scoreResume = createServerFn({ method: "POST" })
       return {
         score: cached.score,
         suggestions: cached.ai_suggestions || [],
-        missingSkills: [], // Resumes table doesn't store missingSkills directly, but we return empty to satisfy schema
+        missingSkills: [],
       };
     }
 
@@ -239,8 +233,6 @@ export const scoreResume = createServerFn({ method: "POST" })
     });
     return ResumeScoreSchema.parse(rawAi);
   });
-
-// ---------- Code review ----------
 
 export const CodeReviewSchema = z.object({
   overall: z.string(),
@@ -314,8 +306,6 @@ export const reviewCode = createServerFn({ method: "POST" })
     return feedback;
   });
 
-// ---------- Interview questions ----------
-
 export const generateInterview = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .validator((d: unknown) =>
@@ -379,8 +369,6 @@ export const generateInterview = createServerFn({ method: "POST" })
 
     return result;
   });
-
-// ---------- Roadmap ----------
 
 export const RoadmapSchema = z.object({
   timeline: z.string(),
@@ -457,8 +445,6 @@ export const generateRoadmap = createServerFn({ method: "POST" })
 
     return roadmap;
   });
-
-// ---------- Dashboard summary ----------
 
 export const getDashboard = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
@@ -569,8 +555,6 @@ export const updateProfile = createServerFn({ method: "POST" })
     return { ok: true };
   });
 
-// ---------- Job Match Analyzer ----------
-
 export const JobMatchSchema = z.object({
   atsScore: z.number(),
   hiringProbability: z.number(),
@@ -612,7 +596,6 @@ export const analyzeJobMatch = createServerFn({ method: "POST" })
       .update(data.resumeText + data.jobDescription)
       .digest("hex");
 
-    // ── Cache Check ────────────────────────────────────────────────────────
     const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
     const { data: cached } = await context.supabase
       .from("job_matches")
@@ -718,8 +701,6 @@ export const getJobMatchesHistory = createServerFn({ method: "GET" })
     return data;
   });
 
-// ---------- Developer Health Score ----------
-
 export const DeveloperScoreSchema = z.object({
   overallScore: z.number(),
   strengths: z.array(z.string()),
@@ -745,7 +726,6 @@ export const generateDeveloperScore = createServerFn({ method: "POST" })
     const supabase = context.supabase;
     const userId = context.userId;
 
-    // Fetch latest data
     const [ghRes, resumeRes, jobMatchRes, interviewRes, profileRes] = await Promise.all([
       supabase
         .from("github_analyses")
@@ -785,7 +765,6 @@ export const generateDeveloperScore = createServerFn({ method: "POST" })
     const resumeScore = resume?.score ?? 0;
     const jobMatchScore = jobMatch?.ats_score ?? 0;
 
-    // Interview score logic: use best_interview_score from profile if available, otherwise fallback to interview count
     const mockInterviewScore = profile?.best_interview_score ?? 0;
     const interviewScore =
       mockInterviewScore > 0 ? mockInterviewScore : Math.min(100, interviewCount * 20);
@@ -800,8 +779,6 @@ export const generateDeveloperScore = createServerFn({ method: "POST" })
       (profileFields.filter(Boolean).length / profileFields.length) * 100,
     );
 
-    // Weighted Overall Score
-    // GitHub: 25%, Resume: 20%, Job Match: 25%, Interview: 20%, Profile: 10%
     const overallScore = Math.round(
       githubScore * 0.25 +
         resumeScore * 0.2 +
@@ -921,8 +898,6 @@ export const getDeveloperScoresHistory = createServerFn({ method: "GET" })
     return data;
   });
 
-// ---------- Resume CRUD ----------
-
 export const saveResume = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .validator((d: unknown) =>
@@ -1000,8 +975,6 @@ export const deleteResume = createServerFn({ method: "POST" })
     return { success: true };
   });
 
-// ---------- Cover Letter ----------
-
 export const generateCoverLetter = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .validator((d: unknown) =>
@@ -1044,8 +1017,6 @@ Output a JSON with the key "coverLetter" containing the full text of the cover l
     });
   });
 
-// ---------- GitHub Resume Generator ----------
-
 export const GithubResumeSchema = z.object({
   developerType: z.string(),
   specialization: z.string(),
@@ -1083,7 +1054,6 @@ export const generateGithubResume = createServerFn({ method: "POST" })
       (r) => !r.fork,
     );
 
-    // Deep analysis parameters (simulate deep scraping by sending top repo descriptions and topics)
     const topReposDeep = repos
       .sort((a, b) => b.stargazers_count - a.stargazers_count)
       .slice(0, 10)
@@ -1234,8 +1204,6 @@ Infer framework usage, specialization, and complexity from the repo descriptions
     };
   });
 
-// ---------- Mock Interview Simulator ----------
-
 export const MockInterviewQuestionsSchema = z.object({
   questions: z.array(
     z.object({
@@ -1264,7 +1232,6 @@ export const generateMockInterviewQuestions = createServerFn({ method: "POST" })
     const supabase = context.supabase;
     const userId = context.userId;
 
-    // Fetch context (github, resume)
     const [ghRes, resumeRes] = await Promise.all([
       supabase
         .from("github_analyses")
@@ -1481,7 +1448,6 @@ export const evaluateMockInterview = createServerFn({ method: "POST" })
       nextSteps: ai.nextSteps,
     };
 
-    // Update interview record
     await supabase
       .from("mock_interviews")
       .update({
@@ -1492,7 +1458,6 @@ export const evaluateMockInterview = createServerFn({ method: "POST" })
       })
       .eq("id", data.interviewId);
 
-    // Update Profile Stats and Gamification
     const { data: profile } = await supabase.from("profiles").select("*").eq("id", userId).single();
     if (profile) {
       const badges = [...(profile.badges || [])];
@@ -1522,7 +1487,6 @@ export const evaluateMockInterview = createServerFn({ method: "POST" })
         .eq("id", userId);
     }
 
-    // Trigger Developer Score Update in background
     generateDeveloperScore({ data: undefined }).catch(console.error);
 
     return { success: true, report, detailedAnswers };

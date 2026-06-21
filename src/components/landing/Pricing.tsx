@@ -11,7 +11,6 @@ export function Pricing() {
   useEffect(() => {
     supabase.auth.getSession().then(async ({ data: { session } }) => {
       if (session) {
-        // Admin gets all pro features
         const { data: roleData } = await supabase.rpc("has_role", {
           _user_id: session.user.id,
           _role: "admin",
@@ -79,14 +78,14 @@ export function Pricing() {
 
   return (
     <section id="pricing" className="relative py-16 overflow-hidden">
-      {/* Background decoration */}
+      {}
       <div className="pointer-events-none absolute inset-0 -z-10">
         <div className="absolute left-1/2 top-0 h-[600px] w-[900px] -translate-x-1/2 rounded-full bg-primary/5 blur-[120px]" />
         <div className="absolute bottom-0 left-0 h-[300px] w-[500px] rounded-full bg-primary/3 blur-[100px]" />
       </div>
 
       <div className="mx-auto max-w-4xl px-6">
-        {/* Header */}
+        {}
         <Reveal>
           <div className="text-center">
             <div className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-4 py-1.5 backdrop-blur">
@@ -104,20 +103,19 @@ export function Pricing() {
           </div>
         </Reveal>
 
-        {/* Cards */}
+        {}
         <div className="mt-16 grid items-stretch gap-6 md:grid-cols-2">
           {tiers.map((t, i) => {
             const Icon = t.icon;
             return (
               <Reveal key={t.name} delay={i * 90}>
                 {t.featured ? (
-                  /* Featured card */
                   <div className="relative h-full rounded-3xl p-px bg-gradient-to-b from-primary via-primary/60 to-primary/20 shadow-2xl shadow-primary/20">
-                    {/* Glow */}
+                    {}
                     <div className="pointer-events-none absolute inset-0 rounded-3xl bg-primary/10 blur-xl" />
 
                     <div className="relative h-full rounded-[23px] bg-card p-8 flex flex-col">
-                      {/* Popular badge */}
+                      {}
                       <div className="absolute -top-3.5 left-1/2 -translate-x-1/2">
                         <span className="inline-flex items-center gap-1.5 rounded-full bg-primary px-4 py-1 text-xs font-semibold text-primary-foreground shadow-lg shadow-primary/30">
                           <Sparkles className="h-3 w-3" />
@@ -125,12 +123,12 @@ export function Pricing() {
                         </span>
                       </div>
 
-                      {/* Icon */}
+                      {}
                       <div className="mb-6 inline-flex h-11 w-11 items-center justify-center rounded-2xl bg-primary/10 ring-1 ring-primary/20">
                         <Icon className="h-5 w-5 text-primary" />
                       </div>
 
-                      {/* Tier info */}
+                      {}
                       <p className="text-xs font-semibold uppercase tracking-widest text-primary">
                         {t.name}
                       </p>
@@ -143,10 +141,10 @@ export function Pricing() {
                       </div>
                       <p className="mt-3 text-sm text-muted-foreground leading-relaxed">{t.desc}</p>
 
-                      {/* Divider */}
+                      {}
                       <div className="my-7 h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent" />
 
-                      {/* Features */}
+                      {}
                       <ul className="space-y-3.5 flex-1">
                         {t.features.map((f) => (
                           <li key={f} className="flex items-start gap-3 text-sm">
@@ -158,7 +156,7 @@ export function Pricing() {
                         ))}
                       </ul>
 
-                      {/* CTA */}
+                      {}
                       <Link to={t.href} className="mt-8 block">
                         <Button
                           className="w-full h-12 rounded-xl text-sm font-semibold shadow-lg shadow-primary/25 hover:shadow-primary/40 transition-all duration-300"
@@ -170,17 +168,16 @@ export function Pricing() {
                     </div>
                   </div>
                 ) : (
-                  /* Standard card */
                   <div className="group relative h-full rounded-3xl border border-border/50 bg-card/40 p-8 backdrop-blur-sm flex flex-col transition-all duration-500 hover:border-primary/20 hover:bg-card/70 hover:shadow-xl hover:shadow-black/5">
-                    {/* Subtle top highlight on hover */}
+                    {}
                     <div className="pointer-events-none absolute inset-x-0 top-0 h-px rounded-t-3xl bg-gradient-to-r from-transparent via-primary/0 to-transparent transition-all duration-500 group-hover:via-primary/30" />
 
-                    {/* Icon */}
+                    {}
                     <div className="mb-6 inline-flex h-11 w-11 items-center justify-center rounded-2xl border border-border/60 bg-muted/50 transition-colors duration-300 group-hover:border-primary/20 group-hover:bg-primary/5">
                       <Icon className="h-5 w-5 text-muted-foreground transition-colors duration-300 group-hover:text-primary" />
                     </div>
 
-                    {/* Tier info */}
+                    {}
                     <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
                       {t.name}
                     </p>
@@ -193,10 +190,10 @@ export function Pricing() {
                     </div>
                     <p className="mt-3 text-sm text-muted-foreground leading-relaxed">{t.desc}</p>
 
-                    {/* Divider */}
+                    {}
                     <div className="my-7 h-px bg-border/60" />
 
-                    {/* Features */}
+                    {}
                     <ul className="space-y-3.5 flex-1">
                       {t.features.map((f) => (
                         <li key={f} className="flex items-start gap-3 text-sm">
@@ -208,7 +205,7 @@ export function Pricing() {
                       ))}
                     </ul>
 
-                    {/* CTA */}
+                    {}
                     <Link to={t.href} className="mt-8 block">
                       <Button
                         variant="outline"
@@ -225,7 +222,7 @@ export function Pricing() {
           })}
         </div>
 
-        {/* Footer note */}
+        {}
         <Reveal delay={300}>
           <p className="mt-10 text-center text-sm text-muted-foreground/70">
             All plans include a 14-day money-back guarantee.{" "}

@@ -43,7 +43,6 @@ export const Route = createFileRoute("/_authenticated/health-score")({
   component: HealthScorePage,
 });
 
-// ─── Animated Counter ──────────────────────────────────────────────────────────
 function AnimatedCounter({
   value,
   duration = 1500,
@@ -97,14 +96,14 @@ function ScoreRing({ score }: { score: number }) {
 
   return (
     <div className="relative flex items-center justify-center">
-      {/* Ambient glow */}
+      {}
       <div
         className="absolute inset-0 rounded-full blur-3xl opacity-20 transition-all duration-1000"
         style={{ background: colors.glow }}
       />
 
       <svg width={radius * 2} height={radius * 2} className="-rotate-90 drop-shadow-2xl">
-        {/* Track */}
+        {}
         <circle
           cx={radius}
           cy={radius}
@@ -114,7 +113,7 @@ function ScoreRing({ score }: { score: number }) {
           strokeWidth={stroke}
           className="text-slate-200 dark:text-white/5"
         />
-        {/* Progress */}
+        {}
         <circle
           cx={radius}
           cy={radius}
@@ -130,7 +129,7 @@ function ScoreRing({ score }: { score: number }) {
             filter: `drop-shadow(0 0 8px ${colors.glow})`,
           }}
         />
-        {/* Tick marks */}
+        {}
         {Array.from({ length: 20 }).map((_, i) => {
           const angle = (i / 20) * 360;
           const rad = (angle * Math.PI) / 180;
@@ -154,7 +153,7 @@ function ScoreRing({ score }: { score: number }) {
         })}
       </svg>
 
-      {/* Center content */}
+      {}
       <div className="absolute inset-0 flex flex-col items-center justify-center">
         <AnimatedCounter
           value={score}
@@ -178,7 +177,6 @@ function ScoreRing({ score }: { score: number }) {
   );
 }
 
-// ─── Metric Card ───────────────────────────────────────────────────────────────
 function MetricCard({
   label,
   score,
@@ -208,7 +206,7 @@ function MetricCard({
       className={`group relative overflow-hidden rounded-2xl border border-slate-200 dark:border-white/8 bg-slate-50 dark:bg-white/[0.03] backdrop-blur-sm p-5 transition-all duration-500 hover:border-slate-300 dark:hover:border-white/15 hover:bg-slate-100 dark:hover:bg-white/[0.06] hover:-translate-y-0.5 ${visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`}
       style={{ transitionDelay: `${delay}ms` }}
     >
-      {/* Gradient top edge */}
+      {}
       <div
         className="absolute top-0 left-0 right-0 h-px opacity-60"
         style={{
@@ -255,7 +253,7 @@ function MetricCard({
         <ArrowUpRight className="h-4 w-4 text-slate-300 dark:text-white/20 group-hover:text-slate-500 dark:group-hover:text-white/40 transition-colors" />
       </div>
 
-      {/* Progress bar */}
+      {}
       <div className="mt-3 h-1 rounded-full bg-slate-200 dark:bg-white/5 overflow-hidden">
         <div
           className="h-full rounded-full transition-all duration-1000 ease-out"
@@ -278,7 +276,6 @@ function MetricCard({
   );
 }
 
-// ─── Custom Tooltip ────────────────────────────────────────────────────────────
 function CustomTooltip({ active, payload, label }: TooltipProps<number, string>) {
   if (!active || !payload?.length) return null;
   return (
@@ -291,7 +288,6 @@ function CustomTooltip({ active, payload, label }: TooltipProps<number, string>)
   );
 }
 
-// ─── Insight Item ──────────────────────────────────────────────────────────────
 function InsightItem({ text, color, delay = 0 }: { text: string; color: string; delay?: number }) {
   const [visible, setVisible] = useState(false);
   useEffect(() => {
@@ -313,7 +309,6 @@ function InsightItem({ text, color, delay = 0 }: { text: string; color: string; 
   );
 }
 
-// ─── Main Page ─────────────────────────────────────────────────────────────────
 function HealthScorePage() {
   const fetcher = useServerFn(getHealthScoreHistory);
   const generator = useServerFn(generateHealthScore);
@@ -451,14 +446,14 @@ function HealthScorePage() {
 
   return (
     <div className="relative min-h-screen text-slate-900 dark:text-white overflow-hidden">
-      {/* ── Ambient background ── */}
+      {}
       <div className="fixed inset-0 -z-10 pointer-events-none">
         <div className="absolute top-0 left-1/4 w-[600px] h-[600px] rounded-full bg-indigo-600/8 blur-[120px]" />
         <div className="absolute bottom-1/4 right-1/4 w-[400px] h-[400px] rounded-full bg-violet-600/8 blur-[100px]" />
         <div className="absolute top-1/2 left-0 w-[300px] h-[300px] rounded-full bg-emerald-600/5 blur-[80px]" />
       </div>
 
-      {/* ── Floating particles ── */}
+      {}
       <div className="fixed inset-0 -z-10 pointer-events-none overflow-hidden">
         {particles.map((p) => (
           <div
@@ -477,7 +472,7 @@ function HealthScorePage() {
       </div>
 
       <div className="space-y-6 pb-10">
-        {/* ── Header ── */}
+        {}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
             <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-indigo-500/20 bg-indigo-500/8 mb-3">
@@ -511,11 +506,11 @@ function HealthScorePage() {
           </button>
         </div>
 
-        {/* ── Hero row ── */}
+        {}
         <div className="grid lg:grid-cols-5 gap-5">
-          {/* Score panel */}
+          {}
           <div className="lg:col-span-2 relative overflow-hidden rounded-3xl border border-slate-200 dark:border-white/8 bg-slate-50 dark:bg-white/[0.03] backdrop-blur-sm p-8 flex flex-col items-center justify-center min-h-[340px]">
-            {/* Corner glow */}
+            {}
             <div className="absolute -top-16 -right-16 w-48 h-48 rounded-full bg-indigo-600/15 blur-3xl pointer-events-none" />
             <div className="absolute -bottom-16 -left-16 w-48 h-48 rounded-full bg-violet-600/10 blur-3xl pointer-events-none" />
 
@@ -524,7 +519,7 @@ function HealthScorePage() {
             </p>
             <ScoreRing score={latest.overall_score} />
 
-            {/* Trend indicator */}
+            {}
             {chartData.length >= 2 && (
               <div className="mt-6 flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/8">
                 {chartData[chartData.length - 1].score >= chartData[chartData.length - 2].score ? (
@@ -551,7 +546,7 @@ function HealthScorePage() {
             )}
           </div>
 
-          {/* Chart panel */}
+          {}
           <div className="lg:col-span-3 relative overflow-hidden rounded-3xl border border-slate-200 dark:border-white/8 bg-slate-50 dark:bg-white/[0.03] backdrop-blur-sm p-6">
             <div className="flex items-center justify-between mb-6">
               <div>
@@ -616,7 +611,7 @@ function HealthScorePage() {
           </div>
         </div>
 
-        {/* ── Metric breakdown ── */}
+        {}
         <div>
           <p className="text-xs font-bold text-slate-400 dark:text-white/30 uppercase tracking-[0.2em] mb-4">
             Score Breakdown
@@ -636,7 +631,7 @@ function HealthScorePage() {
           </div>
         </div>
 
-        {/* ── AI Insights ── */}
+        {}
         <div>
           <p className="text-xs font-bold text-slate-400 dark:text-white/30 uppercase tracking-[0.2em] mb-4">
             AI Insights
@@ -651,7 +646,7 @@ function HealthScorePage() {
                   borderColor: section.borderColor,
                 }}
               >
-                {/* Subtle glow top-right */}
+                {}
                 <div
                   className="absolute -top-8 -right-8 w-24 h-24 rounded-full blur-2xl opacity-30 pointer-events-none"
                   style={{ background: section.color }}

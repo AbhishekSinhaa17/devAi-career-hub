@@ -1,24 +1,14 @@
-// Server-only rate limiter for AI endpoints.
-// Queries the existing ai_usage_events table in Supabase to enforce per-user
-// daily and per-minute limits. The .server.ts suffix prevents client bundling.
-
 import { getOptionalEnv } from "./env-validation.server";
 import { getRequest } from "@tanstack/react-start/server";
 
 export interface RateLimitResult {
   allowed: boolean;
   reason?: string;
-  /** Seconds until the limit resets (useful for Retry-After headers). */
   retryAfterSeconds?: number;
-  /** Current daily usage count. */
   dailyUsed?: number;
-  /** Daily limit for this user. */
   dailyLimit?: number;
 }
 
-/**
- * Read rate-limit configuration from env with sensible defaults.
- */
 function getLimits() {
   return {
     dailyFree: parseInt(getOptionalEnv("AI_RATE_LIMIT_DAILY_FREE", "20"), 10),
@@ -29,17 +19,9 @@ function getLimits() {
   };
 }
 
-/**
- * Check whether the user is allowed to make another AI request.
- *
- * @param userId - Authenticated user ID (from auth middleware context).
- *                 If null/undefined, treated as a free/anonymous user.
- * @returns A RateLimitResult indicating whether the request is allowed.
- */
 export async function checkRateLimit(userId: string | null | undefined): Promise<RateLimitResult> {
   const limits = getLimits();
 
-  // Determine effective daily limit based on auth status
   const dailyLimit = userId ? limits.dailyAuth : limits.dailyFree;
 
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
@@ -50,13 +32,12 @@ export async function checkRateLimit(userId: string | null | undefined): Promise
     clientIp = request?.headers.get("x-real-ip")?.trim() || "unknown";
   }
 
-  // ── Per-minute check ────────────────────────────────────────────────────
   const oneMinuteAgo = new Date(Date.now() - 60_000).toISOString();
   let minuteQuery = supabaseAdmin
     .from("ai_usage_events")
     .select("id", { count: "exact", head: true })
     .gte("created_at", oneMinuteAgo)
-    .in("status", ["success", "error"]); // don't count rate_limited rejections
+    .in("status", ["success", "error"]);
 
   if (userId) {
     minuteQuery = minuteQuery.eq("user_id", userId);
@@ -77,7 +58,6 @@ export async function checkRateLimit(userId: string | null | undefined): Promise
     };
   }
 
-  // IP Per-minute Check
   const { count: ipMinuteCount } = await supabaseAdmin
     .from("ai_usage_events")
     .select("id", { count: "exact", head: true })
@@ -93,7 +73,6 @@ export async function checkRateLimit(userId: string | null | undefined): Promise
     };
   }
 
-  // ── Daily check ─────────────────────────────────────────────────────────
   const todayStart = new Date();
   todayStart.setUTCHours(0, 0, 0, 0);
   const todayStartISO = todayStart.toISOString();
@@ -114,7 +93,6 @@ export async function checkRateLimit(userId: string | null | undefined): Promise
   const currentDailyCount = dailyCount ?? 0;
 
   if (currentDailyCount >= dailyLimit) {
-    // Calculate seconds until midnight UTC
     const now = new Date();
     const tomorrow = new Date(now);
     tomorrow.setUTCDate(tomorrow.getUTCDate() + 1);
@@ -130,7 +108,6 @@ export async function checkRateLimit(userId: string | null | undefined): Promise
     };
   }
 
-  // IP Daily Check
   const { count: ipDailyCount } = await supabaseAdmin
     .from("ai_usage_events")
     .select("id", { count: "exact", head: true })
@@ -153,9 +130,6 @@ export async function checkRateLimit(userId: string | null | undefined): Promise
   };
 }
 
-/**
- * Log a rate-limited rejection to ai_usage_events for monitoring.
- */
 export async function logRateLimitRejection(
   userId: string | null | undefined,
   endpoint: string,

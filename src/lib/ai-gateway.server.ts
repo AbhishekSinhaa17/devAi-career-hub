@@ -1,6 +1,3 @@
-// Server-only helper for calling AI endpoints.
-// Loaded only inside createServerFn handlers via dynamic import.
-
 import { getRequiredEnv } from "./env-validation.server";
 import { checkRateLimit, logRateLimitRejection } from "./rate-limiter.server";
 
@@ -10,7 +7,6 @@ const GROQ_ENDPOINT = "https://api.groq.com/openai/v1/chat/completions";
 const DEFAULT_GEMINI_MODEL = "gemini-2.5-flash";
 const DEFAULT_GROQ_MODEL = "llama-3.3-70b-versatile";
 
-// Approximate USD cost per 1K tokens (input, output). Used for analytics estimates.
 const MODEL_PRICING: Record<string, { in: number; out: number }> = {
   "gemini-2.5-flash": { in: 0.000075, out: 0.0003 },
   "llama-3.3-70b-versatile": { in: 0.00059, out: 0.00079 },
@@ -75,9 +71,7 @@ async function executeProviderCall(
   if (opts.jsonSchema) {
     if (endpoint.includes("groq")) {
       body.response_format = { type: "json_object" };
-      // Ensure Groq knows the schema by appending it to the first message if needed,
-      // or we just trust the system prompt already has enough context.
-      // Appending to the last message safely:
+
       if (Array.isArray(body.messages) && body.messages.length > 0) {
         body.messages[body.messages.length - 1] = {
           ...body.messages[body.messages.length - 1],
@@ -149,7 +143,6 @@ async function rawCall(opts: {
       const reqId = crypto.randomUUID();
       const reqLogger = logger.child({ reqId, endpoint: opts.log?.endpoint });
 
-      // Try Gemini first
       const geminiKey = env.GEMINI_API_KEY;
       if (geminiKey) {
         try {
@@ -165,7 +158,6 @@ async function rawCall(opts: {
         }
       }
 
-      // Fallback to Groq
       const groqKey = env.GROQ_API_KEY;
       if (groqKey) {
         try {
@@ -184,7 +176,7 @@ async function rawCall(opts: {
         (lastError && (lastError as any).message?.includes("AI validation")) ||
         (lastError as any).message?.includes("AI rate limit hit")
       ) {
-        throw lastError; // Don't retry validation errors or immediate 429s (handled by provider)
+        throw lastError;
       }
 
       throw lastError || new Error("No AI providers configured");
@@ -195,7 +187,6 @@ async function rawCall(opts: {
         err.name !== "AbortError" &&
         !err.message?.includes("AI validation")
       ) {
-        // Exponential backoff
         await new Promise((resolve) => setTimeout(resolve, baseDelay * Math.pow(2, attempt)));
       } else if (attempt === maxRetries || err.name === "AbortError") {
         if (err.name === "AbortError") {
@@ -209,16 +200,11 @@ async function rawCall(opts: {
   throw lastError;
 }
 
-/**
- * Enforce rate limits before making an AI call.
- * Throws a user-friendly error if the limit is exceeded.
- */
 async function enforceRateLimit(log?: LogContext): Promise<void> {
-  if (!log) return; // No context = internal call, skip rate limiting
+  if (!log) return;
 
   const result = await checkRateLimit(log.userId);
   if (!result.allowed) {
-    // Log the rejection for monitoring
     await logRateLimitRejection(log.userId, log.endpoint, result.reason ?? "Rate limited");
     throw new Error(result.reason ?? "Rate limit exceeded. Please try again later.");
   }
@@ -240,7 +226,6 @@ export async function callAi(opts: {
       "unknown";
   }
 
-  // Enforce rate limits before calling the AI provider
   await enforceRateLimit(opts.log);
 
   try {
@@ -281,7 +266,6 @@ export async function callAiJson<T>(opts: {
       "unknown";
   }
 
-  // Enforce rate limits before calling the AI provider
   await enforceRateLimit(opts.log);
 
   let lastErr: unknown;
@@ -302,7 +286,7 @@ export async function callAiJson<T>(opts: {
       logger.warn({ err, attempt, endpoint: opts.log?.endpoint }, "JSON parsing or AI call failed");
       lastErr = err;
       if (err.message !== "AI returned malformed JSON" || attempt === 2) {
-        break; // Don't retry if it's not a JSON error, or if we're out of retries
+        break;
       }
     }
   }
@@ -322,11 +306,9 @@ export async function callAiJson<T>(opts: {
     );
   }
 
-  // Return the actual error if it's not a generic JSON parsing issue
   if (lastErr instanceof Error && lastErr.message !== "AI returned malformed JSON") {
     throw lastErr;
   }
 
-  // Return a generic error to the client instead of crashing hard with raw malformed JSON
   throw new Error("AI provider returned invalid data. Please try again.");
 }

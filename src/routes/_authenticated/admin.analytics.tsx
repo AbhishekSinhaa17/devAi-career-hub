@@ -36,7 +36,6 @@ export const Route = createFileRoute("/_authenticated/admin/analytics")({
   component: AdminAnalyticsPage,
 });
 
-// Vibrant colors for charts
 const COLORS = ["#6366f1", "#8b5cf6", "#ec4899", "#14b8a6", "#f59e0b", "#3b82f6"];
 
 function AdminAnalyticsPage() {
@@ -103,7 +102,6 @@ function AdminAnalyticsPage() {
     );
   }
 
-  // Memoize data for pie chart
   const pieData = data.features
     .map((f: any) => ({
       name: f.name,
@@ -116,7 +114,7 @@ function AdminAnalyticsPage() {
       className="space-y-8 min-h-screen text-slate-900 dark:text-foreground print:text-black"
       ref={dashboardRef}
     >
-      {/* ── Header & Controls ── */}
+      {}
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
         <div>
           <div className="flex items-center gap-2 mb-2">
@@ -136,7 +134,7 @@ function AdminAnalyticsPage() {
         </div>
 
         <div className="flex flex-wrap items-center gap-3 print:hidden">
-          {/* Days Filter */}
+          {}
           <div className="flex items-center bg-muted/50 p-1 rounded-xl border border-border/40">
             {[7, 30, 90].map((d) => (
               <button
@@ -169,7 +167,7 @@ function AdminAnalyticsPage() {
         </div>
       </div>
 
-      {/* ── KPIs ── */}
+      {}
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
         {[
           {
@@ -232,7 +230,7 @@ function AdminAnalyticsPage() {
         ))}
       </div>
 
-      {/* ── Feature Usage Distribution ── */}
+      {}
       <div className="grid lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2 p-6 rounded-2xl border border-border/40 bg-white/50 dark:bg-[#0d0d1a]/50 backdrop-blur-sm print:border-gray-300">
           <h3 className="text-lg font-bold mb-6 flex items-center gap-2">
@@ -320,7 +318,7 @@ function AdminAnalyticsPage() {
         </div>
       </div>
 
-      {/* ── Daily Activity Trend ── */}
+      {}
       <div className="p-6 rounded-2xl border border-border/40 bg-white/50 dark:bg-[#0d0d1a]/50 backdrop-blur-sm print:border-gray-300">
         <h3 className="text-lg font-bold mb-6 flex items-center gap-2">
           <Calendar className="h-5 w-5 text-blue-500" /> Daily Activity Trend ({days} Days)
@@ -366,7 +364,7 @@ function AdminAnalyticsPage() {
         </div>
       </div>
 
-      {/* ── Health Score Insights ── */}
+      {}
       <div className="grid lg:grid-cols-2 gap-6">
         <div className="p-6 rounded-2xl border border-border/40 bg-white/50 dark:bg-[#0d0d1a]/50 backdrop-blur-sm print:border-gray-300 flex flex-col">
           <h3 className="text-lg font-bold mb-6 flex items-center gap-2">

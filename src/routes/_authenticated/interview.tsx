@@ -47,8 +47,6 @@ export const Route = createFileRoute("/_authenticated/interview")({
   component: Page,
 });
 
-// ─── Constants ─────────────────────────────────────────────────────────────────
-
 const CATEGORIES = [
   { value: "JavaScript", icon: Code2, color: "#f7df1e" },
   { value: "React", icon: Code2, color: "#61dafb" },
@@ -86,8 +84,6 @@ const DIFFICULTIES = [
 
 const COUNTS = [3, 5, 8, 10];
 
-// ─── Helpers ───────────────────────────────────────────────────────────────────
-
 function diffMeta(value: string) {
   return DIFFICULTIES.find((d) => d.value === value) ?? DIFFICULTIES[1];
 }
@@ -95,8 +91,6 @@ function diffMeta(value: string) {
 function catMeta(value: string) {
   return CATEGORIES.find((c) => c.value === value) ?? CATEGORIES[0];
 }
-
-// ─── Shared Panel ──────────────────────────────────────────────────────────────
 
 function Panel({
   children,
@@ -127,8 +121,6 @@ function Panel({
   );
 }
 
-// ─── Config field ──────────────────────────────────────────────────────────────
-
 function FieldLabel({
   icon: Icon,
   children,
@@ -145,8 +137,6 @@ function FieldLabel({
     </div>
   );
 }
-
-// ─── Copy button ───────────────────────────────────────────────────────────────
 
 function CopyButton({ text }: { text: string }) {
   const [copied, setCopied] = useState(false);
@@ -165,8 +155,6 @@ function CopyButton({ text }: { text: string }) {
     </button>
   );
 }
-
-// ─── Difficulty tabs ───────────────────────────────────────────────────────────
 
 function DifficultyTabs({ value, onChange }: { value: string; onChange: (v: string) => void }) {
   return (
@@ -197,8 +185,6 @@ function DifficultyTabs({ value, onChange }: { value: string; onChange: (v: stri
   );
 }
 
-// ─── Question card ─────────────────────────────────────────────────────────────
-
 function QuestionCard({
   question,
   index,
@@ -222,7 +208,7 @@ function QuestionCard({
       >
         <AccordionTrigger className="px-5 py-4 text-left hover:no-underline group/trig [&>svg]:hidden">
           <div className="flex items-start gap-3 flex-1 min-w-0">
-            {/* Number badge */}
+            {}
             <div
               className="h-8 w-8 rounded-xl flex items-center justify-center text-xs font-black text-white flex-shrink-0 mt-0.5 transition-transform group-hover/trig:scale-105"
               style={{
@@ -233,7 +219,7 @@ function QuestionCard({
               {index + 1}
             </div>
 
-            {/* Text */}
+            {}
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-1.5 mb-1">
                 <cat.icon className="h-3 w-3 text-muted-foreground" />
@@ -246,7 +232,7 @@ function QuestionCard({
               </p>
             </div>
 
-            {/* Chevron */}
+            {}
             <div className="text-muted-foreground mt-1 transition-transform duration-300 group-data-[state=open]/trig:rotate-180">
               ↓
             </div>
@@ -255,7 +241,7 @@ function QuestionCard({
 
         <AccordionContent className="px-5 pb-5 pt-0">
           <div className="space-y-4 border-t border-border/40 pt-4">
-            {/* Model answer */}
+            {}
             <div>
               <div className="flex items-center justify-between mb-2">
                 <div className="flex items-center gap-1.5">
@@ -271,7 +257,7 @@ function QuestionCard({
               </div>
             </div>
 
-            {/* Explanation */}
+            {}
             <div>
               <div className="flex items-center gap-1.5 mb-2">
                 <Lightbulb className="h-3.5 w-3.5 text-violet-400" />
@@ -290,8 +276,6 @@ function QuestionCard({
   );
 }
 
-// ─── Skeleton loader ───────────────────────────────────────────────────────────
-
 function QuestionSkeleton({ count }: { count: number }) {
   return (
     <div className="space-y-3">
@@ -309,8 +293,6 @@ function QuestionSkeleton({ count }: { count: number }) {
     </div>
   );
 }
-
-// ─── Empty state ───────────────────────────────────────────────────────────────
 
 function EmptyState() {
   return (
@@ -332,8 +314,6 @@ function EmptyState() {
     </PageEmptyState>
   );
 }
-
-// ─── Main Page ─────────────────────────────────────────────────────────────────
 
 function Page() {
   const [role, setRole] = useState("Full Stack Developer");
@@ -382,7 +362,7 @@ function Page() {
           transition: "all 0.55s cubic-bezier(0.34,1.2,0.64,1)",
         }}
       >
-        {/* ── Header ── */}
+        {}
         <header className="space-y-2">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-primary/20 bg-primary/5 w-fit">
             <MessageSquare className="h-3.5 w-3.5 text-primary" />
@@ -402,9 +382,9 @@ function Page() {
           </p>
         </header>
 
-        {/* ── Config panel ── */}
+        {}
         <Panel accentColor="#6366f1" className="p-6">
-          {/* Panel header */}
+          {}
           <div className="flex items-center gap-2.5 mb-5">
             <div className="h-8 w-8 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center">
               <SlidersHorizontal className="h-4 w-4 text-primary" />
@@ -412,9 +392,9 @@ function Page() {
             <span className="text-sm font-black text-foreground">Interview parameters</span>
           </div>
 
-          {/* Fields row */}
+          {}
           <div className="grid gap-4 sm:grid-cols-3 mb-5">
-            {/* Role */}
+            {}
             <div>
               <FieldLabel icon={Target}>Role</FieldLabel>
               <Input
@@ -425,7 +405,7 @@ function Page() {
               />
             </div>
 
-            {/* Category */}
+            {}
             <div>
               <FieldLabel icon={BookOpen}>Category</FieldLabel>
               <Select value={category} onValueChange={setCategory}>
@@ -445,7 +425,7 @@ function Page() {
               </Select>
             </div>
 
-            {/* Count */}
+            {}
             <div>
               <FieldLabel icon={ListOrdered}>Questions</FieldLabel>
               <Select value={String(count)} onValueChange={(v) => setCount(Number(v))}>
@@ -463,13 +443,13 @@ function Page() {
             </div>
           </div>
 
-          {/* Difficulty */}
+          {}
           <div className="mb-5">
             <FieldLabel icon={BarChart3}>Difficulty</FieldLabel>
             <DifficultyTabs value={difficulty} onChange={(v) => setDifficulty(v as any)} />
           </div>
 
-          {/* Footer row */}
+          {}
           <div className="flex items-center justify-end gap-3">
             <span className="text-xs text-muted-foreground font-medium">
               {mutation.isPending
@@ -488,7 +468,7 @@ function Page() {
                 boxShadow: "0 1px 2px rgba(0,0,0,.2)",
               }}
             >
-              {/* Shimmer */}
+              {}
               <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-500 pointer-events-none" />
               {mutation.isPending ? (
                 <>
@@ -505,12 +485,12 @@ function Page() {
           </div>
         </Panel>
 
-        {/* ── Loading ── */}
+        {}
         {mutation.isPending && <QuestionSkeleton count={count} />}
-        {/* ── Empty ── */}
+        {}
         {!data && !mutation.isPending && <EmptyState />}
 
-        {/* ── Loading ── */}
+        {}
         {mutation.isPending && (
           <PageLoadingState
             title="Generating Questions..."
@@ -518,7 +498,7 @@ function Page() {
           />
         )}
 
-        {/* ── Results ── */}
+        {}
         {data && !mutation.isPending && (
           <div className="space-y-5" style={{ animation: "fade-up 0.5s ease both" }}>
             <div className="flex items-center gap-3">

@@ -48,8 +48,6 @@ export const Route = createFileRoute("/_authenticated/developer-score")({
   component: DeveloperScore,
 });
 
-// ─── Styles ────────────────────────────────────────────────────────────────────
-
 const STYLES = `
   @keyframes float-orb {
     0%,100% { transform:translate(0,0) scale(1); }
@@ -164,16 +162,12 @@ const STYLES = `
   .btn-ghost:disabled { opacity:0.4; cursor:not-allowed; }
 `;
 
-// ─── Helpers ───────────────────────────────────────────────────────────────────
-
 function getLevel(score: number) {
   if (score <= 40) return { label: "Beginner", color: "#60a5fa", glow: "#3b82f640" };
   if (score <= 60) return { label: "Developing", color: "#fbbf24", glow: "#f59e0b40" };
   if (score <= 80) return { label: "Job Ready", color: "#34d399", glow: "#10b98140" };
   return { label: "Industry Ready", color: "#a78bfa", glow: "#8b5cf640" };
 }
-
-// ─── Shared primitives ─────────────────────────────────────────────────────────
 
 function AccentLine({ color }: { color: string }) {
   return (
@@ -210,8 +204,6 @@ function BackgroundOrbs() {
     </div>
   );
 }
-
-// ─── Sub-score bar card ────────────────────────────────────────────────────────
 
 function SubScoreBar({
   label,
@@ -260,8 +252,6 @@ function SubScoreBar({
   );
 }
 
-// ─── Insight pill ──────────────────────────────────────────────────────────────
-
 function InsightBlock({
   icon: Icon,
   label,
@@ -308,8 +298,6 @@ function InsightBlock({
   );
 }
 
-// ─── Tag ──────────────────────────────────────────────────────────────────────
-
 function Tag({
   label,
   color,
@@ -346,8 +334,6 @@ function Tag({
   );
 }
 
-// ─── List item ─────────────────────────────────────────────────────────────────
-
 function ListItem({
   text,
   index,
@@ -377,8 +363,6 @@ function ListItem({
     </div>
   );
 }
-
-// ─── Main component ────────────────────────────────────────────────────────────
 
 function DeveloperScore() {
   const [mounted, setMounted] = useState(false);
@@ -419,8 +403,6 @@ function DeveloperScore() {
 
   const trendDiff = prevScore ? (currentScore?.overall_score ?? 0) - prevScore.overall_score : 0;
 
-  // ── Derived data ────────────────────────────────────────────────────────────
-
   const level = hasScore ? getLevel(currentScore!.overall_score) : null;
 
   const radarData = hasScore
@@ -460,8 +442,6 @@ function DeveloperScore() {
     }
   };
 
-  // ── Render ──────────────────────────────────────────────────────────────────
-
   return (
     <>
       <style>{STYLES}</style>
@@ -475,7 +455,7 @@ function DeveloperScore() {
           transition: "all 0.55s cubic-bezier(0.34,1.1,0.64,1)",
         }}
       >
-        {/* ── Header ── */}
+        {}
         <header className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pt-1">
           <div style={{ animation: "fade-up 0.5s 0.05s ease both" }}>
             <div
@@ -531,7 +511,7 @@ function DeveloperScore() {
           )}
         </header>
 
-        {/* ── States ── */}
+        {}
         {isLoading && (
           <PageLoadingState
             title="Analyzing your profile…"
@@ -553,10 +533,10 @@ function DeveloperScore() {
           />
         )}
 
-        {/* ── Main content ── */}
+        {}
         {hasScore && (
           <>
-            {/* Celebration banner */}
+            {}
             {trendDiff >= 10 && (
               <div
                 className="relative rounded-2xl p-5 overflow-hidden flex items-center gap-4"
@@ -592,12 +572,12 @@ function DeveloperScore() {
               </div>
             )}
 
-            {/* ── Hero row: Score + Sub-scores + Level ── */}
+            {}
             <div
               className="grid gap-5 lg:grid-cols-3"
               style={{ animation: "fade-up 0.5s 0.1s ease both" }}
             >
-              {/* Main score */}
+              {}
               <div
                 className="glass-panel relative rounded-2xl p-6 flex flex-col items-center justify-center text-center overflow-hidden"
                 style={{ animation: "card-enter 0.5s 0.15s ease both" }}
@@ -610,7 +590,7 @@ function DeveloperScore() {
                   }}
                 />
 
-                {/* Level badge */}
+                {}
                 <div
                   className="absolute top-4 right-4 px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-widest"
                   style={{
@@ -627,7 +607,7 @@ function DeveloperScore() {
                   DevAI Score
                 </div>
 
-                {/* Circular progress */}
+                {}
                 <div
                   className="mb-5"
                   style={{ animation: "score-pop 0.6s 0.3s cubic-bezier(0.34,1.2,0.64,1) both" }}
@@ -639,7 +619,7 @@ function DeveloperScore() {
                   />
                 </div>
 
-                {/* Trend badge */}
+                {}
                 {prevScore && (
                   <div
                     className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold transition-all duration-300"
@@ -732,7 +712,7 @@ function DeveloperScore() {
                 />
               </div>
 
-              {/* Radar */}
+              {}
               <div
                 className="glass-panel relative rounded-2xl p-6 flex flex-col overflow-hidden"
                 style={{ animation: "card-enter 0.5s 0.25s ease both" }}
@@ -780,7 +760,7 @@ function DeveloperScore() {
               </div>
             </div>
 
-            {/* ── AI Insights ── */}
+            {}
             {aiInsights && (
               <div
                 className="glass-panel relative rounded-2xl p-6 overflow-hidden"
@@ -809,7 +789,7 @@ function DeveloperScore() {
                   </div>
                 </div>
 
-                {/* Why box */}
+                {}
                 <div
                   className="relative rounded-xl p-4 mb-4 overflow-hidden"
                   style={{
@@ -855,7 +835,7 @@ function DeveloperScore() {
               </div>
             )}
 
-            {/* ── Strengths + Weaknesses ── */}
+            {}
             <div className="grid gap-5 md:grid-cols-2">
               <div
                 className="glass-panel relative rounded-2xl p-6 overflow-hidden"
@@ -954,7 +934,7 @@ function DeveloperScore() {
               </div>
             </div>
 
-            {/* ── Recommendations ── */}
+            {}
             <div
               className="glass-panel relative rounded-2xl p-6 overflow-hidden"
               style={{ animation: "card-enter 0.5s 0.48s ease both" }}
@@ -986,9 +966,9 @@ function DeveloperScore() {
               </div>
             </div>
 
-            {/* ── Projects / Certs / Roles ── */}
+            {}
             <div className="grid gap-5 md:grid-cols-3">
-              {/* Projects */}
+              {}
               <div
                 className="glass-panel relative rounded-2xl p-5 overflow-hidden"
                 style={{ animation: "card-enter 0.5s 0.52s ease both" }}
@@ -1023,7 +1003,7 @@ function DeveloperScore() {
                 </div>
               </div>
 
-              {/* Certs */}
+              {}
               <div
                 className="glass-panel relative rounded-2xl p-5 overflow-hidden"
                 style={{ animation: "card-enter 0.5s 0.58s ease both" }}
@@ -1058,7 +1038,7 @@ function DeveloperScore() {
                 </div>
               </div>
 
-              {/* Job roles */}
+              {}
               <div
                 className="glass-panel relative rounded-2xl p-5 overflow-hidden"
                 style={{ animation: "card-enter 0.5s 0.64s ease both" }}
@@ -1108,7 +1088,7 @@ function DeveloperScore() {
               </div>
             </div>
 
-            {/* ── Trend chart ── */}
+            {}
             {trendData.length > 1 && (
               <div
                 className="glass-panel relative rounded-2xl p-6 overflow-hidden"
@@ -1197,7 +1177,7 @@ function DeveloperScore() {
         )}
       </div>
 
-      {/* ── Hidden Share Card ── */}
+      {}
       {hasScore && (
         <div
           style={{ position: "absolute", left: "-9999px", top: "-9999px", pointerEvents: "none" }}
@@ -1217,7 +1197,7 @@ function DeveloperScore() {
               position: "relative",
             }}
           >
-            {/* Decorative glow */}
+            {}
             <div
               style={{
                 position: "absolute",

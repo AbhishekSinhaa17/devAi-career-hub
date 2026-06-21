@@ -40,7 +40,7 @@ export function CircularProgress({
             <stop offset="100%" stopColor="hsl(var(--chart-2))" />
           </linearGradient>
         </defs>
-        {/* Track */}
+        {}
         <circle
           cx={size / 2}
           cy={size / 2}
@@ -50,7 +50,7 @@ export function CircularProgress({
           fill="none"
           className="transition-all duration-300 ease-in-out"
         />
-        {/* Progress */}
+        {}
         <circle
           cx={size / 2}
           cy={size / 2}

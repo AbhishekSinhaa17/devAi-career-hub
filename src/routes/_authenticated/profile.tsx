@@ -35,8 +35,6 @@ export const Route = createFileRoute("/_authenticated/profile")({
   component: Page,
 });
 
-// ─── Styles ────────────────────────────────────────────────────────────────────
-
 const STYLES = `
   @keyframes float-orb {
     0%,100% { transform:translate(0,0) scale(1); }
@@ -197,8 +195,6 @@ const STYLES = `
   :root:not(.dark) .divider-line { background: rgba(0,0,0,0.07); }
 `;
 
-// ─── Background orbs ───────────────────────────────────────────────────────────
-
 function BackgroundOrbs() {
   return (
     <div className="pointer-events-none fixed inset-0 overflow-hidden -z-10" aria-hidden>
@@ -225,8 +221,6 @@ function BackgroundOrbs() {
   );
 }
 
-// ─── Accent line ───────────────────────────────────────────────────────────────
-
 function AccentLine({ color }: { color: string }) {
   return (
     <div
@@ -235,8 +229,6 @@ function AccentLine({ color }: { color: string }) {
     />
   );
 }
-
-// ─── Field wrapper ─────────────────────────────────────────────────────────────
 
 function Field({
   icon: Icon,
@@ -263,16 +255,12 @@ function Field({
   );
 }
 
-// ─── Level config ──────────────────────────────────────────────────────────────
-
 const LEVELS = [
   { value: "junior", label: "Junior", color: "#60a5fa" },
   { value: "mid", label: "Mid", color: "#34d399" },
   { value: "senior", label: "Senior", color: "#a78bfa" },
   { value: "staff", label: "Staff", color: "#fbbf24" },
 ];
-
-// ─── Page ──────────────────────────────────────────────────────────────────────
 
 function Page() {
   const fetcher = useServerFn(getDashboard);
@@ -330,7 +318,7 @@ function Page() {
       <BackgroundOrbs />
 
       <div className="mx-auto max-w-2xl space-y-8 pb-16">
-        {/* ── Header ── */}
+        {}
         <header className="space-y-4 pt-1">
           <div
             className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full w-fit"
@@ -369,7 +357,7 @@ function Page() {
           </p>
         </header>
 
-        {/* ── Form card ── */}
+        {}
         <form
           onSubmit={(e) => {
             e.preventDefault();
@@ -380,7 +368,7 @@ function Page() {
         >
           <AccentLine color="#6366f1" />
 
-          {/* Corner glow */}
+          {}
           <div
             className="absolute -top-16 -left-16 h-40 w-40 rounded-full opacity-20 pointer-events-none"
             style={{ background: "radial-gradient(circle,#6366f1,transparent 70%)" }}
@@ -390,7 +378,7 @@ function Page() {
             style={{ background: "radial-gradient(circle,#8b5cf6,transparent 70%)" }}
           />
 
-          {/* Form header */}
+          {}
           <div className="relative flex items-center gap-3 px-6 py-5 border-b border-white/[0.06]">
             <div
               className="h-9 w-9 rounded-xl flex items-center justify-center flex-shrink-0"
@@ -406,7 +394,7 @@ function Page() {
               <div className="text-[11px] t-sub mt-0.5">Used to tailor every AI recommendation</div>
             </div>
 
-            {/* Saved indicator */}
+            {}
             {justSaved && (
               <div
                 className="ml-auto flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-bold"
@@ -423,9 +411,9 @@ function Page() {
             )}
           </div>
 
-          {/* Fields */}
+          {}
           <div className="relative px-6 py-6 space-y-6">
-            {/* Name */}
+            {}
             <Field icon={User} label="Display name" delay={60}>
               <Input
                 className="field-input h-11"
@@ -435,7 +423,7 @@ function Page() {
               />
             </Field>
 
-            {/* GitHub */}
+            {}
             <Field
               icon={Github}
               label="GitHub username"
@@ -455,10 +443,10 @@ function Page() {
               </div>
             </Field>
 
-            {/* Divider */}
+            {}
             <div className="h-px divider-line" />
 
-            {/* Experience level */}
+            {}
             <Field icon={TrendingUp} label="Experience level" delay={140}>
               <Select value={level} onValueChange={setLevel}>
                 <SelectTrigger className="select-trigger-custom h-11">
@@ -476,7 +464,7 @@ function Page() {
                 </SelectContent>
               </Select>
 
-              {/* Level visual bar */}
+              {}
               <div className="flex gap-1.5 mt-2" style={{ animation: "fade-in 0.4s ease both" }}>
                 {LEVELS.map((l, i) => {
                   const idx = LEVELS.findIndex((x) => x.value === level);
@@ -501,7 +489,7 @@ function Page() {
               </div>
             </Field>
 
-            {/* Bio */}
+            {}
             <Field
               icon={FileText}
               label="Bio"
@@ -517,17 +505,17 @@ function Page() {
               />
             </Field>
 
-            {/* Divider */}
+            {}
             <div className="h-px divider-line" />
 
-            {/* Skills */}
+            {}
             <Field
               icon={Wrench}
               label="Skills"
               hint="Press Enter or click + to add. Click a skill to remove it."
               delay={220}
             >
-              {/* Input row */}
+              {}
               <div className="flex gap-2">
                 <Input
                   className="field-input h-11 flex-1"
@@ -550,7 +538,7 @@ function Page() {
                 </button>
               </div>
 
-              {/* Chips */}
+              {}
               {skills.length > 0 && (
                 <div className="flex flex-wrap gap-2 pt-1">
                   {skills.map((s, i) => (
@@ -580,7 +568,7 @@ function Page() {
                 </p>
               )}
 
-              {/* Skill count */}
+              {}
               {skills.length > 0 && (
                 <div className="flex items-center justify-end">
                   <span
@@ -609,7 +597,7 @@ function Page() {
               disabled={mutation.isPending}
               className="btn-cta w-full h-12 flex items-center justify-center gap-2.5 text-sm"
             >
-              {/* shimmer sweep */}
+              {}
               <div
                 className="absolute inset-0 pointer-events-none -skew-x-12"
                 style={{

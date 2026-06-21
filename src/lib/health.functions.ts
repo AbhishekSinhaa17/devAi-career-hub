@@ -24,7 +24,6 @@ export const generateHealthScore = createServerFn({ method: "POST" })
   .handler(async ({ context }) => {
     const { supabase, userId } = context;
 
-    // Fetch highest scores for each feature
     const [gh, res, mock, job, port] = await Promise.all([
       supabase
         .from("github_analyses")
@@ -69,7 +68,6 @@ export const generateHealthScore = createServerFn({ method: "POST" })
     const job_match_score = job.data?.hiring_probability || 0;
     const portfolio_score = port.data?.profile_strength || 0;
 
-    // Weightage
     const overall_score = Math.round(
       github_score * 0.25 +
         resume_score * 0.2 +
@@ -78,7 +76,6 @@ export const generateHealthScore = createServerFn({ method: "POST" })
         portfolio_score * 0.1,
     );
 
-    // AI Generation
     const prompt = `
       Analyze this developer's health scores and provide strengths, weaknesses, and recommendations.
       GitHub Score: ${github_score}/100 (Weight 25%)

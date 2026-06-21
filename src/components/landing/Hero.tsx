@@ -16,19 +16,18 @@ import {
 } from "lucide-react";
 import { useEffect, useRef, useState, useCallback } from "react";
 
-// ─── Aurora + Mesh background ────────────────────────────────────────────────
 function AuroraBackground() {
   return (
     <div className="pointer-events-none absolute inset-0 overflow-hidden">
-      {/* base radial */}
+      {}
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_90%_60%_at_50%_-20%,hsl(var(--primary)/0.18),transparent_70%)]" />
 
-      {/* animated aurora ribbons */}
+      {}
       <div className="absolute -top-1/2 left-1/2 h-[140%] w-[160%] -translate-x-1/2 opacity-50">
         <div className="absolute inset-0 animate-[aurora_18s_ease-in-out_infinite] bg-[conic-gradient(from_120deg_at_50%_50%,transparent_0deg,hsl(var(--primary)/0.25)_60deg,transparent_120deg,rgba(139,92,246,0.2)_200deg,transparent_280deg,rgba(6,182,212,0.18)_340deg,transparent_360deg)] blur-[60px]" />
       </div>
 
-      {/* dot grid with mask */}
+      {}
       <div
         className="absolute inset-0 opacity-[0.3] [mask-image:radial-gradient(ellipse_70%_60%_at_50%_30%,black,transparent)]"
         style={{
@@ -37,16 +36,15 @@ function AuroraBackground() {
         }}
       />
 
-      {/* moving scan line */}
+      {}
       <div className="absolute inset-x-0 top-0 h-px animate-[scan_8s_linear_infinite] bg-gradient-to-r from-transparent via-primary/40 to-transparent" />
 
-      {/* vignette */}
+      {}
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_100%_100%_at_50%_50%,transparent_35%,hsl(var(--background)))]" />
     </div>
   );
 }
 
-// ─── Floating orbs (parallax to pointer) ─────────────────────────────────────
 function FloatingOrbs({ mx, my }: { mx: number; my: number }) {
   return (
     <div className="pointer-events-none absolute inset-0 overflow-hidden">
@@ -66,7 +64,6 @@ function FloatingOrbs({ mx, my }: { mx: number; my: number }) {
   );
 }
 
-// ─── Floating particles ──────────────────────────────────────────────────────
 function Particles() {
   const dots = Array.from({ length: 18 }, (_, i) => ({
     left: `${(i * 53) % 100}%`,
@@ -95,7 +92,6 @@ function Particles() {
   );
 }
 
-// ─── Animated counter ────────────────────────────────────────────────────────
 function AnimatedCounter({
   target,
   suffix = "",
@@ -185,11 +181,10 @@ function SocialProof() {
   );
 }
 
-// ─── Badge pill ──────────────────────────────────────────────────────────────
 function BadgePill() {
   return (
     <div className="group relative mx-auto inline-flex cursor-default items-center gap-2 overflow-hidden rounded-full border border-primary/20 bg-primary/5 px-4 py-1.5 text-xs font-medium text-primary shadow-sm shadow-primary/10 transition-all duration-300 hover:border-primary/40 hover:bg-primary/10 hover:shadow-primary/20">
-      {/* sweep */}
+      {}
       <span className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-primary/20 to-transparent transition-transform duration-1000 group-hover:translate-x-full" />
       <span className="relative flex h-2 w-2">
         <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary opacity-75" />
@@ -204,7 +199,6 @@ function BadgePill() {
   );
 }
 
-// ─── Hero stats strip ────────────────────────────────────────────────────────
 function StatsStrip() {
   const stats = [
     { value: 12000, suffix: "+", label: "Developers", icon: Rocket },
@@ -232,7 +226,6 @@ function StatsStrip() {
   );
 }
 
-// ─── Main Hero ────────────────────────────────────────────────────────────────
 export function Hero({ session }: { session?: any }) {
   const [pointer, setPointer] = useState({ x: 0, y: 0 });
   const sectionRef = useRef<HTMLElement>(null);
@@ -256,12 +249,12 @@ export function Hero({ session }: { session?: any }) {
       <Particles />
 
       <div className="relative mx-auto max-w-6xl px-6 pb-24 pt-10 text-center md:pt-16">
-        {/* badge */}
+        {}
         <Reveal animateOnLoad>
           <BadgePill />
         </Reveal>
 
-        {/* headline */}
+        {}
         <Reveal animateOnLoad delay={80}>
           <h1 className="mx-auto mt-8 max-w-5xl text-balance text-5xl font-extrabold leading-[1.05] tracking-tight md:text-7xl lg:text-[5.5rem]">
             Ship your{" "}
@@ -293,7 +286,7 @@ export function Hero({ session }: { session?: any }) {
           </h1>
         </Reveal>
 
-        {/* sub */}
+        {}
         <Reveal animateOnLoad delay={160}>
           <p className="mx-auto mt-8 max-w-2xl text-balance text-lg leading-relaxed text-muted-foreground md:text-xl">
             Analyze your GitHub, build ATS-optimized resumes, generate portfolios, crack interviews,
@@ -304,7 +297,7 @@ export function Hero({ session }: { session?: any }) {
           </p>
         </Reveal>
 
-        {/* CTAs */}
+        {}
         <Reveal animateOnLoad delay={240}>
           <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
             <Link to={session ? "/dashboard" : "/signup"}>
@@ -312,9 +305,9 @@ export function Hero({ session }: { session?: any }) {
                 size="lg"
                 className="group relative h-13 overflow-hidden rounded-xl px-8 text-base font-semibold shadow-2xl shadow-primary/30 transition-all duration-300 hover:shadow-primary/50 hover:scale-[1.03] active:scale-[0.98]"
               >
-                {/* animated gradient bg */}
+                {}
                 <span className="absolute inset-0 bg-gradient-to-r from-primary via-violet-500 to-primary bg-[length:200%_auto] animate-[shimmer-text_3s_linear_infinite] opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
-                {/* shimmer */}
+                {}
                 <span className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/20 to-transparent transition-transform duration-700 group-hover:translate-x-full" />
                 <span className="relative flex items-center gap-2">
                   {session ? "Go to Dashboard" : "Get started free"}
@@ -336,7 +329,7 @@ export function Hero({ session }: { session?: any }) {
           </div>
         </Reveal>
 
-        {/* trust signals */}
+        {}
         <Reveal animateOnLoad delay={300}>
           <div className="mt-8 flex flex-col items-center justify-center gap-6 sm:flex-row sm:gap-10">
             <SocialProof />
@@ -377,12 +370,12 @@ export function Hero({ session }: { session?: any }) {
           </div>
         </Reveal>
 
-        {/* stats */}
+        {}
         <Reveal animateOnLoad delay={360}>
           <StatsStrip />
         </Reveal>
 
-        {/* product preview */}
+        {}
         <Reveal animateOnLoad delay={440}>
           <HeroPreview mx={pointer.x} my={pointer.y} />
         </Reveal>
@@ -391,7 +384,6 @@ export function Hero({ session }: { session?: any }) {
   );
 }
 
-// ─── Premium product preview (3D tilt) ───────────────────────────────────────
 function HeroPreview({ mx, my }: { mx: number; my: number }) {
   const bars = [38, 62, 47, 78, 65, 92, 85];
 
@@ -400,20 +392,20 @@ function HeroPreview({ mx, my }: { mx: number; my: number }) {
       className="group relative mx-auto mt-20 max-w-5xl [perspective:2000px]"
       style={{ transformStyle: "preserve-3d" }}
     >
-      {/* ambient glow */}
+      {}
       <div className="absolute -inset-4 rounded-3xl bg-gradient-to-b from-primary/25 via-violet-500/10 to-transparent opacity-60 blur-3xl transition-opacity duration-700 group-hover:opacity-100" />
 
-      {/* border glow ring */}
+      {}
       <div className="absolute -inset-px rounded-2xl bg-gradient-to-b from-primary/50 via-primary/10 to-transparent opacity-70" />
 
-      {/* main card with subtle tilt */}
+      {}
       <div
         className="relative overflow-hidden rounded-2xl border border-border/50 bg-card/90 shadow-[0_40px_100px_-20px_hsl(var(--primary)/0.35)] backdrop-blur-2xl transition-transform duration-300 ease-out"
         style={{
           transform: `rotateX(${my * -4}deg) rotateY(${mx * 5}deg)`,
         }}
       >
-        {/* window chrome */}
+        {}
         <div className="flex items-center gap-3 border-b border-border/40 bg-muted/20 px-5 py-3.5">
           <div className="flex gap-1.5">
             <span className="h-3 w-3 rounded-full bg-red-400/90 shadow-sm shadow-red-400/50 transition-transform hover:scale-125" />
@@ -442,10 +434,10 @@ function HeroPreview({ mx, my }: { mx: number; my: number }) {
           </div>
         </div>
 
-        {/* dashboard content */}
+        {}
         <div className="p-6">
           <div className="grid gap-4 md:grid-cols-3">
-            {/* GitHub Score chart */}
+            {}
             <div className="relative overflow-hidden rounded-xl border border-border/40 bg-background/40 p-5 md:col-span-2">
               <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent" />
               <div className="relative">
@@ -482,7 +474,7 @@ function HeroPreview({ mx, my }: { mx: number; my: number }) {
               </div>
             </div>
 
-            {/* ATS Score */}
+            {}
             <div className="relative overflow-hidden rounded-xl border border-border/40 bg-background/40 p-5">
               <div className="absolute inset-0 bg-gradient-to-br from-violet-500/5 to-transparent" />
               <div className="relative flex h-full flex-col justify-between">
@@ -529,7 +521,7 @@ function HeroPreview({ mx, my }: { mx: number; my: number }) {
             </div>
           </div>
 
-          {/* bottom row */}
+          {}
           <div className="mt-4 grid gap-4 sm:grid-cols-3">
             {[
               {
@@ -577,11 +569,11 @@ function HeroPreview({ mx, my }: { mx: number; my: number }) {
           </div>
         </div>
 
-        {/* glossy sheen overlay */}
+        {}
         <div className="pointer-events-none absolute inset-0 bg-gradient-to-tr from-transparent via-white/[0.03] to-white/[0.06]" />
       </div>
 
-      {/* reflection */}
+      {}
       <div className="absolute -bottom-8 left-1/2 h-12 w-4/5 -translate-x-1/2 rounded-full bg-primary/15 blur-2xl" />
     </div>
   );

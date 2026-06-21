@@ -10,7 +10,7 @@ export function CTA() {
         <Reveal>
           <div className="cta-glow relative mx-auto max-w-5xl rounded-[2rem] p-px">
             <div className="relative overflow-hidden rounded-[calc(2rem-1px)] border border-primary/20 bg-gradient-to-br from-primary/15 via-card/70 to-chart-2/10 px-8 py-20 text-center backdrop-blur-xl">
-              {/* animated textures */}
+              {}
               <div className="aurora-blob aurora-cta" />
               <div className="cta-dots pointer-events-none absolute inset-0 opacity-[0.4]" />
               <div className="cta-shine pointer-events-none absolute inset-0" />
@@ -51,7 +51,7 @@ export function CTA() {
                   </a>
                 </div>
 
-                {/* social proof */}
+                {}
                 <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
                   <div className="flex -space-x-2.5">
                     {[

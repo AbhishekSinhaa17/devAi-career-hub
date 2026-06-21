@@ -1,24 +1,12 @@
-// Server-only environment variable validation.
-// The .server.ts suffix prevents Vite from bundling this into the client.
-//
-// Usage:
-//   import { getRequiredEnv, validateEnv } from "@/lib/env-validation.server";
-//   const key = getRequiredEnv("GEMINI_API_KEY");
-
 import process from "node:process";
 
-/** Env var definitions with optional default and whether they are required. */
 interface EnvVarDef {
-  /** If true, the app will refuse to start without this var. */
   required: boolean;
-  /** Human-readable description shown in error messages. */
   description: string;
-  /** Default value when the var is optional and missing. */
   defaultValue?: string;
 }
 
 const ENV_SCHEMA: Record<string, EnvVarDef> = {
-  // Supabase (server)
   SUPABASE_URL: {
     required: true,
     description: "Supabase project URL",
@@ -28,7 +16,6 @@ const ENV_SCHEMA: Record<string, EnvVarDef> = {
     description: "Supabase publishable (anon) key",
   },
 
-  // AI providers — at least one is required, validated separately
   GEMINI_API_KEY: {
     required: false,
     description: "Google Gemini API key",
@@ -38,13 +25,11 @@ const ENV_SCHEMA: Record<string, EnvVarDef> = {
     description: "Groq API key",
   },
 
-  // GitHub (optional — increases rate limit)
   GITHUB_TOKEN: {
     required: false,
     description: "GitHub personal access token (raises rate limit to 5,000/hr)",
   },
 
-  // Rate-limit overrides (optional)
   AI_RATE_LIMIT_DAILY_FREE: {
     required: false,
     description: "Max AI requests per day for free users",
@@ -62,10 +47,6 @@ const ENV_SCHEMA: Record<string, EnvVarDef> = {
   },
 };
 
-/**
- * Read an environment variable, throwing a clear error if it is required and
- * missing. For optional vars, returns the default or undefined.
- */
 export function getRequiredEnv(name: string): string {
   const value = process.env[name];
   if (value) return value;
@@ -117,10 +98,6 @@ export function validateEnv(): string[] {
   return problems;
 }
 
-/**
- * Call once at server startup. Logs warnings/errors and throws if critical
- * vars are missing.
- */
 let _validated = false;
 export function ensureEnvValid(): void {
   if (_validated) return;
@@ -144,7 +121,6 @@ export function ensureEnvValid(): void {
     throw new Error(`Server startup aborted: ${problems.length} env var(s) missing.`);
   }
 
-  // Optional warnings
   if (!process.env.GITHUB_TOKEN) {
     console.warn(
       "[DevAI] GITHUB_TOKEN not set — GitHub API limited to 60 requests/hour. " +
