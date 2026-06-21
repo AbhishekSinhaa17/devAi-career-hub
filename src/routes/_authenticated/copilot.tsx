@@ -201,7 +201,7 @@ function ConvItem({
         )}
       </div>
       {onDelete && (
-        <div 
+        <div
           className="absolute right-3 opacity-0 group-hover:opacity-100 transition-opacity"
           onClick={(e) => {
             e.stopPropagation();
@@ -288,7 +288,11 @@ function CopilotPage() {
 
   const displayMsgs = serverMsgs ? [...serverMsgs] : [];
   optimisticMsgs.forEach((opt) => {
-    if (!displayMsgs.find((m) => m.id === opt.id || (m.role === opt.role && m.content === opt.content))) {
+    if (
+      !displayMsgs.find(
+        (m) => m.id === opt.id || (m.role === opt.role && m.content === opt.content),
+      )
+    ) {
       displayMsgs.push(opt);
     }
   });
