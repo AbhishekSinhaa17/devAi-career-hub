@@ -10,7 +10,6 @@ export function Footer() {
           </div>
           DevAI © {new Date().getFullYear()}
         </div>
-
       </div>
     </footer>
   );

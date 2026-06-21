@@ -771,7 +771,10 @@ function MockInterviewPage() {
           style={{ animation: "fadeSlideIn 0.4s ease-out both" }}
         >
           <div className="relative flex items-center justify-center h-48 w-48 rounded-full bg-primary/10 border-2 border-primary/20 shadow-[0_0_60px_rgba(99,102,241,0.2)]">
-            <div className="absolute inset-0 rounded-full border border-primary/40 animate-ping opacity-20" style={{ animationDuration: '1s' }} />
+            <div
+              className="absolute inset-0 rounded-full border border-primary/40 animate-ping opacity-20"
+              style={{ animationDuration: "1s" }}
+            />
             <div
               className="text-8xl font-black text-primary tracking-tighter"
               key={countdown}
