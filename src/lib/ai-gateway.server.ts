@@ -134,7 +134,7 @@ async function rawCall(opts: {
   for (let attempt = 0; attempt <= maxRetries; attempt++) {
     try {
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 15000); // 15s timeout
+      const timeoutId = setTimeout(() => controller.abort(), 60000); // 60s timeout
 
       const fetchOpts = { ...opts, signal: controller.signal };
 
@@ -190,7 +190,7 @@ async function rawCall(opts: {
         await new Promise((resolve) => setTimeout(resolve, baseDelay * Math.pow(2, attempt)));
       } else if (attempt === maxRetries || err.name === "AbortError") {
         if (err.name === "AbortError") {
-          throw new Error("AI request timed out after 15 seconds. Please try again.");
+          throw new Error("AI request timed out after 60 seconds. Please try again.");
         }
         throw err;
       }

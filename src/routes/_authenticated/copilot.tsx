@@ -7,6 +7,7 @@ import {
   getCopilotHistory,
   getCopilotMessages,
   sendCopilotMessage,
+  deleteCopilotConversation,
 } from "@/lib/copilot.functions";
 import {
   Bot,
@@ -24,6 +25,7 @@ import {
   ChevronRight,
   Zap,
   Menu,
+  Trash2,
 } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import ReactMarkdown from "react-markdown";
@@ -102,6 +104,7 @@ function QuickActionCard({
   color,
   onClick,
   delay = 0,
+  disabled = false,
 }: {
   icon: any;
   title: string;
@@ -110,15 +113,19 @@ function QuickActionCard({
   color: string;
   onClick: (p: string) => void;
   delay?: number;
+  disabled?: boolean;
 }) {
   return (
     <button
       onClick={() => onClick(prompt)}
-      className="group relative p-5 rounded-2xl text-left transition-all duration-300 hover:-translate-y-0.5 hover:shadow-xl animate-in fade-in slide-in-from-bottom-4 duration-500 overflow-hidden
+      disabled={disabled}
+      className={`group relative p-5 rounded-2xl text-left transition-all duration-300 ${
+        disabled ? "opacity-50 cursor-not-allowed" : "hover:-translate-y-0.5 hover:shadow-xl"
+      } animate-in fade-in slide-in-from-bottom-4 duration-500 overflow-hidden
         bg-white dark:bg-white/[0.03]
         border border-slate-200 dark:border-white/8
         hover:border-slate-300 dark:hover:border-white/15
-        shadow-sm dark:shadow-none"
+        shadow-sm dark:shadow-none`}
       style={{ animationDelay: `${delay}ms` }}
     >
       {}
@@ -153,15 +160,17 @@ function ConvItem({
   conv,
   isActive,
   onClick,
+  onDelete,
 }: {
   conv: any;
   isActive: boolean;
   onClick: () => void;
+  onDelete?: (e: React.MouseEvent) => void;
 }) {
   return (
     <button
       onClick={onClick}
-      className={`w-full text-left px-3 py-2.5 rounded-xl flex items-center gap-3 transition-all duration-200 group ${
+      className={`w-full text-left px-3 py-2.5 rounded-xl flex items-center gap-3 transition-all duration-200 group relative overflow-hidden ${
         isActive
           ? "bg-indigo-50 dark:bg-indigo-500/10 border border-indigo-200 dark:border-indigo-500/20"
           : "hover:bg-slate-100 dark:hover:bg-white/5 border border-transparent"
@@ -178,7 +187,7 @@ function ConvItem({
           className={`h-3.5 w-3.5 ${isActive ? "text-indigo-600 dark:text-indigo-400" : "text-slate-400 dark:text-slate-500"}`}
         />
       </div>
-      <div className="flex-1 min-w-0">
+      <div className="flex-1 min-w-0 pr-6">
         <p
           className={`text-sm font-medium truncate ${isActive ? "text-indigo-700 dark:text-indigo-300" : "text-slate-700 dark:text-slate-300"}`}
         >
@@ -191,6 +200,19 @@ function ConvItem({
           </p>
         )}
       </div>
+      {onDelete && (
+        <div 
+          className="absolute right-3 opacity-0 group-hover:opacity-100 transition-opacity"
+          onClick={(e) => {
+            e.stopPropagation();
+            onDelete(e);
+          }}
+        >
+          <div className="h-7 w-7 rounded-lg flex items-center justify-center text-red-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors">
+            <Trash2 className="h-3.5 w-3.5" />
+          </div>
+        </div>
+      )}
     </button>
   );
 }
@@ -207,6 +229,7 @@ function CopilotPage() {
   const startFn = useServerFn(startCopilotConversation);
   const msgsFn = useServerFn(getCopilotMessages);
   const sendFn = useServerFn(sendCopilotMessage);
+  const deleteFn = useServerFn(deleteCopilotConversation);
 
   const { data: history, isLoading: isHistoryLoading } = useQuery({
     queryKey: ["copilotHistory"],
@@ -224,22 +247,26 @@ function CopilotPage() {
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ["copilotHistory"] });
       setActiveConvId(data.id);
-      setOptimisticMsgs([]);
     },
   });
 
   const sendMut = useMutation({
-    mutationFn: (msg: string) => sendFn({ data: { conversationId: activeConvId!, message: msg } }),
-    onMutate: (msg) => {
-      setOptimisticMsgs((prev) => [
-        ...prev,
-        { id: `opt-${Date.now()}`, role: "user", content: msg },
-      ]);
-      setInputMsg("");
-    },
-    onSuccess: (data) => {
+    mutationFn: ({ msg, convId }: { msg: string; convId: string }) =>
+      sendFn({ data: { conversationId: convId, message: msg } }),
+    onSuccess: (data, variables) => {
       setOptimisticMsgs((prev) => [...prev, data]);
-      queryClient.invalidateQueries({ queryKey: ["copilotMsgs", activeConvId] });
+      queryClient.invalidateQueries({ queryKey: ["copilotMsgs", variables.convId] });
+    },
+  });
+
+  const deleteMut = useMutation({
+    mutationFn: (id: string) => deleteFn({ data: { conversationId: id } }),
+    onSuccess: (_, id) => {
+      queryClient.invalidateQueries({ queryKey: ["copilotHistory"] });
+      if (activeConvId === id) {
+        setActiveConvId(null);
+        setOptimisticMsgs([]);
+      }
     },
   });
 
@@ -261,48 +288,48 @@ function CopilotPage() {
 
   const displayMsgs = serverMsgs ? [...serverMsgs] : [];
   optimisticMsgs.forEach((opt) => {
-    if (!displayMsgs.find((m) => m.id === opt.id)) displayMsgs.push(opt);
+    if (!displayMsgs.find((m) => m.id === opt.id || (m.role === opt.role && m.content === opt.content))) {
+      displayMsgs.push(opt);
+    }
   });
+
+  const isPending = sendMut.isPending || startMut.isPending;
 
   const handleSend = useCallback(() => {
     const msg = inputMsg.trim();
-    if (!msg) return;
+    if (!msg || isPending) return;
+
+    setOptimisticMsgs((prev) => [...prev, { id: `opt-${Date.now()}`, role: "user", content: msg }]);
+    setInputMsg("");
+
     if (!activeConvId) {
       startMut.mutate("Career Discussion", {
-        onSuccess: (conv) => {
-          sendFn({ data: { conversationId: conv.id, message: msg } }).then((data) => {
-            setOptimisticMsgs([{ id: "opt-user-1", role: "user", content: msg }, data]);
-            queryClient.invalidateQueries({
-              queryKey: ["copilotMsgs", conv.id],
-            });
-          });
-          setInputMsg("");
-        },
+        onSuccess: (conv) => sendMut.mutate({ msg, convId: conv.id }),
       });
     } else {
-      sendMut.mutate(msg);
+      sendMut.mutate({ msg, convId: activeConvId });
     }
-  }, [inputMsg, activeConvId, startMut, sendMut, sendFn, queryClient]);
+  }, [inputMsg, activeConvId, isPending, startMut, sendMut]);
 
   const handleQuickAction = useCallback(
     (prompt: string) => {
+      if (isPending) return;
+
+      setOptimisticMsgs((prev) => [
+        ...prev,
+        { id: `opt-${Date.now()}`, role: "user", content: prompt },
+      ]);
+      setInputMsg("");
+
       if (!activeConvId) {
         startMut.mutate(prompt, {
-          onSuccess: (conv) => {
-            sendFn({ data: { conversationId: conv.id, message: prompt } }).then((data) => {
-              setOptimisticMsgs([{ id: "opt-user-1", role: "user", content: prompt }, data]);
-              queryClient.invalidateQueries({
-                queryKey: ["copilotMsgs", conv.id],
-              });
-            });
-          },
+          onSuccess: (conv) => sendMut.mutate({ msg: prompt, convId: conv.id }),
         });
       } else {
-        setInputMsg(prompt);
-        setTimeout(() => sendMut.mutate(prompt), 50);
+        sendMut.mutate({ msg: prompt, convId: activeConvId });
       }
     },
-    [activeConvId, startMut, sendMut, sendFn, queryClient],
+    [activeConvId, isPending, startMut, sendMut],
   );
 
   const quickActions = [
@@ -340,7 +367,6 @@ function CopilotPage() {
     },
   ];
 
-  const isPending = sendMut.isPending || startMut.isPending;
   const hasMessages = displayMsgs.length > 0;
 
   return (
@@ -407,6 +433,7 @@ function CopilotPage() {
                     setActiveConvId(conv.id);
                     setOptimisticMsgs([]);
                   }}
+                  onDelete={() => deleteMut.mutate(conv.id)}
                 />
               ))}
             </>
@@ -469,6 +496,7 @@ function CopilotPage() {
                           setActiveConvId(conv.id);
                           setOptimisticMsgs([]);
                         }}
+                        onDelete={() => deleteMut.mutate(conv.id)}
                       />
                     ))
                   )}
@@ -514,6 +542,7 @@ function CopilotPage() {
                     {...action}
                     onClick={handleQuickAction}
                     delay={i * 80}
+                    disabled={isPending}
                   />
                 ))}
               </div>

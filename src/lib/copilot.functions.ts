@@ -184,3 +184,17 @@ ${JSON.stringify(conv.context_snapshot, null, 2)}
 
     return savedMsg;
   });
+
+export const deleteCopilotConversation = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .validator((d: unknown) => z.object({ conversationId: z.string().uuid() }).parse(d))
+  .handler(async ({ data, context }) => {
+    const { error } = await context.supabase
+      .from("copilot_conversations")
+      .delete()
+      .eq("id", data.conversationId)
+      .eq("user_id", context.userId);
+
+    if (error) throw new Error(error.message);
+    return { success: true };
+  });
