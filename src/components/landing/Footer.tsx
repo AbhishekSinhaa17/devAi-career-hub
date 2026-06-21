@@ -10,13 +10,7 @@ export function Footer() {
           </div>
           DevAI © {new Date().getFullYear()}
         </div>
-        <div className="flex items-center gap-5">
-          {["Features", "Pricing", "FAQ"].map((l) => (
-            <a key={l} href={`#${l.toLowerCase()}`} className="hover:text-foreground">
-              {l}
-            </a>
-          ))}
-        </div>
+
       </div>
     </footer>
   );

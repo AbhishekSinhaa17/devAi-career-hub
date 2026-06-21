@@ -414,7 +414,7 @@ export const generateRoadmap = createServerFn({ method: "POST" })
         },
         {
           role: "user",
-          content: `Generate a ${data.path} career roadmap starting from ${data.level}. Return JSON with: estimated timeline, 4-6 phases (title, duration, key skills, suggested projects, recommended resources), and 3-5 useful certifications.`,
+          content: `Generate a ${data.path} career roadmap starting from ${data.level}. Return JSON with: estimated timeline (MAXIMUM 12 months in total), 4-6 phases (title, duration, key skills, suggested projects, recommended resources), and 3-5 useful certifications.`,
         },
       ],
       schema: {

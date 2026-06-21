@@ -382,8 +382,9 @@ function TimerDisplay({ seconds }: { seconds: number }) {
 function MockInterviewPage() {
   const queryClient = useQueryClient();
   const [status, setStatus] = useState<
-    "setup" | "generating" | "interview" | "evaluating" | "report"
+    "setup" | "generating" | "countdown" | "interview" | "evaluating" | "report"
   >("setup");
+  const [countdown, setCountdown] = useState<number | null>(null);
   const [role, setRole] = useState("Full Stack Developer");
   const [level, setLevel] = useState("Intermediate");
   const [type, setType] = useState("Technical Interview");
@@ -524,9 +525,8 @@ function MockInterviewPage() {
       setQuestions(qs);
       setAnswers(new Array(qs.length).fill(""));
       setCurrentQ(0);
-      setStatus("interview");
-      if (timerOpt > 0) setTimeRemaining(timerOpt);
-      speakQuestion(qs[0].question);
+      setStatus("countdown");
+      setCountdown(3);
     },
     onError: (e: Error) => {
       setStatus("setup");
@@ -548,6 +548,18 @@ function MockInterviewPage() {
       toast.error(e.message);
     },
   });
+
+  useEffect(() => {
+    if (status !== "countdown" || countdown === null) return;
+    if (countdown < 0) {
+      setStatus("interview");
+      if (timerOpt > 0) setTimeRemaining(timerOpt);
+      if (questions.length > 0) speakQuestion(questions[0].question);
+      return;
+    }
+    const iv = setInterval(() => setCountdown((c) => (c !== null ? c - 1 : null)), 1000);
+    return () => clearInterval(iv);
+  }, [countdown, status, timerOpt, questions]);
 
   useEffect(() => {
     if (status !== "interview" || timeRemaining === null) return;
@@ -750,6 +762,28 @@ function MockInterviewPage() {
           title="Analyzing Profile..."
           subtitle="Building a custom interview based on your skills and experience."
         />
+      )}
+
+      {/* ──────────────────────── COUNTDOWN ──────────────────────── */}
+      {status === "countdown" && countdown !== null && (
+        <div
+          className="flex flex-col items-center justify-center py-32 space-y-6"
+          style={{ animation: "fadeSlideIn 0.4s ease-out both" }}
+        >
+          <div className="relative flex items-center justify-center h-48 w-48 rounded-full bg-primary/10 border-2 border-primary/20 shadow-[0_0_60px_rgba(99,102,241,0.2)]">
+            <div className="absolute inset-0 rounded-full border border-primary/40 animate-ping opacity-20" style={{ animationDuration: '1s' }} />
+            <div
+              className="text-8xl font-black text-primary tracking-tighter"
+              key={countdown}
+              style={{ animation: "logo-enter 0.4s cubic-bezier(0.34,1.1,0.64,1) both" }}
+            >
+              {countdown > 0 ? countdown : "Go!"}
+            </div>
+          </div>
+          <p className="text-muted-foreground font-bold uppercase tracking-widest text-sm">
+            {countdown > 0 ? "Get ready" : "Good luck!"}
+          </p>
+        </div>
       )}
 
       {/* ──────────────────────── INTERVIEW ──────────────────────── */}

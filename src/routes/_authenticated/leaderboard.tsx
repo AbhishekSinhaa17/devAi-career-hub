@@ -25,12 +25,23 @@ export const fetchLeaderboard = createServerFn({ method: "GET" })
       .from("developer_scores")
       .select("user_id, overall_score, resume_score, github_score")
       .order("overall_score", { ascending: false })
-      .limit(20);
+      .limit(100);
 
     if (scoresError) throw new Error(scoresError.message);
     if (!scores || scores.length === 0) return [];
 
-    const userIds = scores.map((s) => s.user_id);
+    // Deduplicate by user_id, taking only the highest score for each user
+    const uniqueScores = [];
+    const seenUsers = new Set();
+    for (const score of scores) {
+      if (!seenUsers.has(score.user_id)) {
+        seenUsers.add(score.user_id);
+        uniqueScores.push(score);
+        if (uniqueScores.length === 20) break; // Limit to top 20 unique users
+      }
+    }
+
+    const userIds = uniqueScores.map((s) => s.user_id);
     const { data: profiles, error: profilesError } = await context.supabase
       .from("profiles")
       .select("id, name, avatar_url, github_username")
@@ -40,7 +51,7 @@ export const fetchLeaderboard = createServerFn({ method: "GET" })
 
     const profileMap = new Map(profiles?.map((p) => [p.id, p]) || []);
 
-    return scores.map((score) => {
+    return uniqueScores.map((score) => {
       const profile = profileMap.get(score.user_id);
       return {
         ...score,
