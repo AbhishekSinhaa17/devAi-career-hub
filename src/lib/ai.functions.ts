@@ -190,7 +190,7 @@ export const scoreResume = createServerFn({ method: "POST" })
       .from("resumes")
       .select("score, ai_suggestions")
       .eq("user_id", context.userId)
-      .eq("resume_hash", resumeHash)
+      // .eq("resume_hash", resumeHash) // Temporarily disabled due to schema cache mismatch
       .order("updated_at", { ascending: false })
       .limit(1)
       .maybeSingle();
@@ -923,7 +923,7 @@ export const saveResume = createServerFn({ method: "POST" })
           content: data.content as never,
           score: data.score,
           ai_suggestions: data.ai_suggestions,
-          resume_hash: resumeHash,
+          // resume_hash: resumeHash, // Temporarily disabled
           updated_at: new Date().toISOString(),
         })
         .eq("id", data.id)
@@ -941,7 +941,7 @@ export const saveResume = createServerFn({ method: "POST" })
           content: data.content as never,
           score: data.score,
           ai_suggestions: data.ai_suggestions,
-          resume_hash: resumeHash,
+          // resume_hash: resumeHash, // Temporarily disabled
         })
         .select()
         .single();

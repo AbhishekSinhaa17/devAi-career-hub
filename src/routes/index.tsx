@@ -11,6 +11,7 @@ import { Pricing } from "@/components/landing/Pricing";
 import { FAQ } from "@/components/landing/FAQ";
 import { CTA } from "@/components/landing/CTA";
 import { Footer } from "@/components/landing/Footer";
+import { ScrollToTop } from "@/components/landing/ScrollToTop";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -42,7 +43,7 @@ function Landing() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-background text-foreground antialiased">
+    <div className="relative min-h-screen overflow-x-clip bg-background text-foreground antialiased">
       <Aurora />
       <Nav session={session} />
       <Hero session={session} />
@@ -53,6 +54,7 @@ function Landing() {
       <FAQ />
       <CTA />
       <Footer />
+      <ScrollToTop />
       <StyleInjector />
     </div>
   );
