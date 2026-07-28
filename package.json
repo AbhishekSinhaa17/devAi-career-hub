@@ -5,7 +5,9 @@
     "dev:frontend": "npm run dev --prefix frontend",
     "dev:backend": "npm run dev --prefix server",
     "dev": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\"",
-    "install:all": "npm install && npm install --prefix frontend && npm install --prefix server"
+    "install:all": "npm install && npm install --prefix frontend && npm install --prefix server",
+    "lint": "npm run lint --prefix frontend && npm run lint --prefix server",
+    "build": "npm run build --prefix frontend && npm run build --prefix server"
   },
   "devDependencies": {
     "concurrently": "^8.2.2"
