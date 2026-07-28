@@ -1,4 +1,5 @@
 import { apiClient } from "./api-client";
+import { env } from "../env";
 
 // Custom Auth Client mimicking the subset of Supabase Auth API used in the frontend
 
@@ -112,7 +113,7 @@ export const authClient = {
 
     async signInWithOAuth({ provider }: any): Promise<{ data: any, error: any }> {
       if (provider === "google") {
-        const backendUrl = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
+        const backendUrl = env.VITE_API_URL;
         window.location.href = `${backendUrl}/auth/google`;
         return { data: { url: `${backendUrl}/auth/google` }, error: null };
       }

@@ -1,8 +1,9 @@
 import axios from "axios";
+import { env } from "../env";
 
 // Create Axios instance pointing to the Express backend proxy
 export const apiClient = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || "http://localhost:5000/api",
+  baseURL: env.VITE_API_URL,
   headers: {
     "Content-Type": "application/json",
   },
@@ -39,7 +40,7 @@ apiClient.interceptors.response.use(
 );
 
 export const serverApiClient = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || "http://localhost:5000/api",
+  baseURL: env.VITE_API_URL,
   headers: {
     "Content-Type": "application/json",
   }
