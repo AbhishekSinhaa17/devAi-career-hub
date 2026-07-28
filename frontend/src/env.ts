@@ -1,13 +1,3 @@
-import { z } from "zod";
-
-const envSchema = z.object({
-  VITE_API_URL: z.string().url().default("http://localhost:5000/api"),
-  SUPABASE_SERVICE_ROLE_KEY: z.string().optional(),
-  GEMINI_API_KEY: z.string().optional(),
-  GROQ_API_KEY: z.string().optional(),
-  SENTRY_DSN: z.string().optional(),
-  VITE_POSTHOG_KEY: z.string().optional(),
-  VITE_POSTHOG_HOST: z.string().optional(),
 });
 
 export const env = envSchema.parse({
