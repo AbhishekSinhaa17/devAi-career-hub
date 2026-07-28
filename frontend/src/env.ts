@@ -1,3 +1,18 @@
+import { z } from "zod";
+
+const isProd = (typeof process !== "undefined" && process.env.NODE_ENV === "production") || 
+  (typeof import.meta !== "undefined" && import.meta.env && import.meta.env.PROD);
+
+const envSchema = z.object({
+  VITE_API_URL: z.string().url().default(
+    isProd ? "https://devai-career-hub-1.onrender.com/api" : "http://localhost:5000/api"
+  ),
+  SUPABASE_SERVICE_ROLE_KEY: z.string().optional(),
+  GEMINI_API_KEY: z.string().optional(),
+  GROQ_API_KEY: z.string().optional(),
+  SENTRY_DSN: z.string().optional(),
+  VITE_POSTHOG_KEY: z.string().optional(),
+  VITE_POSTHOG_HOST: z.string().optional(),
 });
 
 export const env = envSchema.parse({
