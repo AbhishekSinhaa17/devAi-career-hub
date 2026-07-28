@@ -23,56 +23,74 @@ DevAI is a full-stack, AI-powered career platform built exclusively for develope
 ## Tech Stack
 
 - **Frontend:** React 19, Vite
-- **Routing & State:** TanStack Router, TanStack Query
-- **Backend:** TanStack Start Server Functions (SSR)
-- **Database:** Supabase (PostgreSQL + Row Level Security + Auth)
+- **Routing & State:** TanStack Router, TanStack Query, Zustand
+- **Backend:** Node.js, Express (REST API)
+- **Database:** MongoDB (via Mongoose)
+- **Authentication:** Custom JWT-based Auth
 - **AI Integration:** Google Gemini 2.5 Flash (primary) + Groq LLaMA 3.3 70B (fallback)
 - **Deployment:** Vercel (both application hosting and dynamic portfolio deployments)
 - **Styling:** Tailwind CSS v4, shadcn/ui, Radix UI, Framer Motion
-- **Tooling:** ESLint, Prettier
 
 ## Local Setup
+
+The project uses a split architecture with a React frontend and an Node.js/Express backend.
 
 ```bash
 # Clone the repository
 git clone https://github.com/AbhishekSinhaa17/devAi-career-hub.git
 cd devAi-career-hub
 
-# Install dependencies
+# Install frontend dependencies
+cd frontend
 npm install
 
-# Copy env file and fill in your values
-cp .env.example .env
+# Install backend dependencies
+cd ../backend
+npm install
+cd ..
 
-# Run the development server
+# Run the development servers using concurrently
 npm run dev
 ```
 
 ### Environment Variables
 
-See `.env.example` for all required variables. You will need:
+You will need to set up two `.env` files.
 
-- **Supabase:** Project URL and anon/service keys.
-- **AI Providers:** Gemini API key (primary) or Groq API key (fallback).
-- **Vercel:** Vercel API token (required for the 1-click portfolio deployment feature).
+**1. Frontend (`.env` in the root directory)**
+```env
+VITE_API_URL=http://localhost:5000/api
+```
 
-### Database Setup
-
-Run the `combined_schema.sql` file in your Supabase SQL Editor to instantly create all required tables, Row Level Security (RLS) policies, and database functions.
+**2. Backend (`backend/.env`)**
+See `backend/.env.example` for all required variables. You will need:
+- `MONGO_URI=mongodb://localhost:27017/devai_career_hub`
+- `JWT_SECRET=your_jwt_secret`
+- `GEMINI_API_KEY=` or `GROQ_API_KEY=`
+- `DEPLOY_VERCEL_TOKEN=` (required for the 1-click portfolio deployment feature)
 
 ## Project Structure
 
 ```text
-src/
-├── routes/                 # TanStack Router file-based routes
-│   ├── _authenticated/     # Protected routes (all core app features)
-│   └── index.tsx           # Landing page
-├── lib/                    # Server functions & core AI logic
-│   ├── ai.functions.ts     # All AI interaction logic
-│   ├── ai-gateway.server.ts# AI provider routing (Gemini + Groq)
-│   └── vercel.functions.ts # Vercel deployment orchestration
-├── components/             # Reusable React components
-│   ├── landing/            # Landing page sections
-│   └── ui/                 # shadcn/ui foundational components
-└── integrations/supabase/  # Supabase client initialization + auth hooks
+/                       # Frontend React Application
+├── src/
+│   ├── routes/         # TanStack Router file-based routes
+│   ├── lib/            # Frontend API clients and auth logic
+│   ├── components/     # Reusable React components (shadcn/ui)
+│   └── store/          # Zustand state management
+│
+backend/                # Backend Express Application
+├── src/
+│   ├── controllers/    # API endpoint logic (auth, ai, github, resumes, etc.)
+│   ├── models/         # Mongoose database schemas
+│   ├── routes/         # Express routers
+│   ├── middlewares/    # JWT auth and rate-limiting
+│   └── services/       # AI provider integration (Gemini + Groq)
 ```
+
+## Migration Notice
+
+**Supabase has been fully decommissioned as of July 22, 2026.** 
+The architecture has been migrated from Supabase (PostgreSQL + Auth + Server Functions) to a dedicated MongoDB + Express stack to better support long-term scalability and AI unstructured data. 
+
+*Note: A final backup of the Postgres database was exported and archived before the Supabase project was safely paused.*
