@@ -15,6 +15,7 @@ dist-ssr
 .vite
 .tanstack/**
 .nitro
+.vercel
 *.local
 
 # Wrangler / Cloudflare

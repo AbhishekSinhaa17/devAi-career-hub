@@ -1,1 +1,0 @@
-import{R as o}from"./ErrorBoundary-D6KOjR89.js";import"./index-BX_SnE3X.js";import"./refresh-cw-Dcgj8doy.js";import"./createLucideIcon-BsSxXg-h.js";import"./house-DgGFKr5-.js";import"./shield-DR5OVjAz.js";import"./bot-tq4TBui7.js";import"./triangle-alert-0Hvhatc4.js";const s=o;export{s as errorComponent};

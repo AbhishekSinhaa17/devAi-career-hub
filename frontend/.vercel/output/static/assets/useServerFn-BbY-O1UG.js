@@ -1,1 +1,0 @@
-import{u as a,r as i,G as e}from"./index-BX_SnE3X.js";function c(o){const t=a();return i.useCallback(async(...s)=>{try{const r=await o(...s);if(e(r))throw r;return r}catch(r){if(e(r))return r.options._fromLocation=t.stores.location.get(),t.navigate(t.resolveRedirect(r).options);throw r}},[t,o])}export{c as u};
