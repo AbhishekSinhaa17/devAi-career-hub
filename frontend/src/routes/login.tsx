@@ -5,6 +5,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
+import { motion, useReducedMotion } from "framer-motion";
+import { LampIcon } from "@/components/LampIcon";
 import {
   Loader2,
   ArrowRight,
@@ -341,6 +343,14 @@ function LoginPage() {
   const [mounted, setMounted] = useState(false);
   const cardRef = useRef<HTMLDivElement>(null);
   const rotateRef = useRef({ x: 0, y: 0 });
+  const [isOn, setIsOn] = useState(false);
+  const shouldReduceMotion = useReducedMotion();
+
+  useEffect(() => {
+    if (isOn) {
+      setTimeout(() => document.getElementById("email-input")?.focus(), 100);
+    }
+  }, [isOn]);
 
   const typewriterText = useTypewriter(
     [
@@ -588,7 +598,60 @@ function LoginPage() {
               transform: mounted ? "translateY(0)" : "translateY(40px)",
               transition: "all 1s cubic-bezier(0.34,1.2,0.64,1) 150ms",
             }}
+            className="flex flex-col"
           >
+            {/* Lamp Toggle */}
+            <div className="flex flex-col items-center justify-center mb-6 relative">
+              <motion.button
+                type="button"
+                onClick={(e) => {
+                  // Only allow keyboard clicks (Enter/Space) to preserve accessibility
+                  if (e.detail === 0) {
+                    setIsOn(!isOn);
+                  }
+                }}
+                aria-label="Toggle login form"
+                aria-expanded={isOn}
+                className="focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 rounded-full relative z-10"
+                whileTap={shouldReduceMotion ? {} : { scale: 0.95 }}
+                transition={{ type: "spring", stiffness: 400, damping: 15 }}
+              >
+                <LampIcon isOn={isOn} onToggle={() => setIsOn(!isOn)} className="w-20 h-28" />
+              </motion.button>
+
+              {/* Hint Text */}
+              <motion.div
+                initial={false}
+                animate={{ 
+                  opacity: isOn ? 0 : 0.7, 
+                  y: isOn ? -10 : 0,
+                  scale: isOn ? 0.95 : 1
+                }}
+                transition={{ duration: 0.3 }}
+                className="absolute top-[105%] text-[10px] font-bold text-slate-500 dark:text-slate-400 tracking-widest uppercase pointer-events-none whitespace-nowrap"
+              >
+                Pull the rope to login
+              </motion.div>
+            </div>
+
+            <motion.div
+              initial={false}
+              animate={{
+                opacity: isOn ? 1 : 0,
+                y: isOn ? 0 : (shouldReduceMotion ? 0 : -20),
+                scale: isOn ? 1 : (shouldReduceMotion ? 1 : 0.95),
+                pointerEvents: isOn ? "auto" : "none",
+                height: isOn ? "auto" : 0,
+              }}
+              style={{ overflow: "hidden" }}
+              transition={{
+                duration: 0.5,
+                ease: [0.34, 1.2, 0.64, 1],
+              }}
+              className="w-full"
+            >
+              {/* Extra wrapper for padding to prevent shadow clipping during animation if possible */}
+              <div className="p-1 pb-8">
             {}
             <div className="lg:hidden mb-8 text-center space-y-3">
               <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-indigo-200 dark:border-indigo-500/30 bg-indigo-50 dark:bg-indigo-500/10">
@@ -713,6 +776,7 @@ function LoginPage() {
                     <div className="relative">
                       <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 dark:text-slate-600 group-focus-within/f:text-indigo-600 dark:group-focus-within/f:text-indigo-400 transition-colors pointer-events-none z-10" />
                       <Input
+                        id="email-input"
                         type="email"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
@@ -845,6 +909,9 @@ function LoginPage() {
                 Privacy Policy
               </Link>
             </p>
+            
+              </div>
+            </motion.div>
           </div>
         </div>
       </div>
