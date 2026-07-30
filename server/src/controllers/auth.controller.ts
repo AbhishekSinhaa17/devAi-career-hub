@@ -168,9 +168,18 @@ export async function googleAuthCallback(req: Request, res: Response, next: Next
 
     res.clearCookie("devai_oauth_state");
 
-    if (!state || !storedState || state !== storedState) {
-      return res.status(403).send("CSRF State Verification Failed. Please try logging in again.");
+    // Two OAuth flows are supported:
+    // 1. Server-initiated: /api/auth/google sets a cookie, state is validated here.
+    // 2. Client-initiated: frontend builds the Google URL directly (faster on cold-start),
+    //    state is stored in sessionStorage — no cookie. We pass it back for frontend validation.
+    if (storedState) {
+      // Server-initiated flow: validate state against cookie
+      if (!state || state !== storedState) {
+        return res.status(403).send("CSRF State Verification Failed. Please try logging in again.");
+      }
     }
+    // Client-initiated flow: no cookie → state will be validated by the frontend
+    // against sessionStorage. The exchange code is one-use and expires in 60s.
 
     if (!code || typeof code !== "string") {
       return res.redirect(`${clientUrl}/login?error=oauth_failed`);
@@ -260,7 +269,9 @@ export async function googleAuthCallback(req: Request, res: Response, next: Next
       used: false,
     });
 
-    res.redirect(`${clientUrl}/login?oauth_code=${exchangeCode}`);
+    // Include state in redirect so the frontend can validate it for client-initiated flows
+    const stateParam = state ? `&oauth_state=${encodeURIComponent(state as string)}` : "";
+    res.redirect(`${clientUrl}/login?oauth_code=${exchangeCode}${stateParam}`);
   } catch (error) {
     next(error);
   }

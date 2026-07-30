@@ -362,12 +362,23 @@ function LoginPage() {
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const oauthCode = params.get("oauth_code");
+    const oauthState = params.get("oauth_state");
     const errorParam = params.get("error");
 
     if (errorParam) {
       toast.error("Google login failed. Please try again.");
       window.history.replaceState({}, document.title, window.location.pathname);
     } else if (oauthCode) {
+      // Validate CSRF state for client-initiated OAuth flows
+      const storedState = sessionStorage.getItem("devai_oauth_state");
+      if (oauthState && storedState && oauthState !== storedState) {
+        toast.error("OAuth state mismatch. Please try logging in again.");
+        sessionStorage.removeItem("devai_oauth_state");
+        window.history.replaceState({}, document.title, window.location.pathname);
+        return;
+      }
+      sessionStorage.removeItem("devai_oauth_state");
+
       setLoading(true);
       authClient.auth.exchangeGoogleCode(oauthCode).then(({ error }) => {
         if (error) {

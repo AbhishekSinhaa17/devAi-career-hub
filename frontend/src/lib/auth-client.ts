@@ -1,6 +1,14 @@
 import { apiClient } from "./api-client";
 import { env } from "../env";
 
+// Generate a cryptographically random hex string for OAuth CSRF state.
+// Uses the Web Crypto API (available in all modern browsers).
+function generateCryptoState(): string {
+  const bytes = new Uint8Array(32);
+  crypto.getRandomValues(bytes);
+  return Array.from(bytes, (b) => b.toString(16).padStart(2, "0")).join("");
+}
+
 // Custom Auth Client mimicking the subset of Supabase Auth API used in the frontend
 
 type Session = {
@@ -113,6 +121,29 @@ export const authClient = {
 
     async signInWithOAuth({ provider }: any): Promise<{ data: any, error: any }> {
       if (provider === "google") {
+        const clientId = env.VITE_GOOGLE_CLIENT_ID;
+        const callbackUrl = env.VITE_GOOGLE_CALLBACK_URL;
+
+        if (clientId && callbackUrl) {
+          // Build the Google OAuth URL client-side — goes directly to Google's
+          // account picker without hitting the backend (avoids cold-start wait).
+          const state = generateCryptoState();
+          sessionStorage.setItem("devai_oauth_state", state);
+
+          const googleAuthUrl =
+            `https://accounts.google.com/o/oauth2/v2/auth?` +
+            `client_id=${encodeURIComponent(clientId)}` +
+            `&redirect_uri=${encodeURIComponent(callbackUrl)}` +
+            `&response_type=code` +
+            `&scope=${encodeURIComponent("openid email profile")}` +
+            `&state=${encodeURIComponent(state)}` +
+            `&prompt=select_account`;
+
+          window.location.href = googleAuthUrl;
+          return { data: { url: googleAuthUrl }, error: null };
+        }
+
+        // Fallback: use the backend redirect (slower on cold-start)
         const backendUrl = env.VITE_API_URL;
         window.location.href = `${backendUrl}/auth/google`;
         return { data: { url: `${backendUrl}/auth/google` }, error: null };
