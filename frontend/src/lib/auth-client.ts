@@ -6,7 +6,7 @@ import { env } from "../env";
 function generateCryptoState(): string {
   const bytes = new Uint8Array(32);
   crypto.getRandomValues(bytes);
-  return Array.from(bytes, (b) => b.toString(16).padStart(2, "0")).join("");
+  return "c_" + Array.from(bytes, (b) => b.toString(16).padStart(2, "0")).join("");
 }
 
 // Custom Auth Client mimicking the subset of Supabase Auth API used in the frontend

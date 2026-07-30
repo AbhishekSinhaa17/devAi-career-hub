@@ -370,12 +370,14 @@ function LoginPage() {
       window.history.replaceState({}, document.title, window.location.pathname);
     } else if (oauthCode) {
       // Validate CSRF state for client-initiated OAuth flows
-      const storedState = sessionStorage.getItem("devai_oauth_state");
-      if (oauthState && storedState && oauthState !== storedState) {
-        toast.error("OAuth state mismatch. Please try logging in again.");
-        sessionStorage.removeItem("devai_oauth_state");
-        window.history.replaceState({}, document.title, window.location.pathname);
-        return;
+      if (oauthState && oauthState.startsWith("c_")) {
+        const storedState = sessionStorage.getItem("devai_oauth_state");
+        if (oauthState !== storedState) {
+          toast.error("OAuth state mismatch. Please try logging in again.");
+          sessionStorage.removeItem("devai_oauth_state");
+          window.history.replaceState({}, document.title, window.location.pathname);
+          return;
+        }
       }
       sessionStorage.removeItem("devai_oauth_state");
 
