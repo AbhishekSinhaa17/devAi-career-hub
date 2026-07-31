@@ -50,7 +50,6 @@
 :root {
   --radius: 0.625rem;
 
-  /* Light Theme */
   --background: oklch(0.98 0.01 270);
   --foreground: oklch(0.14 0.012 270);
 
@@ -176,7 +175,6 @@
     background: oklch(0.68 0.18 280 / 0.35);
   }
 
-  /* Fix browser autofill colors */
   input:-webkit-autofill,
   input:-webkit-autofill:hover,
   input:-webkit-autofill:focus,
@@ -323,7 +321,6 @@
   }
 }
 
-/* gradient text utility (if you don't already have it) */
 .gradient-text {
   background-image: linear-gradient(
     to right,

@@ -32,7 +32,6 @@ router.post("/request-reset", validate(requestResetSchema), requestPasswordReset
 router.post("/reset-password", validate(resetSchema), resetPassword);
 router.get("/me", requireAuth, getMe);
 
-// Google OAuth
 router.get("/google", googleAuth);
 router.get("/google/callback", googleAuthCallback);
 router.post("/google/exchange", exchangeGoogleCode);

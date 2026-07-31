@@ -28,7 +28,6 @@ export interface DailyActivity {
 
 export async function getGlobalAnalytics(req: Request, res: Response, next: NextFunction) {
   try {
-    // Admin check is done via middleware, so we can proceed
     const days = parseInt(req.query.days as string, 10) || 30;
 
     const now = new Date();

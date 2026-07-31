@@ -149,7 +149,6 @@ export async function getLeaderboard(req: Request, res: Response) {
       .sort({ overallScore: -1 })
       .limit(50);
       
-    // Transform to match the old supabase return shape
     const data = scores.map(s => {
       const user = (s as any).userId;
       return {

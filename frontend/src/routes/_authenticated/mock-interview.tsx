@@ -412,7 +412,6 @@ function MockInterviewPage() {
     currentQRef.current = currentQ;
   }, [currentQ]);
 
-  // Voice Initialization
   useEffect(() => {
     const SpeechRecognition =
       (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;

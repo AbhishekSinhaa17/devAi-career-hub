@@ -7,8 +7,6 @@ const envSchema = z.object({
   VITE_API_URL: z.string().url().default(
     isProd ? "https://devai-career-hub-1.onrender.com/api" : "http://localhost:5000/api"
   ),
-  // Google OAuth — Client ID is always public (the secret stays on the server).
-  // These let the frontend redirect to Google instantly without waking the backend.
   VITE_GOOGLE_CLIENT_ID: z.string().optional(),
   VITE_GOOGLE_CALLBACK_URL: z.string().optional(),
   SUPABASE_SERVICE_ROLE_KEY: z.string().optional(),

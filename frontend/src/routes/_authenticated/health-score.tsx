@@ -72,7 +72,6 @@ function AnimatedCounter({
   return <span className={className}>{display}</span>;
 }
 
-// ─── Score Ring ────────────────────────────────────────────────────────────────
 function ScoreRing({ score }: { score: number }) {
   const radius = 88;
   const stroke = 10;

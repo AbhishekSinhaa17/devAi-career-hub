@@ -194,7 +194,6 @@ function useTypewriter(texts: string[], speed = 80, pause = 2000) {
   return displayed;
 }
 
-// ─── Code Rain Lines (Matrix-style decorative) ───────────────────────────────
 const CODE_SNIPPETS = [
   "git commit -m 'feat: AI-powered'",
   "const resume = await ai.generate()",
@@ -379,7 +378,6 @@ function LoginPage() {
       toast.error("Google login failed. Please try again.");
       window.history.replaceState({}, document.title, window.location.pathname);
     } else if (oauthCode) {
-      // Validate CSRF state for client-initiated OAuth flows
       if (oauthState && oauthState.startsWith("c_")) {
         const storedState = sessionStorage.getItem("devai_oauth_state");
         if (oauthState !== storedState) {
@@ -605,7 +603,6 @@ function LoginPage() {
               <motion.button
                 type="button"
                 onClick={(e) => {
-                  // Only allow keyboard clicks (Enter/Space) to preserve accessibility
                   if (e.detail === 0) {
                     setIsOn(!isOn);
                   }

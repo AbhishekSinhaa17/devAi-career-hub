@@ -25,7 +25,6 @@ export async function startDeployment(req: Request, res: Response, next: NextFun
       status: "building",
     });
 
-    // Simulate background deployment processing
     setTimeout(async () => {
       try {
         const liveUrl = generateDeploymentUrl(username, provider, portfolioId);

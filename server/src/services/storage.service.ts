@@ -37,10 +37,8 @@ export async function generateUploadUrl(fileName: string, contentType: string, p
     ContentType: contentType,
   });
 
-  // URL expires in 15 minutes
   const uploadUrl = await getSignedUrl(s3Client, command, { expiresIn: 900 });
 
-  // Return both the URL to upload to, and the key that the file will be saved as.
   return {
     uploadUrl,
     key: s3Key,

@@ -12,7 +12,6 @@ interface ErrorInfo {
 function categorizeError(error: Error): ErrorInfo {
   const msg = error.message?.toLowerCase() ?? "";
 
-  // AI rate limiting
   if (msg.includes("daily ai limit") || msg.includes("rate limit")) {
     return {
       title: "AI Usage Limit Reached",

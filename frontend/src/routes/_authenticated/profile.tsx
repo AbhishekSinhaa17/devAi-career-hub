@@ -67,7 +67,6 @@ const STYLES = `
     100% { transform:scale(1); opacity:1; }
   }
 
-  /* Glass panel */
   .glass-panel {
     background: rgba(255,255,255,0.03);
     border: 1px solid rgba(255,255,255,0.08);
@@ -78,7 +77,6 @@ const STYLES = `
     border: 1px solid rgba(0,0,0,0.08);
   }
 
-  /* Semantic text */
   .t-heading { color: rgba(255,255,255,0.92); }
   :root:not(.dark) .t-heading { color: rgba(0,0,0,0.88); }
   .t-sub { color: rgba(255,255,255,0.42); }
@@ -86,7 +84,6 @@ const STYLES = `
   .t-body { color: rgba(255,255,255,0.65); }
   :root:not(.dark) .t-body { color: rgba(0,0,0,0.65); }
 
-  /* Field inputs */
   .field-input {
     background: rgba(255,255,255,0.04) !important;
     border: 1px solid rgba(255,255,255,0.1) !important;
@@ -107,7 +104,6 @@ const STYLES = `
   .field-input::placeholder { color: rgba(255,255,255,0.22) !important; }
   :root:not(.dark) .field-input::placeholder { color: rgba(0,0,0,0.28) !important; }
 
-  /* Select trigger */
   .select-trigger-custom {
     background: rgba(255,255,255,0.04) !important;
     border: 1px solid rgba(255,255,255,0.1) !important;
@@ -125,7 +121,6 @@ const STYLES = `
     box-shadow: 0 0 0 3px rgba(99,102,241,0.1) !important;
   }
 
-  /* Skill chip */
   .skill-chip {
     display: inline-flex;
     align-items: center;
@@ -157,7 +152,6 @@ const STYLES = `
   }
   .skill-chip:hover .chip-x { opacity: 1; }
 
-  /* CTA button */
   .btn-cta {
     background: linear-gradient(135deg,#4f46e5,#7c3aed 60%,#6366f1);
     box-shadow: 0 0 22px rgba(99,102,241,0.35), 0 4px 12px rgba(0,0,0,0.2);
@@ -175,7 +169,6 @@ const STYLES = `
   .btn-cta:active:not(:disabled) { transform:scale(0.97); }
   .btn-cta:disabled { opacity:0.45; cursor:not-allowed; }
 
-  /* Add skill button */
   .btn-add {
     background: rgba(99,102,241,0.12);
     border: 1px solid rgba(99,102,241,0.25);

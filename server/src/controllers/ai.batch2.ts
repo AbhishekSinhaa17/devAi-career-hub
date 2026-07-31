@@ -91,7 +91,6 @@ export async function getJobMatchesHistory(req: Request, res: Response, next: Ne
       .select("id jobRole atsScore resumeFileName createdAt")
       .sort({ createdAt: -1 });
     
-    // Transform to match frontend expectation
     res.json(matches.map(m => ({
       id: m._id,
       job_role: m.jobRole,

@@ -68,7 +68,6 @@ const STYLES = `
     to   { opacity:1; }
   }
 
-  /* ── Sidebar shell ── */
   .sidebar-shell {
     background: rgba(8, 8, 16, 0.55);
     backdrop-filter: blur(28px) saturate(180%);
@@ -80,7 +79,6 @@ const STYLES = `
     border-right: 1px solid rgba(0,0,0,0.07);
   }
 
-  /* ── Mobile header ── */
   .mobile-header {
     background: rgba(8,8,16,0.7);
     backdrop-filter: blur(24px);
@@ -91,7 +89,6 @@ const STYLES = `
     border-bottom: 1px solid rgba(0,0,0,0.06);
   }
 
-  /* ── Mobile bottom bar ── */
   .mobile-bottom {
     background: rgba(8,8,16,0.8);
     backdrop-filter: blur(24px);
@@ -102,7 +99,6 @@ const STYLES = `
     border-top: 1px solid rgba(0,0,0,0.07);
   }
 
-  /* ── Mobile drawer overlay ── */
   .drawer-overlay {
     background: rgba(0,0,0,0.6);
     backdrop-filter: blur(4px);
@@ -120,7 +116,6 @@ const STYLES = `
     border-right: 1px solid rgba(0,0,0,0.08);
   }
 
-  /* ── Logo box ── */
   .logo-box {
     background: linear-gradient(135deg, rgba(99,102,241,0.2), rgba(139,92,246,0.2));
     border: 1px solid rgba(139,92,246,0.3);
@@ -136,7 +131,6 @@ const STYLES = `
     animation: shimmer 3s ease infinite;
   }
 
-  /* ── Nav items ── */
   .nav-item {
     position: relative;
     overflow: hidden;
@@ -151,7 +145,6 @@ const STYLES = `
     background: rgba(0,0,0,0.04);
   }
 
-  /* Active indicator bar */
   .nav-item::before {
     content: '';
     position: absolute;
@@ -164,7 +157,6 @@ const STYLES = `
   }
   .nav-item.active::before { transform: translateY(-50%) scaleY(1); }
 
-  /* Active background + glow */
   .nav-item.active {
     background: rgba(99,102,241,0.1);
     box-shadow: inset 0 0 24px rgba(99,102,241,0.06), 0 1px 0 rgba(99,102,241,0.08);
@@ -173,7 +165,6 @@ const STYLES = `
     background: rgba(99,102,241,0.08);
   }
 
-  /* Shimmer sweep on hover */
   .nav-item::after {
     content: '';
     position: absolute;
@@ -187,7 +178,6 @@ const STYLES = `
     transition: transform 0.5s ease;
   }
 
-  /* ── Section labels ── */
   .nav-section-label {
     font-size: 9px;
     font-weight: 900;
@@ -200,7 +190,6 @@ const STYLES = `
   }
   :root:not(.dark) .nav-section-label { color: rgba(0,0,0,0.25); }
 
-  /* ── Sign-out button ── */
   .signout-btn {
     border: 1px solid rgba(255,255,255,0.06);
     border-radius: 12px;
@@ -218,13 +207,11 @@ const STYLES = `
     transform: translateX(2px);
   }
 
-  /* ── Semantic text ── */
   .t-heading { color: rgba(255,255,255,0.92); }
   :root:not(.dark) .t-heading { color: rgba(0,0,0,0.88); }
   .t-sub { color: rgba(255,255,255,0.38); }
   :root:not(.dark) .t-sub { color: rgba(0,0,0,0.38); }
 
-  /* ── Mobile nav dot indicator ── */
   .mobile-nav-dot {
     position: absolute;
     bottom: 4px;
@@ -236,7 +223,6 @@ const STYLES = `
     box-shadow: 0 0 6px #818cf8;
   }
 
-  /* ── Theme Adaptations ── */
   .nav-icon-badge {
     background: rgba(255,255,255,0.05);
     border: 1px solid rgba(255,255,255,0.07);
@@ -290,7 +276,6 @@ const STYLES = `
     border: 1px solid rgba(99,102,241,0.1);
   }
 
-  /* ── Menu button ── */
   .menu-btn {
     background: rgba(255,255,255,0.05);
     border: 1px solid rgba(255,255,255,0.09);
@@ -306,7 +291,6 @@ const STYLES = `
     border-color: rgba(99,102,241,0.25);
   }
 
-  /* ── Scrollbar ── */
   .sidebar-scroll::-webkit-scrollbar { width: 4px; }
   .sidebar-scroll::-webkit-scrollbar-track { background: transparent; }
   .sidebar-scroll::-webkit-scrollbar-thumb {

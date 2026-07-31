@@ -4,7 +4,6 @@ import { getGlobalAnalytics } from "../controllers/analytics.controller.js";
 
 const router = Router();
 
-// Only admins can access global analytics
 router.use(requireAdmin);
 
 router.get("/global", getGlobalAnalytics);

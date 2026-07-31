@@ -121,7 +121,6 @@ export async function listAdminAiRequests(req: Request, res: Response, next: Nex
       .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
       .slice(0, 50);
 
-    // Some frontend remapping for specific fields
     const mappedAll = all.map(item => {
       if (item._table === "interview_sessions") {
         return { ...item, role: item.jobRole, category: item.interviewType };

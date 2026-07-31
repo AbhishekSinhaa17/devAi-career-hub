@@ -220,7 +220,6 @@ export async function deleteConversation(req: Request, res: Response, next: Next
       return next({ status: 404, code: "NOT_FOUND", message: "Conversation not found" });
     }
     
-    // Also delete associated messages
     await CopilotMessage.deleteMany({
       conversationId: new mongoose.Types.ObjectId(conversationId)
     });

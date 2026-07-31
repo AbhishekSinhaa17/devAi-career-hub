@@ -78,7 +78,6 @@ const STYLES = `
     to   { opacity:1; transform:translateX(0); }
   }
 
-  /* Glass */
   .glass-panel {
     background: rgba(255,255,255,0.03);
     border: 1px solid rgba(255,255,255,0.08);
@@ -89,7 +88,6 @@ const STYLES = `
     border: 1px solid rgba(0,0,0,0.08);
   }
 
-  /* Text tokens */
   .t-heading { color: rgba(255,255,255,0.92); }
   :root:not(.dark) .t-heading { color: rgba(0,0,0,0.88); }
   .t-sub { color: rgba(255,255,255,0.40); }
@@ -97,17 +95,14 @@ const STYLES = `
   .t-body { color: rgba(255,255,255,0.65); }
   :root:not(.dark) .t-body { color: rgba(0,0,0,0.65); }
 
-  /* Dividers / borders */
   .soft-border { border-color: rgba(255,255,255,0.07); }
   :root:not(.dark) .soft-border { border-color: rgba(0,0,0,0.07); }
   .divider-line { background: rgba(255,255,255,0.06); }
   :root:not(.dark) .divider-line { background: rgba(0,0,0,0.06); }
 
-  /* Table rows */
   .table-row-hover:hover { background: rgba(255,255,255,0.025); }
   :root:not(.dark) .table-row-hover:hover { background: rgba(0,0,0,0.02); }
 
-  /* Preset pill buttons */
   .preset-btn {
     padding: 5px 14px;
     border-radius: 8px;
@@ -126,7 +121,6 @@ const STYLES = `
     box-shadow: 0 0 14px rgba(99,102,241,0.35);
   }
 
-  /* Export buttons */
   .export-btn {
     display: inline-flex;
     align-items: center;
@@ -155,7 +149,6 @@ const STYLES = `
   .export-btn:active:not(:disabled) { transform:scale(0.97); }
   .export-btn:disabled { opacity:0.35; cursor:not-allowed; }
 
-  /* Chart tooltip */
   .chart-tooltip {
     background: rgba(10,10,18,0.95) !important;
     border: 1px solid rgba(99,102,241,0.25) !important;

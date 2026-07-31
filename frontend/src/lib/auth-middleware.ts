@@ -20,7 +20,6 @@ export const requireAuth = createMiddleware({ type: "function" }).server(
       throw new Error("Unauthorized: No request headers available");
     }
 
-    // Try Authorization header first, then fall back to cookie
     let token: string | undefined;
 
     const authHeader = request.headers.get("authorization");
@@ -38,8 +37,6 @@ export const requireAuth = createMiddleware({ type: "function" }).server(
       throw new Error("Unauthorized: No authorization token found");
     }
 
-    // A simple decode of the JWT payload to extract the userId (sub)
-    // The Express backend actually verifies the signature, but here we just need the userId for context.
     try {
       const payloadBase64 = token.split(".")[1];
       const payload = JSON.parse(Buffer.from(payloadBase64, "base64").toString("utf-8"));

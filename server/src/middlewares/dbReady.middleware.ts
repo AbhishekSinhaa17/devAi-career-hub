@@ -10,8 +10,6 @@ import mongoose from "mongoose";
  * Google) should NOT use this middleware.
  */
 export function requireDbReady(req: Request, res: Response, next: NextFunction) {
-  // mongoose.connection.readyState:
-  //   0 = disconnected, 1 = connected, 2 = connecting, 3 = disconnecting
   if (mongoose.connection.readyState === 1) {
     return next();
   }

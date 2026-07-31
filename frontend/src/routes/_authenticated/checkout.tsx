@@ -32,7 +32,6 @@ function CheckoutPage() {
     setLoading(true);
 
     try {
-      // Simulate payment processing delay
       await new Promise((resolve) => setTimeout(resolve, 2000));
 
       const {
@@ -43,7 +42,6 @@ function CheckoutPage() {
         throw new Error("You must be logged in to upgrade.");
       }
 
-      // Update the user's profile to mark them as Pro
       const expiresAt = new Date();
       expiresAt.setMonth(expiresAt.getMonth() + 1);
 
@@ -69,7 +67,6 @@ function CheckoutPage() {
     }
   };
 
-  // Simple formatter for expiry
   const handleExpiryChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const val = e.target.value.replace(/\D/g, "");
     if (val.length <= 4) {

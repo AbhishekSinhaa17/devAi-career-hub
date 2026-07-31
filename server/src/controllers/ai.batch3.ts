@@ -52,7 +52,6 @@ export async function deleteResume(req: Request, res: Response, next: NextFuncti
   try {
     const userId = (req as any).user.id;
     const { id } = req.params; // wait, frontend sends it in body for TanStack? 
-    // In Express we will use req.params.id for DELETE
     const targetId = id || req.body.id;
     
     await Resume.deleteOne({ _id: targetId, userId });

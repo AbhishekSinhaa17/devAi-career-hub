@@ -4,7 +4,6 @@ import { getHealthScoreHistory, generateHealthScore } from "../controllers/healt
 
 const router = Router();
 
-// Apply auth middleware to all routes in this router
 router.use(requireAuth);
 
 router.get("/history", getHealthScoreHistory);

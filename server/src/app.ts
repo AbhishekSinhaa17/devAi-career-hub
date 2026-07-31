@@ -16,7 +16,6 @@ import vercelRoutes from "./routes/vercel.routes.js";
 import { errorHandler } from "./middlewares/errorHandler.middleware.js";
 import { requireDbReady } from "./middlewares/dbReady.middleware.js";
 
-// We will mount routers and the global error handler here later
 const app = express();
 
 app.use(cors());
@@ -24,8 +23,6 @@ app.use(helmet());
 app.use(cookieParser());
 app.use(express.json());
 
-// ─── Change #2: Connection-aware health endpoint ─────────────────────
-// NOT behind requireDbReady — must always respond so Render's probe passes
 const READY_STATE_MAP: Record<number, string> = {
   0: "disconnected",
   1: "connected",
@@ -45,16 +42,10 @@ app.get("/api/health", (req, res) => {
   });
 });
 
-// ─── Google OAuth redirect (no DB needed) ────────────────────────────
-// The initial /api/auth/google redirect only constructs a URL and
-// redirects to Google — it doesn't touch MongoDB, so it can respond
-// instantly even during cold-start.
 app.get("/api/auth/google", (req, res, next) => {
-  // Forward to the auth router; the route handler itself is DB-free
   authRoutes(req, res, next);
 });
 
-// ─── DB-dependent routes (gated by requireDbReady) ───────────────────
 app.use("/api/auth", requireDbReady, authRoutes);
 app.use("/api/upload", requireDbReady, uploadRoutes);
 app.use("/api/deployment", requireDbReady, deploymentRoutes);
@@ -65,12 +56,10 @@ app.use("/api/copilot", requireDbReady, copilotRoutes);
 app.use("/api/analytics", requireDbReady, analyticsRoutes);
 app.use("/api/vercel", requireDbReady, vercelRoutes);
 
-// 404 handler
 app.use((req, res, next) => {
   res.status(404).json({ status: "error", code: "NOT_FOUND", message: "Route not found" });
 });
 
-// Global Error Handler
 app.use(errorHandler);
 
 export default app;

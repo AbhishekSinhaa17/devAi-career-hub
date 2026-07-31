@@ -5,7 +5,6 @@ import pino from "pino";
 dotenv.config();
 
 const logger = pino();
-// Fallback to a dummy key if not provided, to prevent crash on startup
 const resend = new Resend(process.env.RESEND_API_KEY || "re_dummy_key_to_prevent_startup_crash");
 const FROM_EMAIL = process.env.FROM_EMAIL || "noreply@devai-career-hub.com";
 const FRONTEND_URL = process.env.FRONTEND_URL || "http://localhost:5173";

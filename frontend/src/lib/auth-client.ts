@@ -1,25 +1,20 @@
 import { apiClient } from "./api-client";
 import { env } from "../env";
 
-// Generate a cryptographically random hex string for OAuth CSRF state.
-// Uses the Web Crypto API (available in all modern browsers).
 function generateCryptoState(): string {
   const bytes = new Uint8Array(32);
   crypto.getRandomValues(bytes);
   return "c_" + Array.from(bytes, (b) => b.toString(16).padStart(2, "0")).join("");
 }
 
-// Custom Auth Client mimicking the subset of Supabase Auth API used in the frontend
 
 type Session = {
   user: any;
   access_token: string;
 };
 
-// Event listeners for auth state changes
 const listeners: Set<(event: string, session: { user: any } | null) => void> = new Set();
 
-// Listen to the custom event dispatched by api-client on 401s
 if (typeof window !== "undefined") {
   window.addEventListener("devai_auth_change", () => {
     notifyListeners("SIGNED_OUT", null);
@@ -30,7 +25,6 @@ function notifyListeners(event: string, session: { user: any } | null) {
   listeners.forEach((listener) => listener(event, session));
 }
 
-// Helper to set a cookie accessible by TanStack Start server functions
 function setTokenCookie(token: string) {
   document.cookie = `devai_jwt=${token}; path=/; max-age=${7 * 24 * 60 * 60}; SameSite=Lax`;
 }
@@ -125,8 +119,6 @@ export const authClient = {
         const callbackUrl = env.VITE_GOOGLE_CALLBACK_URL;
 
         if (clientId && callbackUrl) {
-          // Build the Google OAuth URL client-side — goes directly to Google's
-          // account picker without hitting the backend (avoids cold-start wait).
           const state = generateCryptoState();
           sessionStorage.setItem("devai_oauth_state", state);
 
@@ -143,7 +135,6 @@ export const authClient = {
           return { data: { url: googleAuthUrl }, error: null };
         }
 
-        // Fallback: use the backend redirect (slower on cold-start)
         const backendUrl = env.VITE_API_URL;
         window.location.href = `${backendUrl}/auth/google`;
         return { data: { url: `${backendUrl}/auth/google` }, error: null };

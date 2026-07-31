@@ -95,7 +95,6 @@ const empty: Resume = {
   projects: [{ name: "", description: "", tech: "" }],
 };
 
-// ─── Shared Panel ─────────────────────────────────────────────────────────────
 function Panel({
   children,
   className = "",
@@ -273,7 +272,6 @@ function ListSection<T extends object>({
   );
 }
 
-// ─── Skill Tag ────────────────────────────────────────────────────────────────
 function SkillTag({ label, onRemove }: { label: string; onRemove: () => void }) {
   return (
     <div className="group inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold border border-primary/20 bg-primary/8 text-primary hover:border-destructive/30 hover:bg-destructive/5 hover:text-destructive transition-all duration-300 cursor-default">

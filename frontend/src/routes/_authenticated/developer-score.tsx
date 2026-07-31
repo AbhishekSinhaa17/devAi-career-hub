@@ -98,7 +98,6 @@ const STYLES = `
     to   { opacity:1; transform:translateY(0); }
   }
 
-  /* Glass panel — dark default, light override */
   .glass-panel {
     background: rgba(255,255,255,0.03);
     border: 1px solid rgba(255,255,255,0.08);
@@ -110,7 +109,6 @@ const STYLES = `
     backdrop-filter: blur(14px);
   }
 
-  /* Semantic text */
   .t-heading { color: rgba(255,255,255,0.92); }
   :root:not(.dark) .t-heading { color: rgba(0,0,0,0.88); }
   .t-sub { color: rgba(255,255,255,0.42); }
@@ -118,15 +116,12 @@ const STYLES = `
   .t-body { color: rgba(255,255,255,0.62); }
   :root:not(.dark) .t-body { color: rgba(0,0,0,0.62); }
 
-  /* Dividers */
   .divider-line { background: rgba(255,255,255,0.06); }
   :root:not(.dark) .divider-line { background: rgba(0,0,0,0.07); }
 
-  /* Row hover */
   .item-row:hover { background: rgba(255,255,255,0.03); }
   :root:not(.dark) .item-row:hover { background: rgba(0,0,0,0.02); }
 
-  /* Radar / Chart theming */
   .recharts-polar-grid-concentric-polygon,
   .recharts-polar-grid-angle line { stroke: rgba(255,255,255,0.08) !important; }
   :root:not(.dark) .recharts-polar-grid-concentric-polygon,
@@ -434,7 +429,6 @@ function DeveloperScore() {
         cacheBust: true,
         skipFonts: true,
         filter: (node: HTMLElement) => {
-          // Skip cross-origin <link> stylesheets that cause SecurityError
           if (node.tagName === "LINK" && (node as HTMLLinkElement).rel === "stylesheet") {
             const href = (node as HTMLLinkElement).href || "";
             if (href.startsWith("http") && !href.startsWith(window.location.origin)) {

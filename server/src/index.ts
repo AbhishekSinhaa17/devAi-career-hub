@@ -15,10 +15,8 @@ if (!MONGO_URI) {
   process.exit(1);
 }
 
-// Exported so middleware can check if the DB is ready before handling requests
 export let dbReady = false;
 
-// ─── Change #1: Mongoose connection pooling ──────────────────────────
 async function connectToDatabase() {
   try {
     await mongoose.connect(MONGO_URI!, {
@@ -31,12 +29,9 @@ async function connectToDatabase() {
     logger.info("Connected to MongoDB successfully");
   } catch (error) {
     logger.error({ err: error }, "Failed to connect to MongoDB");
-    // Don't exit — the server stays up so health checks pass and
-    // the DB-readiness middleware will return 503 on DB-dependent routes.
   }
 }
 
-// ─── Change #4: Keep-alive self-ping (prevents Render spin-down) ─────
 let keepAliveInterval: ReturnType<typeof setInterval> | null = null;
 
 function startKeepAlive() {
@@ -60,27 +55,22 @@ function startKeepAlive() {
       });
   }, FOURTEEN_MINUTES);
 
-  // Don't let the interval keep the process alive during shutdown
   keepAliveInterval.unref();
   logger.info("Keep-alive cron ENABLED — pinging /api/health every 14 minutes");
 }
 
-// ─── Change #3: Graceful shutdown ────────────────────────────────────
 function setupGracefulShutdown(server: http.Server) {
   const shutdown = async (signal: string) => {
     logger.info(`${signal} received — shutting down gracefully`);
 
-    // Stop accepting new connections
     server.close(() => {
       logger.info("HTTP server closed");
     });
 
-    // Clear keep-alive interval
     if (keepAliveInterval) {
       clearInterval(keepAliveInterval);
     }
 
-    // Close mongoose connection
     try {
       await mongoose.connection.close();
       logger.info("MongoDB connection closed");
@@ -95,21 +85,15 @@ function setupGracefulShutdown(server: http.Server) {
   process.on("SIGINT", () => shutdown("SIGINT"));
 }
 
-// ─── Start ───────────────────────────────────────────────────────────
 function startServer() {
-  // 1. Start the HTTP listener FIRST so Render's health-check probe
-  //    gets a response immediately, even during a cold start.
   const server = app.listen(PORT, () => {
     logger.info(`Server listening on port ${PORT}`);
 
-    // 2. Connect to MongoDB AFTER the listener is up (non-blocking).
     connectToDatabase();
 
-    // 3. Start keep-alive cron if enabled.
     startKeepAlive();
   });
 
-  // 4. Wire up graceful shutdown handlers.
   setupGracefulShutdown(server);
 }
 

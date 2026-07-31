@@ -7,7 +7,6 @@ dotenv.config();
 
 const MONGO_URI = process.env.MONGO_URI || "";
 
-// Per-minute IP limit (15 requests/minute)
 export const apiLimiterMinuteIp = rateLimit({
   windowMs: 60 * 1000,
   max: parseInt(process.env.AI_RATE_LIMIT_PER_MINUTE_IP || "15", 10),
@@ -23,7 +22,6 @@ export const apiLimiterMinuteIp = rateLimit({
   }
 });
 
-// Daily Auth limit (100 requests/day per user ID)
 export const apiLimiterDailyAuth = rateLimit({
   windowMs: 24 * 60 * 60 * 1000,
   max: parseInt(process.env.AI_RATE_LIMIT_DAILY_AUTH || "100", 10),

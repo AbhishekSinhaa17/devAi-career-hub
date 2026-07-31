@@ -31,7 +31,6 @@ const aiUsageEventSchema = new Schema<IAiUsageEvent>(
   { timestamps: true }
 );
 
-// Indexes useful for the rate limiter queries
 aiUsageEventSchema.index({ createdAt: -1 });
 aiUsageEventSchema.index({ userId: 1, createdAt: -1 });
 aiUsageEventSchema.index({ clientIp: 1, createdAt: -1 });

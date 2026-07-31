@@ -48,7 +48,6 @@ export const getDeploymentsByPortfolio = createServerFn({ method: "GET" })
 export const getPublicPortfolio = createServerFn({ method: "GET" })
   .validator((d: unknown) => z.object({ id: z.string() }).parse(d))
   .handler(async ({ data: input }) => {
-    // public endpoint does not require auth
     const { data } = await serverApiClient.get(`/deployment/public/${input.id}`);
     return data.data;
   });

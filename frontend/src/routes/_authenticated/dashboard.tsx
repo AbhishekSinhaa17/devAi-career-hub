@@ -293,7 +293,6 @@ function GlassPanel({
   );
 }
 
-// ─── Section header ───────────────────────────────────────────────────────────
 function SectionHeader({
   icon: Icon,
   label,

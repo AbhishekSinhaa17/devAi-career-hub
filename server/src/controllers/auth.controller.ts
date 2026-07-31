@@ -75,7 +75,6 @@ export async function requestPasswordReset(req: Request, res: Response, next: Ne
       await sendPasswordResetEmail(user.email, resetToken);
     }
 
-    // Always return success even if user not found (security best practice)
     res.json({ status: "success", message: "If an account exists, a reset link has been sent." });
   } catch (error) {
     next(error);
@@ -170,17 +169,11 @@ export async function googleAuthCallback(req: Request, res: Response, next: Next
 
     const stateStr = typeof state === "string" ? state : "";
 
-    // Two OAuth flows are supported, identified by the state prefix:
-    // "s_" = Server-initiated: /api/auth/google sets a cookie, state is validated here.
-    // "c_" = Client-initiated: frontend builds the Google URL directly (faster on cold-start).
-    // This separation prevents a stale server cookie from breaking a client-initiated login.
     if (stateStr.startsWith("s_")) {
-      // Server-initiated flow: validate state against cookie
       if (!storedState || stateStr !== storedState) {
         return res.status(403).send("CSRF State Verification Failed. Please try logging in again.");
       }
     }
-    // Client-initiated flow ("c_"): state will be validated by the frontend against sessionStorage.
 
     if (!code || typeof code !== "string") {
       return res.redirect(`${clientUrl}/login?error=oauth_failed`);
@@ -270,7 +263,6 @@ export async function googleAuthCallback(req: Request, res: Response, next: Next
       used: false,
     });
 
-    // Include state in redirect so the frontend can validate it for client-initiated flows
     const stateParam = state ? `&oauth_state=${encodeURIComponent(state as string)}` : "";
     res.redirect(`${clientUrl}/login?oauth_code=${exchangeCode}${stateParam}`);
   } catch (error) {

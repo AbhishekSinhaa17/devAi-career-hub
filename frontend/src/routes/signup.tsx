@@ -67,7 +67,6 @@ function useTypewriter(texts: string[], speed = 80, pause = 2200) {
   return displayed;
 }
 
-// ─── Password Strength ────────────────────────────────────────────────────────
 function getPasswordStrength(password: string): {
   score: number;
   label: string;

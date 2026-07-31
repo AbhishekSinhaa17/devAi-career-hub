@@ -137,7 +137,6 @@ function AnimatedCounter({
   );
 }
 
-// ─── Social proof bar ────────────────────────────────────────────────────────
 function SocialProof() {
   const avatars = [
     "https://api.dicebear.com/7.x/avataaars/svg?seed=Alice",

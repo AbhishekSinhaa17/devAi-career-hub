@@ -16,7 +16,6 @@ export async function getHealthScoreHistory(req: Request, res: Response, next: N
       .sort({ createdAt: -1 })
       .lean();
       
-    // Map _id to id and camelCase to snake_case for frontend compatibility
     const mappedData = data.map(item => ({
       ...item,
       id: item._id,

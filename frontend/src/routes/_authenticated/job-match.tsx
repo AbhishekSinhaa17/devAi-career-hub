@@ -103,7 +103,6 @@ const STYLES = `
     background: rgba(255,255,255,0.03);
     border: 1px solid rgba(255,255,255,0.08);
   }
-  /* light mode override */
   :root:not(.dark) .glass-panel {
     background: rgba(255,255,255,0.7);
     border: 1px solid rgba(0,0,0,0.08);

@@ -41,7 +41,6 @@ export const getGlobalAnalytics = createServerFn({ method: "GET" })
     z.object({ days: z.number().min(7).max(90).default(30) }).parse(d ?? {}),
   )
   .handler(async ({ data: { days }, context }): Promise<AnalyticsResponse> => {
-    // Note: Admin check is handled on the backend route /api/analytics/global
     const { data } = await serverApiClient.get("/analytics/global", {
       params: { days },
       headers: { Authorization: `Bearer ${context.token}` }

@@ -11,10 +11,8 @@ import {
 
 const router = Router();
 
-// /is-admin just checks role, so it only requires auth
 router.get("/is-admin", requireAuth, checkIsAdmin);
 
-// The rest of the routes require admin privileges
 router.use(requireAdmin);
 
 router.get("/overview", getAdminOverview);
