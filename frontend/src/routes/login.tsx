@@ -416,8 +416,8 @@ function LoginPage() {
     const dx = (e.clientX - cx) / (rect.width / 2);
     const dy = (e.clientY - cy) / (rect.height / 2);
 
-    rotateRef.current = { x: -dy * 6, y: dx * 6 };
-    cardRef.current.style.transform = `perspective(1000px) rotateX(${-dy * 6}deg) rotateY(${dx * 6}deg) scale3d(1.01,1.01,1.01)`;
+    rotateRef.current = { x: -dy * 5, y: dx * 5 };
+    cardRef.current.style.transform = `perspective(1000px) rotateX(${-dy * 5}deg) rotateY(${dx * 5}deg) scale3d(1.01,1.01,1.01)`;
     cardRef.current.style.transition = "transform 0.1s ease-out";
   }, []);
 
@@ -637,15 +637,16 @@ function LoginPage() {
               initial={false}
               animate={{
                 opacity: isOn ? 1 : 0,
-                y: isOn ? 0 : (shouldReduceMotion ? 0 : -20),
-                scale: isOn ? 1 : (shouldReduceMotion ? 1 : 0.95),
+                y: isOn ? 0 : (shouldReduceMotion ? 0 : -40),
+                scale: isOn ? 1 : (shouldReduceMotion ? 1 : 0.92),
+                filter: isOn ? "blur(0px)" : "blur(8px)",
                 pointerEvents: isOn ? "auto" : "none",
                 height: isOn ? "auto" : 0,
               }}
-              style={{ overflow: "hidden" }}
+              style={{ overflow: isOn ? "visible" : "hidden" }}
               transition={{
-                duration: 0.5,
-                ease: [0.34, 1.2, 0.64, 1],
+                duration: 0.6,
+                ease: [0.16, 1, 0.3, 1],
               }}
               className="w-full"
             >
@@ -670,17 +671,27 @@ function LoginPage() {
               ref={cardRef}
               onMouseMove={handleCardMouseMove}
               onMouseLeave={handleCardMouseLeave}
-              className="relative rounded-3xl overflow-hidden cursor-default bg-white dark:bg-transparent border border-slate-200 dark:border-indigo-500/20 shadow-xl dark:shadow-2xl"
+              className={`relative rounded-3xl overflow-hidden cursor-default bg-white dark:bg-[#0f0f1e] border border-slate-200 dark:border-indigo-500/20 transition-all duration-500 ${
+                isOn ? "ring-1 ring-amber-300/30 dark:ring-amber-200/20" : ""
+              }`}
               style={{
-                boxShadow: `
-                  0 32px 64px -16px rgba(0,0,0,0.05),
-                  0 0 80px rgba(99,102,241,0.05)
-                `,
+                boxShadow: isOn
+                  ? `0 20px 50px -10px rgba(0,0,0,0.5), 0 0 40px rgba(254,240,138,0.06)`
+                  : `0 20px 40px -10px rgba(0,0,0,0.3)`,
               }}
             >
+              {/* Sweep Light Animation on reveal */}
+              {isOn && (
+                <motion.div
+                  initial={{ x: "-100%", opacity: 0.8 }}
+                  animate={{ x: "200%", opacity: 0 }}
+                  transition={{ duration: 1.2, ease: "easeOut", delay: 0.15 }}
+                  className="absolute top-0 inset-x-0 h-1.5 bg-gradient-to-r from-transparent via-amber-300 to-transparent pointer-events-none z-30"
+                />
+              )}
               {}
               <div
-                className="absolute inset-0 bg-white hidden dark:block"
+                className="absolute inset-0 rounded-3xl bg-white hidden dark:block pointer-events-none"
                 style={{
                   background:
                     "linear-gradient(135deg, rgba(15,15,30,0.95) 0%, rgba(10,10,25,0.98) 100%)",
@@ -699,8 +710,12 @@ function LoginPage() {
               {}
               <div className="absolute inset-0 bg-gradient-to-br from-indigo-100/30 dark:from-indigo-600/[0.04] via-transparent to-violet-100/30 dark:to-violet-600/[0.04] pointer-events-none" />
 
-              {}
-              <div className="relative px-8 pt-8 pb-6 border-b border-slate-100 dark:border-white/[0.04]">
+              {/* 1. Header Stagger */}
+              <motion.div 
+                animate={{ opacity: isOn ? 1 : 0, y: isOn ? 0 : 15 }}
+                transition={{ duration: 0.4, delay: 0.12 }}
+                className="relative px-8 pt-8 pb-6 border-b border-slate-100 dark:border-white/[0.04]"
+              >
                 <div className="flex items-center justify-between mb-1">
                   <div className="flex items-center gap-2.5">
                     <div className="relative h-8 w-8 rounded-xl bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center shadow-lg shadow-indigo-500/30">
@@ -722,12 +737,16 @@ function LoginPage() {
                 <p className="text-slate-500 text-sm mt-1">
                   Continue building your developer career
                 </p>
-              </div>
+              </motion.div>
 
               {}
               <div className="relative px-8 py-6 space-y-5">
-                {}
-                <div className="grid grid-cols-1 gap-3">
+                {/* 2. Social Login Stagger */}
+                <motion.div 
+                  animate={{ opacity: isOn ? 1 : 0, y: isOn ? 0 : 15 }}
+                  transition={{ duration: 0.4, delay: 0.2 }}
+                  className="grid grid-cols-1 gap-3"
+                >
                   <button
                     onClick={handleGoogle}
                     disabled={loading}
@@ -754,7 +773,7 @@ function LoginPage() {
                     </svg>
                     <span className="relative z-10">Google</span>
                   </button>
-                </div>
+                </motion.div>
 
                 {}
                 <div className="flex items-center gap-3">
@@ -765,8 +784,13 @@ function LoginPage() {
                   <div className="flex-1 h-px bg-gradient-to-r from-transparent via-slate-200 dark:via-white/10 to-transparent" />
                 </div>
 
-                {}
-                <form onSubmit={handleSubmit} className="space-y-4">
+                {/* 3. Form Inputs & Submit Stagger */}
+                <motion.form 
+                  animate={{ opacity: isOn ? 1 : 0, y: isOn ? 0 : 15 }}
+                  transition={{ duration: 0.4, delay: 0.28 }}
+                  onSubmit={handleSubmit} 
+                  className="space-y-4"
+                >
                   {}
                   <div className="space-y-2 group/f">
                     <Label className="text-[11px] font-bold uppercase tracking-[0.15em] text-slate-500 dark:text-slate-500 group-focus-within/f:text-indigo-600 dark:group-focus-within/f:text-indigo-400 transition-colors">
@@ -857,7 +881,7 @@ function LoginPage() {
                       )}
                     </span>
                   </button>
-                </form>
+                </motion.form>
 
                 {}
                 <p className="text-center text-sm text-slate-600">
@@ -892,22 +916,7 @@ function LoginPage() {
             </div>
 
             {}
-            <p className="mt-5 text-center text-xs text-slate-500 dark:text-slate-700">
-              By signing in, you agree to our{" "}
-              <Link
-                to="/"
-                className="text-slate-600 dark:text-slate-500 hover:text-slate-900 dark:hover:text-slate-300 transition-colors underline underline-offset-2"
-              >
-                Terms
-              </Link>
-              {" & "}
-              <Link
-                to="/"
-                className="text-slate-600 dark:text-slate-500 hover:text-slate-900 dark:hover:text-slate-300 transition-colors underline underline-offset-2"
-              >
-                Privacy Policy
-              </Link>
-            </p>
+
             
               </div>
             </motion.div>

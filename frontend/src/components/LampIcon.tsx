@@ -40,65 +40,44 @@ export function LampIcon({ isOn, onToggle, className = "" }: LampIconProps) {
       `}</style>
 
       {/* ═══════════ LIGHT BEAM SHINING ONTO THE FORM BELOW ═══════════ */}
-      {/* Outer Soft Wide Light Glow Halo */}
-      <div
-        className="absolute pointer-events-none"
-        style={{
-          top: "85px",
-          left: "50%",
-          transform: "translateX(-50%)",
-          width: "900px",
-          height: "800px",
-          background: isOn 
-            ? "radial-gradient(ellipse at 50% 0%, rgba(254, 240, 138, 0.12) 0%, rgba(253, 224, 71, 0.05) 35%, rgba(253, 224, 71, 0.01) 70%, transparent 100%)" 
-            : "transparent",
-          opacity: isOn ? 0.7 : 0,
-          transition: "opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1)",
-          zIndex: 24,
-          filter: "blur(12px)",
-        }}
-      />
-
-      {/* Main Wide Light Cone */}
       <div
         className="absolute pointer-events-none"
         style={{
           top: "92px",
           left: "50%",
           transform: "translateX(-50%)",
-          width: "850px",
-          height: "750px",
+          width: "700px",
+          height: "650px",
           background: isOn 
-            ? "linear-gradient(180deg, rgba(254, 240, 138, 0.18) 0%, rgba(253, 224, 71, 0.07) 30%, rgba(253, 224, 71, 0.01) 70%, transparent 100%)" 
+            ? "linear-gradient(180deg, rgba(254, 240, 138, 0.2) 0%, rgba(253, 224, 71, 0.06) 35%, rgba(253, 224, 71, 0.01) 75%, transparent 100%)" 
             : "transparent",
           clipPath: "polygon(42% 0, 58% 0, 100% 100%, 0 100%)",
-          opacity: isOn ? 0.65 : 0,
+          opacity: isOn ? 1 : 0,
           transition: "opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1)",
           animation: isOn ? "beam-flicker 5s infinite" : "none",
           transformOrigin: "top center",
           zIndex: 25,
-          filter: "blur(4px)",
         }}
       >
         {/* Inner bright core beam */}
         <div
           className="w-full h-full"
           style={{
-            background: "linear-gradient(180deg, rgba(255, 255, 255, 0.25) 0%, rgba(254, 240, 138, 0.08) 35%, transparent 80%)",
+            background: "linear-gradient(180deg, rgba(255, 255, 255, 0.28) 0%, rgba(254, 240, 138, 0.08) 35%, transparent 80%)",
             clipPath: "polygon(46% 0, 54% 0, 88% 100%, 12% 100%)",
           }}
         />
 
         {/* Ambient dust sparkles in the beam */}
-        {isOn && [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11].map((i) => (
+        {isOn && [0, 1, 2, 3, 4, 5, 6, 7].map((i) => (
           <div
             key={i}
             className="absolute bg-white rounded-full pointer-events-none"
             style={{
               width: (i % 3 + 1.2) + "px",
               height: (i % 3 + 1.2) + "px",
-              left: 10 + (i * 9) % 80 + "%",
-              top: 5 + (i * 8) % 80 + "%",
+              left: 15 + (i * 10) % 70 + "%",
+              top: 5 + (i * 9) % 80 + "%",
               opacity: 0,
               boxShadow: "0 0 4px #fff",
               animation: `float-dust ${3.5 + (i % 3) * 1.5}s linear infinite`,
@@ -128,7 +107,16 @@ export function LampIcon({ isOn, onToggle, className = "" }: LampIconProps) {
       />
 
       {/* ═══════════ LAMP STRUCTURE ═══════════ */}
-      <div className="relative z-10 flex flex-col items-center pt-1">
+      <motion.div 
+        className="relative z-10 flex flex-col items-center pt-1"
+        style={{
+          transformOrigin: "top center",
+        }}
+        animate={{
+          rotate: dragging ? pullY.get() * 0.12 : 0,
+        }}
+        transition={{ type: "spring", stiffness: 300, damping: 15 }}
+      >
         {/* Wire */}
         <div 
           className="w-1.5 bg-gradient-to-r from-gray-800 via-gray-600 to-gray-800 dark:from-black dark:via-gray-700 dark:to-black"
@@ -165,7 +153,11 @@ export function LampIcon({ isOn, onToggle, className = "" }: LampIconProps) {
         </div>
 
         {/* Bulb */}
-        <div 
+        <motion.div 
+          animate={{
+            scale: isOn ? [1.25, 1] : 1,
+          }}
+          transition={{ duration: 0.35, ease: "easeOut" }}
           className="absolute"
           style={{
             top: "92px",
@@ -174,7 +166,7 @@ export function LampIcon({ isOn, onToggle, className = "" }: LampIconProps) {
             background: isOn ? "#fff" : "#e2e8f0",
             borderRadius: "0 0 50% 50%",
             boxShadow: isOn 
-              ? "0 5px 25px #fde047, 0 10px 50px #fef08a, inset 0 -5px 15px #ffffff" 
+              ? "0 4px 15px rgba(253,224,71,0.6), 0 8px 25px rgba(254,240,138,0.3), inset 0 -5px 15px #ffffff" 
               : "inset 0 -3px 8px rgba(0,0,0,0.3)",
             transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
             border: isOn ? "none" : "1px solid #94a3b8",
@@ -182,7 +174,7 @@ export function LampIcon({ isOn, onToggle, className = "" }: LampIconProps) {
             zIndex: -1,
           }}
         />
-      </div>
+      </motion.div>
 
       {/* ═══════════ PULL CHAIN ═══════════ */}
       <div

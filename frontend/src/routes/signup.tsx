@@ -382,20 +382,34 @@ function SignupPage() {
             initial={false}
             animate={{
               opacity: isOn ? 1 : 0,
-              y: isOn ? 0 : (shouldReduceMotion ? 0 : -20),
-              scale: isOn ? 1 : (shouldReduceMotion ? 1 : 0.95),
+              y: isOn ? 0 : (shouldReduceMotion ? 0 : -40),
+              scale: isOn ? 1 : (shouldReduceMotion ? 1 : 0.92),
+              filter: isOn ? "blur(0px)" : "blur(8px)",
               pointerEvents: isOn ? "auto" : "none",
               height: isOn ? "auto" : 0,
             }}
-            style={{ overflow: "hidden" }}
+            style={{ overflow: isOn ? "visible" : "hidden" }}
             transition={{
-              duration: 0.5,
-              ease: [0.34, 1.2, 0.64, 1],
+              duration: 0.6,
+              ease: [0.16, 1, 0.3, 1],
             }}
-            className="w-full"
+            className="w-full relative"
           >
+            {/* Sweep Light Highlight Animation */}
+            {isOn && (
+              <motion.div
+                initial={{ x: "-100%", opacity: 0.8 }}
+                animate={{ x: "200%", opacity: 0 }}
+                transition={{ duration: 1.2, ease: "easeOut", delay: 0.15 }}
+                className="absolute top-0 inset-x-0 h-1.5 bg-gradient-to-r from-transparent via-amber-300 to-transparent pointer-events-none z-30"
+              />
+            )}
             <div className="p-1 pb-8">
-          <div className="flex items-center gap-2.5 mb-10">
+          <motion.div 
+            animate={{ opacity: isOn ? 1 : 0, y: isOn ? 0 : 15 }}
+            transition={{ duration: 0.4, delay: 0.12 }}
+            className="flex items-center gap-2.5 mb-10"
+          >
             <div className="relative h-9 w-9 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center shadow-lg shadow-emerald-500/30">
               <Zap className="h-5 w-5 text-white" />
               <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-white/20 to-transparent" />
@@ -403,16 +417,20 @@ function SignupPage() {
             <span className="text-xl font-black text-slate-900 dark:text-white tracking-tight">
               DevAI
             </span>
-          </div>
+          </motion.div>
 
-          <div className="mb-8">
+          <motion.div 
+            animate={{ opacity: isOn ? 1 : 0, y: isOn ? 0 : 15 }}
+            transition={{ duration: 0.4, delay: 0.2 }}
+            className="mb-8"
+          >
             <h2 className="text-3xl font-black text-slate-900 dark:text-white">
               Create an account
             </h2>
             <p className="text-slate-500 dark:text-slate-400 text-sm mt-2">
               Start building your developer career for free.
             </p>
-          </div>
+          </motion.div>
 
           {success ? (
             <div className="text-center space-y-4 py-8">
