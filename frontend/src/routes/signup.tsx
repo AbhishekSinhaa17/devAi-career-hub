@@ -346,8 +346,8 @@ function SignupPage() {
             transition: "all 0.8s cubic-bezier(0.34,1.56,0.64,1)",
           }}
         >
-          {/* Lamp Toggle */}
-          <div className="flex flex-col items-center justify-center mb-6 relative">
+          {/* Power Orb Toggle */}
+          <div className={`flex flex-col items-center justify-center relative transition-all duration-300 ${isOn ? "mb-0" : "mb-3"}`}>
             <motion.button
               type="button"
               onClick={(e) => {
@@ -359,20 +359,22 @@ function SignupPage() {
               whileTap={shouldReduceMotion ? {} : { scale: 0.95 }}
               transition={{ type: "spring", stiffness: 400, damping: 15 }}
             >
-              <LampIcon isOn={isOn} onToggle={() => setIsOn(!isOn)} className="w-20 h-28" />
+              <LampIcon isOn={isOn} onToggle={() => setIsOn(!isOn)} className="w-44 h-44" />
             </motion.button>
             {/* Hint Text */}
             <motion.div
               initial={false}
               animate={{ 
-                opacity: isOn ? 0 : 0.7, 
+                opacity: isOn ? 0 : 0.85, 
                 y: isOn ? -10 : 0,
-                scale: isOn ? 0.95 : 1
+                scale: isOn ? 0.95 : 1,
+                height: isOn ? 0 : "auto",
+                marginTop: isOn ? 0 : 4
               }}
               transition={{ duration: 0.3 }}
-              className="absolute top-[105%] text-[10px] font-bold text-slate-500 dark:text-slate-400 tracking-widest uppercase pointer-events-none whitespace-nowrap"
+              className="text-[10px] font-bold text-violet-400 dark:text-violet-300/70 tracking-widest uppercase pointer-events-none whitespace-nowrap overflow-hidden"
             >
-              Pull the rope to sign up
+              ↓ Pull down to sign up ↓
             </motion.div>
           </div>
 

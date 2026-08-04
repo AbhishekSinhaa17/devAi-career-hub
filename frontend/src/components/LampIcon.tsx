@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { motion, useMotionValue } from "framer-motion";
 
 interface LampIconProps {
@@ -9,112 +9,239 @@ interface LampIconProps {
 
 export function LampIcon({ isOn, onToggle, className = "" }: LampIconProps) {
   const pullY = useMotionValue(0);
+  const [hovered, setHovered] = useState(false);
+  const [dragging, setDragging] = useState(false);
 
   return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      viewBox="0 0 100 150"
-      className={className}
-      style={{
-        overflow: "visible",
-      }}
+    <div
+      className={`relative flex flex-col items-center justify-start ${className}`}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      style={{ minWidth: 220, minHeight: 185, height: 185 }}
     >
-      <defs>
-        {/* Crisp modern LED glow */}
-        <filter id="led-glow" x="-100%" y="-100%" width="300%" height="300%">
-          <feGaussianBlur stdDeviation="3" result="blur1" />
-          <feGaussianBlur stdDeviation="8" result="blur2" />
-          <feMerge>
-            <feMergeNode in="blur2" />
-            <feMergeNode in="blur1" />
-            <feMergeNode in="SourceGraphic" />
-          </feMerge>
-        </filter>
-        
-        {/* Cool modern light beam (icy blue/white) */}
-        <linearGradient id="light-beam" x1="0%" y1="0%" x2="0%" y2="100%">
-          <stop offset="0%" stopColor="#bae6fd" stopOpacity="0.35" />
-          <stop offset="100%" stopColor="#bae6fd" stopOpacity="0" />
-        </linearGradient>
-        
-        {/* Clip path to hide the top of the cord when it slides down */}
-        <clipPath id="cord-clip">
-          <rect x="0" y="34.5" width="100" height="200" />
-        </clipPath>
-      </defs>
+      {/* ═══ Scoped Keyframes ═══ */}
+      <style>{`
+        @keyframes beam-flicker {
+          0%, 100% { opacity: 0.95; }
+          50% { opacity: 1; }
+          52% { opacity: 0.8; }
+          54% { opacity: 1; }
+        }
+        @keyframes float-dust {
+          0% { transform: translateY(0) translateX(0) scale(0.5); opacity: 0; }
+          20% { opacity: 0.9; }
+          80% { opacity: 0.9; }
+          100% { transform: translateY(-50px) translateX(25px) scale(1.4); opacity: 0; }
+        }
+        @keyframes ambient-pulse {
+          0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.8; }
+          50% { transform: translate(-50%, -50%) scale(1.05); opacity: 1; }
+        }
+      `}</style>
 
-      {/* Light Beam (Casts down from the modern LED arm, covering the card) */}
-      {isOn && (
-        <path
-          d="M 22 36 L 55 36 L 550 800 L -450 800 Z"
-          fill="url(#light-beam)"
-          style={{ transition: "opacity 0.4s ease-in-out" }}
-        />
-      )}
-
-      {/* Minimalist Desk Base */}
-      <ellipse cx="65" cy="145" rx="22" ry="4" fill="#0f172a" />
-      <path d="M 43 145 L 87 145 L 87 147 A 22 4 0 0 1 43 147 Z" fill="#1e293b" />
-
-      {/* Vertical Stand (Sleek dark metal rod) */}
-      <rect x="62.5" y="30" width="5" height="115" rx="1.5" fill="#1e293b" />
-      <rect x="61.5" y="30" width="2" height="115" rx="1" fill="#334155" opacity="0.5" />
-      
-      {/* Articulation Hinge */}
-      <circle cx="65" cy="32" r="7" fill="#334155" />
-      <circle cx="65" cy="32" r="3" fill="#0f172a" />
-
-      {/* Horizontal LED Arm (Overhangs to the left) */}
-      <rect x="15" y="29.5" width="55" height="5" rx="2.5" fill="#0f172a" />
-      <rect x="15" y="29.5" width="55" height="1" fill="#334155" opacity="0.4" />
-      
-      {/* Exposed LED Strip under the arm */}
-      <rect 
-        x="22" y="33.5" width="33" height="1.5" rx="0.5" 
-        fill={isOn ? "#ffffff" : "#334155"} 
-        filter={isOn ? "url(#led-glow)" : "none"} 
-        style={{ transition: "all 0.4s ease-in-out" }}
+      {/* ═══════════ LIGHT BEAM SHINING ONTO THE FORM BELOW ═══════════ */}
+      {/* Outer Soft Wide Light Glow Halo */}
+      <div
+        className="absolute pointer-events-none"
+        style={{
+          top: "85px",
+          left: "50%",
+          transform: "translateX(-50%)",
+          width: "900px",
+          height: "800px",
+          background: isOn 
+            ? "radial-gradient(ellipse at 50% 0%, rgba(254, 240, 138, 0.12) 0%, rgba(253, 224, 71, 0.05) 35%, rgba(253, 224, 71, 0.01) 70%, transparent 100%)" 
+            : "transparent",
+          opacity: isOn ? 0.7 : 0,
+          transition: "opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1)",
+          zIndex: 24,
+          filter: "blur(12px)",
+        }}
       />
 
-      {/* Sleek Modern Pull Cord */}
-      <g clipPath="url(#cord-clip)">
-        {/* The draggable grip and cord */}
-        <motion.g
+      {/* Main Wide Light Cone */}
+      <div
+        className="absolute pointer-events-none"
+        style={{
+          top: "92px",
+          left: "50%",
+          transform: "translateX(-50%)",
+          width: "850px",
+          height: "750px",
+          background: isOn 
+            ? "linear-gradient(180deg, rgba(254, 240, 138, 0.18) 0%, rgba(253, 224, 71, 0.07) 30%, rgba(253, 224, 71, 0.01) 70%, transparent 100%)" 
+            : "transparent",
+          clipPath: "polygon(42% 0, 58% 0, 100% 100%, 0 100%)",
+          opacity: isOn ? 0.65 : 0,
+          transition: "opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1)",
+          animation: isOn ? "beam-flicker 5s infinite" : "none",
+          transformOrigin: "top center",
+          zIndex: 25,
+          filter: "blur(4px)",
+        }}
+      >
+        {/* Inner bright core beam */}
+        <div
+          className="w-full h-full"
+          style={{
+            background: "linear-gradient(180deg, rgba(255, 255, 255, 0.25) 0%, rgba(254, 240, 138, 0.08) 35%, transparent 80%)",
+            clipPath: "polygon(46% 0, 54% 0, 88% 100%, 12% 100%)",
+          }}
+        />
+
+        {/* Ambient dust sparkles in the beam */}
+        {isOn && [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11].map((i) => (
+          <div
+            key={i}
+            className="absolute bg-white rounded-full pointer-events-none"
+            style={{
+              width: (i % 3 + 1.2) + "px",
+              height: (i % 3 + 1.2) + "px",
+              left: 10 + (i * 9) % 80 + "%",
+              top: 5 + (i * 8) % 80 + "%",
+              opacity: 0,
+              boxShadow: "0 0 4px #fff",
+              animation: `float-dust ${3.5 + (i % 3) * 1.5}s linear infinite`,
+              animationDelay: `${i * 0.25}s`
+            }}
+          />
+        ))}
+      </div>
+
+      {/* ═══════════ AMBIENT BACKGROUND GLOW ═══════════ */}
+      <div
+        className="absolute pointer-events-none"
+        style={{
+          top: "100px",
+          left: "50%",
+          transform: "translate(-50%, -50%)",
+          width: 180,
+          height: 180,
+          borderRadius: "50%",
+          background: isOn
+            ? "radial-gradient(circle, rgba(253, 224, 71, 0.2) 0%, rgba(253, 224, 71, 0.03) 50%, transparent 70%)"
+            : "radial-gradient(circle, rgba(253, 224, 71, 0) 0%, transparent 70%)",
+          transition: "all 0.5s ease",
+          animation: isOn ? "ambient-pulse 4s ease-in-out infinite" : "none",
+          zIndex: 0,
+        }}
+      />
+
+      {/* ═══════════ LAMP STRUCTURE ═══════════ */}
+      <div className="relative z-10 flex flex-col items-center pt-1">
+        {/* Wire */}
+        <div 
+          className="w-1.5 bg-gradient-to-r from-gray-800 via-gray-600 to-gray-800 dark:from-black dark:via-gray-700 dark:to-black"
+          style={{ height: "35px" }}
+        />
+        
+        {/* Lamp Fixture Top */}
+        <div className="w-8 h-2.5 bg-gradient-to-r from-gray-700 via-gray-500 to-gray-700 dark:from-gray-800 dark:via-gray-600 dark:to-gray-800 rounded-t-md border-b border-gray-900" />
+        
+        {/* Lampshade (Glossy Metallic/Matte Finish) */}
+        <div 
+          className="relative flex justify-center overflow-hidden"
+          style={{
+            width: "125px",
+            height: "55px",
+            background: "linear-gradient(to right, #1f2937 0%, #374151 20%, #111827 80%, #0f172a 100%)",
+            borderTop: "1px solid rgba(255,255,255,0.2)",
+            borderBottom: isOn ? "2px solid rgba(254, 240, 138, 0.9)" : "2px solid rgba(0,0,0,0.5)",
+            clipPath: "polygon(30% 0, 70% 0, 100% 100%, 0 100%)",
+            boxShadow: isOn ? "inset 0px -15px 30px rgba(253, 224, 71, 0.35)" : "inset 0 -10px 20px rgba(0,0,0,0.5)",
+            transition: "all 0.4s ease",
+          }}
+        >
+          {/* Specular highlight on shade */}
+          <div 
+            className="absolute top-0 h-full opacity-30 pointer-events-none"
+            style={{
+              left: "20%",
+              width: "30%",
+              background: "linear-gradient(90deg, transparent, rgba(255,255,255,0.8), transparent)",
+              transform: "skewX(-20deg)"
+            }}
+          />
+        </div>
+
+        {/* Bulb */}
+        <div 
+          className="absolute"
+          style={{
+            top: "92px",
+            width: "40px",
+            height: "24px",
+            background: isOn ? "#fff" : "#e2e8f0",
+            borderRadius: "0 0 50% 50%",
+            boxShadow: isOn 
+              ? "0 5px 25px #fde047, 0 10px 50px #fef08a, inset 0 -5px 15px #ffffff" 
+              : "inset 0 -3px 8px rgba(0,0,0,0.3)",
+            transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+            border: isOn ? "none" : "1px solid #94a3b8",
+            borderTop: "none",
+            zIndex: -1,
+          }}
+        />
+      </div>
+
+      {/* ═══════════ PULL CHAIN ═══════════ */}
+      <div
+        className="absolute z-20"
+        style={{
+          top: "116px",
+          left: "50%",
+          transform: "translateX(-50%)",
+          width: 40,
+          height: 90,
+        }}
+      >
+        <motion.div
           drag="y"
-          dragConstraints={{ top: 0, bottom: 60 }}
+          dragConstraints={{ top: 0, bottom: 35 }}
           dragElastic={0.4}
           dragSnapToOrigin={true}
-          onDragEnd={(e, info) => {
-            if (info.offset.y > 25 && onToggle) {
+          onDragStart={() => setDragging(true)}
+          onDragEnd={(_e, info) => {
+            setDragging(false);
+            if (info.offset.y > 18 && onToggle) {
               onToggle();
             }
           }}
           style={{ y: pullY }}
-          className="cursor-grab active:cursor-grabbing"
+          className="cursor-grab active:cursor-grabbing flex flex-col items-center"
         >
-          {/* Invisible hit box to make it easy to grab with mouse/touch */}
-          <rect x="15" y="35" width="25" height="80" fill="transparent" />
-
-          {/* VERY long cord that translates down, clipped at the top */}
-          <line 
-            x1="28" y1="-100" 
-            x2="28" y2="85" 
-            stroke="#64748b" 
-            strokeWidth="1" 
+          {/* Chain */}
+          <div
+            style={{
+              width: 3,
+              height: 42,
+              background: isOn ? "linear-gradient(to bottom, rgba(254,240,138,0.8), #9ca3af)" : "#6b7280",
+              backgroundImage: "repeating-linear-gradient(to bottom, transparent, transparent 2px, rgba(0,0,0,0.3) 2px, rgba(0,0,0,0.3) 4px)",
+              transition: "background 0.3s",
+            }}
           />
-
-          {/* Aluminum cylindrical grip */}
-          <rect 
-            x="26.5" y="85" width="3" height="22" rx="1.5" 
-            fill="#94a3b8" 
-          />
-          {/* Grip details (knurling) */}
-          <line x1="26.5" y1="88" x2="29.5" y2="88" stroke="#475569" strokeWidth="0.5" />
-          <line x1="26.5" y1="91" x2="29.5" y2="91" stroke="#475569" strokeWidth="0.5" />
-          <line x1="26.5" y1="94" x2="29.5" y2="94" stroke="#475569" strokeWidth="0.5" />
-          <line x1="26.5" y1="97" x2="29.5" y2="97" stroke="#475569" strokeWidth="0.5" />
-        </motion.g>
-      </g>
-    </svg>
+          {/* Pull knob */}
+          <div
+            className="w-4.5 h-7 rounded-full shadow-lg border border-gray-400 dark:border-gray-600 flex items-end justify-center pb-1"
+            style={{
+              background: "linear-gradient(135deg, #f3f4f6 0%, #9ca3af 100%)",
+              boxShadow: "0 4px 6px rgba(0,0,0,0.3), inset 0 2px 4px rgba(255,255,255,0.5)",
+              transform: dragging ? "scale(1.1)" : "scale(1)",
+              transition: "transform 0.2s",
+            }}
+          >
+            <div className="w-1.5 h-1.5 rounded-full bg-gray-500 shadow-inner" />
+          </div>
+        </motion.div>
+      </div>
+      
+      {/* ═══════════ HELPER TEXT ═══════════ */}
+      <div 
+        className="absolute bottom-1 left-1/2 -translate-x-1/2 text-[10px] font-bold tracking-[0.2em] text-gray-400 dark:text-gray-500 pointer-events-none"
+        style={{ opacity: hovered && !dragging && !isOn ? 1 : 0, transition: "opacity 0.3s" }}
+      >
+        PULL
+      </div>
+    </div>
   );
 }
